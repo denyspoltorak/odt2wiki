@@ -27,6 +27,7 @@ def main():
     group.add_argument("-f", "--list-files", action="store_true", help="list files inside the ODT")
     group.add_argument("-g", "--list-tags", action="store_true", help="list unique tags used in the ODT")
     group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
+    group.add_argument("-x", "--extract-text", action="store", help="extract text from ODT to this file")
     
     args = parser.parse_args()
     
@@ -52,6 +53,9 @@ def main():
             tree = odt_parser.tree_of_tags(parsed_content)
             for (k, v) in tree.items():
                 print_dict_tree(k, v, 0)
+        elif args.extract_text:
+            print(f"extracting text from {args.input_filename + '/' + TEXT_XML_FILE_NAME} to {args.extract_text}")
+            file_access.write_file(odt_parser.extract_text(parsed_content), args.extract_text)
         else:
             assert(False)
     print()

@@ -8,6 +8,13 @@ import odt_parser
 
 
 TEXT_XML_FILE_NAME="content.xml"
+STYLES_XML_FILE_NAME="styles.xml"
+
+
+def print_dict_tree(key, tree, level):
+    print((" " * 4 * level) + key)
+    for (k, v) in sorted(tree.items()):
+        print_dict_tree(k, v, level + 1)
 
 
 def main():
@@ -18,7 +25,8 @@ def main():
     
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--list-files", action="store_true", help="list files inside the ODT")
-    group.add_argument("-t", "--list-tags", action="store_true", help="list tags used in the ODT")
+    group.add_argument("-g", "--list-tags", action="store_true", help="list unique tags used in the ODT")
+    group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
     
     args = parser.parse_args()
     
@@ -29,15 +37,23 @@ def main():
         print("ODT contents:")
         for f in file_access.list_files_in_archive(args.input_filename):
             print(f)
-    # Print tags in content.xml
-    elif args.list_tags:
-        print(f"tags in {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")
-        tags = odt_parser.unique_tags(odt_parser.parse(file_access.read_single_file(args.input_filename, TEXT_XML_FILE_NAME)))
-        max_len = max(len(t) for t in tags)
-        for (t, v) in sorted(tags.items()):
-            print(f"{t + ':':{max_len + 2}}{v}")
-    else:
-        assert(False)
+    else: # Process content.xml in the archive
+        parsed_content = odt_parser.parse(file_access.read_single_file(args.input_filename, TEXT_XML_FILE_NAME))
+        # Print tags from content.xml
+        if args.list_tags:
+            print(f"tags in {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")
+            tags = odt_parser.unique_tags(parsed_content)
+            max_len = max(len(t) for t in tags)
+            for (t, v) in sorted(tags.items()):
+                print(f"{t + ':':{max_len + 2}}{v}")
+        # Print the tree of tags from content.xml
+        elif args.tags_tree:
+            print(f"hierarchy of tags for {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")
+            tree = odt_parser.tree_of_tags(parsed_content)
+            for (k, v) in tree.items():
+                print_dict_tree(k, v, 0)
+        else:
+            assert(False)
     print()
 
 

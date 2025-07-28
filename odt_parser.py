@@ -1,3 +1,5 @@
+"See https://docs.oasis-open.org/office/v1.2/cs01/OpenDocument-v1.2-cs01-part1.html"
+
 import xml.etree.ElementTree
 import abc
 
@@ -12,14 +14,14 @@ def _extract(name):
 # Classes that collect data from traversing an ElementTree
 
 # Parent
-class _Context(abc.ABC):
+class _Visitor(abc.ABC):
     @abc.abstractclassmethod
     def traverse(self, element):
         ...
         
 
 # Collects unique tags and their content from the entire XML treee
-class _UniqueTagsContext(_Context):
+class _UniqueTagsVisitor(_Visitor):
     def __init__(self):
         self._tags = {}
         
@@ -47,6 +49,30 @@ class _UniqueTagsContext(_Context):
         return self._tags
     
 
+# Collects unique tags into a tree of dictionaries
+class _TagsTreeVisitor(_Visitor):
+    def __init__(self):
+        self._tree = {}
+        
+    def traverse(self, root):
+        self._recurse(self._tree, root)
+    
+    def results(self):
+        return self._tree
+
+    @staticmethod
+    def _recurse(dict, element):
+        
+        # Make sure we remeber the current element's tag
+        tag = _extract(element.tag)
+        if tag not in dict:
+            dict[tag] = {}
+        
+        # Visit the current element's children
+        for child in element:
+            _TagsTreeVisitor._recurse(dict[tag], child)
+
+
 # Public interface
 
 def parse(content):
@@ -54,6 +80,12 @@ def parse(content):
 
 
 def unique_tags(root):
-    context = _UniqueTagsContext()
+    context = _UniqueTagsVisitor()
+    context.traverse(root)
+    return context.results()
+
+
+def tree_of_tags(root):
+    context = _TagsTreeVisitor()
     context.traverse(root)
     return context.results()

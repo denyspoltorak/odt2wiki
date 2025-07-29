@@ -1,7 +1,7 @@
 "See https://docs.oasis-open.org/office/v1.2/cs01/OpenDocument-v1.2-cs01-part1.html"
 
 import xml.etree.ElementTree
-import abc
+import collections
 from abc import abstractmethod
 
 
@@ -14,48 +14,29 @@ def _extract(name):
 
 # Classes that collect data from traversing an ElementTree
 
-# Parent
-class _Visitor(abc.ABC):
-    @abc.abstractclassmethod
-    def traverse(self, element):
-        ...
-        
-    @abc.abstractclassmethod
-    def results(self):
-        ...
-
-
 # Collects unique tags and their content from the entire XML treee
-class _UniqueTagsVisitor(_Visitor):
+class _UniqueTagsVisitor:
     def __init__(self):
-        self._tags = {}
+        self._tags = collections.defaultdict(set)
         
     def traverse(self, element):
-        value = None
-        
-        # Found new kind of tag - remember it and an example of the tag's data
+        # Remember the tag and the element's attributes
         tag = _extract(element.tag)
-        if tag not in self._tags:
-            value = "(" + ", ".join(_extract(key) for key in element.attrib.keys()) + ")"
-            if element.text:
-                value += element.text
-        
+        attrs = self._tags[tag]
+        if element.text:
+            attrs.add("+text")
+        for key in element.attrib.keys():
+            attrs.add(_extract(key))
         # Traverse children
         for child in element:
             self.traverse(child)
-            if value and child.tail:
-                value += child.tail
-        
-        # Save the new tag
-        if value:
-            self._tags[tag] = value
     
     def results(self):
         return self._tags
     
 
 # Collects unique tags into a tree of dictionaries
-class _TagsTreeVisitor(_Visitor):
+class _TagsTreeVisitor:
     def __init__(self):
         self._tree = {}
         
@@ -67,23 +48,20 @@ class _TagsTreeVisitor(_Visitor):
 
     @staticmethod
     def _recurse(dic, element):
-        
         # Make sure we remeber the current element's tag
         tag = _extract(element.tag)
         if tag not in dic:
             dic[tag] = {}
-        
         # Visit the current element's children
         for child in element:
             _TagsTreeVisitor._recurse(dic[tag], child)
 
 
 # Parent for text extraction
-class _ContentVisitor(_Visitor):
+class _ContentVisitor:
     def traverse(self, root):
         tag = _extract(root.tag)
         assert(tag == "document-content")
-        
         for child in root:
             child_tag = _extract(child.tag)
             if child_tag == "automatic-styles":
@@ -134,19 +112,6 @@ class _TextVisitor(_ContentVisitor):
             else:
                 self._unhandled.add(tag)
 
-    
-    """def _dispatch_text_child(self, child):
-        tag = _extract(child.tag)
-        match tag:
-            case "p" | "h":
-                self.on_p(child)
-            case "list":
-                self.on_list(child)
-            case "table":
-                self.on_table(child)
-            case _:
-                self._unhandled.add(tag)"""
-    
     def results(self):
         print("Unhandles tags: " + ", ".join(sorted(self._unhandled)))
         return "\n".join(self._paragraphs)

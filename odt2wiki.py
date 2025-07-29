@@ -25,7 +25,7 @@ def main():
     
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--list-files", action="store_true", help="list files inside the ODT")
-    group.add_argument("-g", "--list-tags", action="store_true", help="list unique tags used in the ODT")
+    group.add_argument("-a", "--list-attrs", action="store_true", help="list attributes for each tag")
     group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
     group.add_argument("-x", "--extract-text", action="store", help="extract text from ODT to this file")
     
@@ -41,12 +41,12 @@ def main():
     else: # Process content.xml in the archive
         parsed_content = odt_parser.parse(file_access.read_single_file(args.input_filename, TEXT_XML_FILE_NAME))
         # Print tags from content.xml
-        if args.list_tags:
-            print(f"tags in {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")
+        if args.list_attrs:
+            print(f"attributes for each tag in {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")
             tags = odt_parser.unique_tags(parsed_content)
             max_len = max(len(t) for t in tags)
             for (t, v) in sorted(tags.items()):
-                print(f"{t + ':':{max_len + 2}}{v}")
+                print(f"{t + ':':{max_len + 2}}{', '.join(v)}")
         # Print the tree of tags from content.xml
         elif args.tags_tree:
             print(f"hierarchy of tags for {args.input_filename + '/' + TEXT_XML_FILE_NAME}:")

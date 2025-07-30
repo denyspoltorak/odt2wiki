@@ -2,9 +2,7 @@
 
 import xml.etree.ElementTree
 from collections import defaultdict
-from dataclasses import dataclass
-from typing import Optional
-from matplotlib import style
+import tree_repr
 
 
 
@@ -182,12 +180,12 @@ class _TextVisitor(_ContentVisitor):
         
 
 # Data classes
-@dataclass(repr=False, eq=False, kw_only=True)
 class _Style:
-    bold:           Optional[bool] = None
-    italic:         Optional[bool] = None
-    underline:      Optional[bool] = None
-    strikethrough:  Optional[bool] = None
+    def __init__(self, bold=None, italic=None, underline=None, strikethrough=None):
+        self.bold = bold
+        self.italic = italic
+        self.underline = underline
+        self.strikethrough = strikethrough
     
     def __ior__(self, other):
         if self.bold is None:
@@ -197,13 +195,17 @@ class _Style:
         if self.underline is None:
             self.underline = other.underline
         if self.strikethrough is None:
-            self.strikethrough = other.strikethrough  
+            self.strikethrough = other.strikethrough
+        return self
+    
+    def normalize(self):
+        return tree_repr.Style(self.bold, self.italic, self.underline, self.strikethrough)
         
 
-@dataclass(repr=False, eq=False)
 class _Span:
-    text:   str
-    style:  _Style
+    def __init__(self, text, style):
+        self.text = text
+        self.style = style
         
         
 class _Paragraph:
@@ -212,16 +214,9 @@ class _Paragraph:
         self.outline_level = 0        
     
     
-# Full-featured extraction classes
-class _ParagraphVisitor:
-    def __init__(self):
-        self.unhandled_tags = set()
-        self.unhandled_attrs = {}
-
-
+# Full-featured extraction class
 class _FullVisitor(_ContentVisitor):
     def __init__(self):
-        self._paragraph_visitor = _ParagraphVisitor()
         self._paragraphs = []
         self._styles = {}
         self._unhandled_tags = set()
@@ -229,7 +224,17 @@ class _FullVisitor(_ContentVisitor):
         
     def to_tree(self):
         self._print_warnings()
-        pass
+        # Export to an intermediary representation
+        document = tree_repr.Document()
+        for p in self._paragraphs:
+            spans = []
+            for s in p.spans:
+                spans.append(tree_repr.Span(s.text, s.style.normalize()))
+            if p.outline_level:
+                document.add_header(spans, p.outline_level)
+            else:
+                document.add_paragraph(spans)
+        return document
     
     def _print_warnings(self):
         print()

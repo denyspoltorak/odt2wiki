@@ -29,7 +29,7 @@ def main():
     group.add_argument("-a", "--list-attrs", action="store_true", help="list attributes for each tag")
     group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
     group.add_argument("-x", "--extract-text", action="store", help="extract text from ODT to this file")
-    group.add_argument("-m", "--to-markdown", action="store", help="convert to markdown in this directory")
+    group.add_argument("-g", "--to-github-md", action="store", help="convert to GitHub markdown in the given dir")
     
     args = parser.parse_args()
     
@@ -58,10 +58,10 @@ def main():
         elif args.extract_text:
             print(f"extracting text from {args.input_filename + '/' + TEXT_XML_FILE_NAME} to {args.extract_text}")
             file_access.write_file(odt_parser.extract_text(parsed_content), args.extract_text)
-        elif args.to_markdown:
-            print(f"converting from (ODT) {args.input_filename + '/' + TEXT_XML_FILE_NAME} to (md) {args.to_markdown}")
+        elif args.to_github_md:
+            print(f"converting from (ODT) {args.input_filename + '/' + TEXT_XML_FILE_NAME} to (md) {args.to_github_md}")
             tree = odt_parser.extract_tree_repr(parsed_content)
-            md_writer.write_markdown(tree, args.to_markdown)
+            md_writer.write_markdown(tree, args.to_github_md)
         else:
             assert(False)
     print()

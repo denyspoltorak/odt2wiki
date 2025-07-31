@@ -1,10 +1,9 @@
 "Markdown writers"
 
-import file_access
 import tree_repr
 
 
-class _GitHubMdWriter:
+class GitHubMdWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
     def __init__(self):
@@ -77,13 +76,7 @@ class _GitHubMdWriter:
     def _escape(text):
         output = []
         for l in text:
-            if l in "\\`*_~{}[]<>#+-.!|":
+            if l in "\\`*_~(){}[]<>#+-.!|":
                 output.append("\\")
             output.append(l)
         return "".join(output)
-
-
-def write_markdown(tree, output_name):
-    writer = _GitHubMdWriter()
-    tree.dump(writer)
-    file_access.write_file(writer.get_output(), output_name)

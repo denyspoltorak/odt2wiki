@@ -1,6 +1,6 @@
 "Markdown writers"
 
-import tree_repr
+import document
 
 
 class GitHubMdWriter:
@@ -9,24 +9,62 @@ class GitHubMdWriter:
     def __init__(self):
         self._output = []
     
-    def get_output(self):
+    def get_output(self) -> str:
         return "".join(self._output)
     
-    # Methods to add elements to the markdown
-    def add_paragraph(self, spans):
-        self._add_spans(spans)
+    def add(self, content: document.Content) -> None:
+        match content:
+            case document.Header():
+                self._add_header(content)
+            case document.Paragraph():
+                self._add_paragraph(content)
+            case document.List():
+                self._add_list(content)
+            case _:
+                assert(False)
         self._output.append(self.PARAGRAPH_SEPARATOR)
     
-    def add_header(self, spans, outline_level):
-        assert(outline_level)
-        self._output.append("#" * outline_level + " ")
-        self.add_paragraph(spans)
+    # Methods to add document parts
+    def _add_header(self, header):
+        assert(header.outline_level)
+        self._output.append("#" * header.outline_level + " ")
+        self._add_paragraph(header)
         
+    def _add_paragraph(self, paragraph):
+        self._add_spans(paragraph.spans)
+        
+    def _add_list(self, l, offset = 0):
+        prefix = " " * offset
+        index = 1
+        # Differentiate between bulleted and numbered lists
+        match l.kind:
+            case document.ListStyle.BULLET:
+                method = self._make_list_bullet
+                offset += 2
+            case document.ListStyle.NUMBER:
+                method = self._make_list_number
+                offset += 4
+            case _:
+                assert(False)
+        # Process the list items
+        for i in l.items:
+            match i:
+                case document.Paragraph():
+                    self._output.append(prefix + method(index))
+                    self._add_paragraph(i)
+                    self._output.append("\n")
+                case document.List():
+                    self._add_list(i, offset)
+                case _:
+                    assert(False)
+            index += 1
+    
+    # Low-level methods
     def _add_spans(self, spans):
         output = []
         move_spaces = 0
         # Current style
-        style = tree_repr.Style()
+        style = document.Style()
         # Process the spans
         for s in spans:
             # Don't allow for spaces between markup tags and the text
@@ -40,7 +78,7 @@ class GitHubMdWriter:
             assert(fully_stripped_text)
             move_spaces = len(left_stripped_text) - len(fully_stripped_text)
             output.append(self._escape(fully_stripped_text))
-        output.append(self._change_style(style, tree_repr.Style(), move_spaces))
+        output.append(self._change_style(style, document.Style(), move_spaces))
         # Merge
         result = "".join(output)
         assert(result)
@@ -80,3 +118,13 @@ class GitHubMdWriter:
                 output.append("\\")
             output.append(l)
         return "".join(output)
+    
+    @staticmethod
+    def _make_list_bullet(index):
+        return "- "
+    
+    @staticmethod
+    def _make_list_number(index):
+        assert(index < 100)
+        return f"{str(index)+'.':<4}"
+        

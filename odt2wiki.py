@@ -48,10 +48,11 @@ def extract_text(content, destination):
     with open(expanduser(destination), "x") as output:
         output.write(visitor.results())
         
-def convert_to_markdown(content, destination):
+def convert_to_markdown(content, styles, destination):
     visitor = odt_parser.FullVisitor()
+    visitor.preload_styles(styles)
     visitor.traverse(content)
-    tree = visitor.to_tree()
+    tree = visitor.to_document()
     writer = md_writer.GitHubMdWriter()
     tree.dump(writer)
     with open(expanduser(destination), "x") as output:
@@ -103,7 +104,7 @@ def main():
                     tags_tree(parsed_content)
                 elif args.to_github_md:
                     print(f"Converting to GitHub markdown in {args.to_github_md}")
-                    convert_to_markdown(parsed_content, args.to_github_md)
+                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md)
                 else:
                     assert(False)
     print()

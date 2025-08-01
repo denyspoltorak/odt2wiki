@@ -1,21 +1,10 @@
 "See https://docs.oasis-open.org/office/v1.2/cs01/OpenDocument-v1.2-cs01-part1.html"
 
 from collections import defaultdict
+from xml.etree.ElementTree import Element
 
 from odt_tools import extract, ContentVisitor
-import tree_repr
-
-
-
-# Utils
-
-
-
-
-# Classes that collect data from traversing an ElementTree
-
-
-        
+import document
 
 # Data classes
 class _Style:
@@ -37,24 +26,13 @@ class _Style:
         return self
     
     def normalize(self):
-        return tree_repr.Style(self.bold, self.italic, self.underline, self.strikethrough)
+        return document.Style(self.bold, self.italic, self.underline, self.strikethrough)
         
 
 class _Span:
     def __init__(self, text, style):
         self.text = text
         self.style = style
-        
-        
-class _Paragraph:
-    def __init__(self):
-        self.spans = []
-
-
-class _Header(_Paragraph):
-    def __init__(self):
-        super(_Header, self).__init__()
-        self.outline_level = 0
 
 
 # Full-featured extraction class
@@ -62,36 +40,33 @@ class FullVisitor(ContentVisitor):
     def __init__(self):
         self._content = []
         self._styles = {}
+        self._list_styles = {}
         self._unhandled_tags = set()
         self._unhandled_attrs = defaultdict(set)
         
-    def to_tree(self):
+    def preload_styles(self, root: Element) -> None:
+        tag = extract(root.tag)
+        assert(tag == "document-styles")
+        for child in root:
+            child_tag = extract(child.tag)
+            if child_tag == "styles":
+                for grandchild in child:
+                    grandchild_tag = extract(grandchild.tag)
+                    if grandchild_tag == "list-style":
+                        (name, kind) = self._process_list_style(grandchild)
+                        assert(not name in self._list_styles)
+                        self._list_styles[name] = kind
+        
+    def to_document(self) -> document.Document:
         self._print_warnings()
         # Export to an intermediary representation
-        document = tree_repr.Document()
+        doc = document.Document()
         for elem in self._content:
-            spans = []
-            for s in elem.spans:
-                spans.append(tree_repr.Span(s.text, s.style.normalize()))
-            if isinstance(elem, _Header):
-                document.add_header(spans, elem.outline_level)
-            elif isinstance(elem, _Paragraph):
-                document.add_paragraph(spans)
-            else:
-                assert(False)      
-        return document
-    
-    def _print_warnings(self):
-        print()
-        print("Unhandled tags: " + ", ".join(sorted(self._unhandled_tags)))
-        print()
-        print("Unhandled attrs:")
-        for (k, v) in sorted(self._unhandled_attrs.items()):
-            print("\t" + k + ":\t" + ", ".join(sorted(v)))
-        print()
+            doc.add(elem)
+        return doc
     
     # _Style extraction
-    def traverse_styles(self, styles):
+    def traverse_styles(self, styles: Element) -> None:
         assert(not styles.attrib)
         for child in styles:
             child_tag = extract(child.tag)
@@ -103,19 +78,23 @@ class FullVisitor(ContentVisitor):
                 self._styles[name] = data
     
     # Information retrieval
-    def traverse_text(self, text):
+    def traverse_text(self, text: Element) -> None:
         for child in text:
             child_tag = extract(child.tag)
             match child_tag:
                 case "h":
-                    self._process_h(child)
+                    self._content.append(self._process_h(child))
                 case "p":
-                    self._process_p(child)
+                    content = self._process_p(child)
+                    if content:
+                        self._content.append(content)
+                case "list":
+                    self._content.append(self._process_list(child))
                 case _:
                     self._unhandled_tags.add(child_tag)
 
     def _process_h(self, header):
-        output = _Header()
+        output = document.Header()
         style = None
         # Parse attributes
         for (k, v) in header.attrib.items():
@@ -146,10 +125,11 @@ class FullVisitor(ContentVisitor):
                 output.spans.append(_Span(child.tail, style))
         # Commit
         assert(output.spans)
-        self._content.append(output)
+        output.spans = self._convert_spans(output.spans)
+        return output
 
     def _process_p(self, paragraph):
-        output = _Paragraph()
+        output = document.Paragraph()
         style = None
         # Parse style
         for (k, v) in paragraph.attrib.items():
@@ -180,8 +160,30 @@ class FullVisitor(ContentVisitor):
             if child.tail:
                 output.spans.append(_Span(child.tail, style))
         # Commit
-        if output.spans:
-            self._content.append(output)
+        output.spans = self._convert_spans(output.spans)
+        return output if output.spans else None
+            
+    def _process_list(self, l, kind = None):
+        output = document.List()
+        # Parse style
+        for (k, v) in l.attrib.items():
+            if(extract(k) == "style-name"):
+                assert(not output.kind)
+                output.kind = self._list_styles.get(v)
+        if not output.kind:
+            output.kind = kind
+        assert(output.kind)
+        # Parse items
+        assert(not l.text)
+        for child in l:
+            assert(extract(child.tag) == "list-item")
+            item = self._process_list_item(child, output.kind)
+            if item:
+                output.items.extend(item)
+            assert(not child.tail)
+        # Commit
+        assert(output.items)
+        return output
 
     # Low-level methods
     def _process_style(self, style):
@@ -207,6 +209,33 @@ class FullVisitor(ContentVisitor):
                 case _:
                     self._unhandled_tags.add(child_tag)
         return name, output
+    
+    def _process_list_style(self, list_style):
+        name = None
+        kind = None
+        # Extract style name
+        for (k, v) in list_style.attrib.items():
+            assert(extract(k) == "name")
+            assert(not name)
+            name = v
+        assert(name)
+        # Extract list kind
+        for child in list_style:
+            for (k, v) in child.attrib.items():
+                if extract(k) == "level" and int(v) == 1:
+                    match extract(child.tag):
+                        case "list-level-style-bullet":
+                            new_kind = document.ListStyle.BULLET
+                        case "list-level-style-number":
+                            new_kind = document.ListStyle.NUMBER
+                        case _:
+                            assert(False)
+                    if kind:
+                        assert(kind == new_kind)
+                    else:
+                        kind = new_kind
+        assert(kind)
+        return name, kind
             
     def _process_text_properties(self, props):               
         output = _Style()
@@ -253,3 +282,37 @@ class FullVisitor(ContentVisitor):
             count = int(v)
             assert(count)
         return " " * count
+    
+    def _process_list_item(self, li, kind):
+        output = []
+        assert(not li.attrib)
+        assert(not li.text)
+        for child in li:
+            match extract(child.tag):
+                case "p":
+                    result = self._process_p(child)
+                    if result:
+                        output.append(result)
+                case "list":
+                    output.append(self._process_list(child, kind))
+        return output
+            
+    def _print_warnings(self):
+        print()
+        print("Unhandled tags: " + ", ".join(sorted(self._unhandled_tags)))
+        print()
+        print("Unhandled attrs:")
+        for (k, v) in sorted(self._unhandled_attrs.items()):
+            print("\t" + k + ":\t" + ", ".join(sorted(v)))
+        print()
+        
+    @staticmethod
+    def _convert_spans(spans):
+        output = []
+        for s in spans:
+            converted_style = s.style.normalize()
+            if len(output) and output[-1].style == converted_style:
+                output[-1].text += s.text
+            else:
+                output.append(document.Span(s.text, converted_style))
+        return output

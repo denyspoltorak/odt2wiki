@@ -90,7 +90,7 @@ class TextVisitor(ContentVisitor):
         # Dispatch tables
         self._text_child_handlers = {
             "p": self._on_p,
-            "h": self._on_p,
+            "h": self._on_h,
             "list": self._on_list,
             "table": self._on_table
         }
@@ -100,6 +100,10 @@ class TextVisitor(ContentVisitor):
             "frame": self._on_frame,
             "s": self._on_s,
             "tab": self._on_tab
+        }
+        self._list_item_handlers = {
+            "p": self._on_p,
+            "list": self._on_list,
         }
         
     def traverse_text(self, text):
@@ -116,6 +120,9 @@ class TextVisitor(ContentVisitor):
         return "\n".join(self._content)
     
     # Top-level elements
+    def _on_h(self, h):
+        return "\n" + self._on_p(h)
+    
     def _on_p(self, p):
         paragraph = []
         # Add the prefix text
@@ -129,7 +136,7 @@ class TextVisitor(ContentVisitor):
                 handler(paragraph, child)
             else:
                 self._unhandled.add(tag)
-            # Add any text found text between this and the following element
+            # Add any text found between this and the following element
             if child.tail:
                 paragraph.append(child.tail)
         # Merge the paragraph into a string
@@ -139,7 +146,19 @@ class TextVisitor(ContentVisitor):
         return "TABLE"
         
     def _on_list(self, l):
-        return "LIST"
+        output = []
+        assert(not l.text)
+        for child in l:
+            tag = extract(child.tag)
+            assert(tag == "list-item")
+            for grandchild in child:
+                grandtag = extract(grandchild.tag)
+                handler = self._list_item_handlers.get(grandtag)
+                assert(handler)
+                output.append(handler(grandchild))
+                assert(not grandchild.tail)
+            assert(not child.tail)
+        return "\n".join(output)
         
     # Low-level elements
     @staticmethod

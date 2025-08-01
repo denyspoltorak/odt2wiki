@@ -31,9 +31,9 @@ class GitHubMdWriter:
         for s in spans:
             # Don't allow for spaces between markup tags and the text
             left_stripped_text = s.text.lstrip()
+            move_spaces += len(s.text) - len(left_stripped_text)
             if not left_stripped_text:
                 continue
-            move_spaces += len(s.text) - len(left_stripped_text)
             output.append(self._change_style(style, s.style, move_spaces))
             style = s.style
             fully_stripped_text = left_stripped_text.rstrip()

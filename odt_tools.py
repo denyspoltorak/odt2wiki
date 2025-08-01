@@ -143,7 +143,30 @@ class TextVisitor(ContentVisitor):
         return "".join(paragraph)
     
     def _on_table(self, table):
-        return "TABLE"
+        rows = []
+        # Extract cells
+        assert(not table.text)
+        for child in table:
+            match extract(child.tag):
+                case "table-header-rows":
+                    assert(not child.text)
+                    for r in child:
+                        assert(extract(r.tag) == "table-row")
+                        rows.append(self._on_table_row(r))
+                case "table-row":
+                    rows.append(self._on_table_row(child))
+        assert(len(rows) > 1)
+        for i in range(len(rows) - 1):
+            assert(len(rows[i]) == len(rows[i + 1]))
+        # Output transposed
+        output = ["",]
+        for c in range(len(rows[0])):
+            for r in range(len(rows)):
+                text = rows[r][c]
+                if text:
+                    output.append(text)
+            output.append("")
+        return "\n".join(output)
         
     def _on_list(self, l):
         output = []
@@ -161,6 +184,16 @@ class TextVisitor(ContentVisitor):
         return "\n".join(output)
         
     # Low-level elements
+    def _on_table_row(self, row):
+        assert(not row.text)
+        output = []
+        for cell in row:
+            assert(extract(cell.tag) == "table-cell")
+            assert(len(cell) == 1)
+            assert(extract(cell[0].tag) == "p")
+            output.append(self._on_p(cell[0]))
+        return output
+    
     @staticmethod
     def _on_a(paragraph, a):
         if a.text:
@@ -193,3 +226,4 @@ class TextVisitor(ContentVisitor):
     @staticmethod
     def _on_frame(paragraph, frame):
         paragraph.append(" IMAGE ")
+        

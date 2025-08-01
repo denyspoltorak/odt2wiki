@@ -90,6 +90,8 @@ class FullVisitor(ContentVisitor):
                         self._content.append(content)
                 case "list":
                     self._content.append(self._process_list(child))
+                case "table":
+                    self._content.append(self._process_table(child))
                 case _:
                     self._unhandled_tags.add(child_tag)
 
@@ -183,6 +185,28 @@ class FullVisitor(ContentVisitor):
             assert(not child.tail)
         # Commit
         assert(output.items)
+        return output
+    
+    def _process_table(self, table):
+        output = document.Table()
+        # Extract cells
+        assert(not table.text)
+        for child in table:
+            match extract(child.tag):
+                case "table-header-rows":
+                    assert(not child.text)
+                    for r in child:
+                        assert(extract(r.tag) == "table-row")
+                        output.rows.append(self._process_table_row(r))
+                        assert(not r.tail)
+                case "table-row":
+                    output.rows.append(self._process_table_row(child))
+            assert(not child.tail)
+        # Validate and return
+        assert(len(output.rows))
+        output.num_columns = len(output.rows[0])
+        for i in range(1, len(output.rows)):
+            assert(len(output.rows[i]) == output.num_columns)
         return output
 
     # Low-level methods
@@ -295,6 +319,16 @@ class FullVisitor(ContentVisitor):
                         output.append(result)
                 case "list":
                     output.append(self._process_list(child, kind))
+        return output
+    
+    def _process_table_row(self, row):
+        assert(not row.text)
+        output = []
+        for cell in row:
+            assert(extract(cell.tag) == "table-cell")
+            assert(len(cell) == 1)
+            assert(extract(cell[0].tag) == "p")
+            output.append(self._process_p(cell[0]))
         return output
             
     def _print_warnings(self):

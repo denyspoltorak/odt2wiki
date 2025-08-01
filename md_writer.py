@@ -3,6 +3,92 @@
 import document
 
 
+def _escape(text):
+    output = []
+    for l in text:
+        if l in "\\`*_~(){}[]<>#+-.!|":
+            output.append("\\")
+        output.append(l)
+    return "".join(output)
+
+
+def _make_list_bullet(index):
+    return "- "
+
+
+def _make_list_number(index):
+    assert(index < 100)
+    return f"{str(index)+'.':<4}"
+
+
+def _make_table_row(row):
+    output = ["|",]
+    for cell in row:
+        output.append(_add_spans(cell.spans) if cell else "")
+        output.append("|")
+    return " ".join(output) + "\n"
+    
+
+def _make_table_separator(num_columns):
+    output = ["|",]
+    for _ in range(num_columns):
+        output.append("---")
+        output.append("|")
+    return " ".join(output) + "\n"
+        
+
+def _change_style(old, new, add_spaces):
+    output = []
+    # Close the old style
+    if old.underline and not new.underline:
+        output.append("</ins>")
+    if old.bold and not new.bold:
+        output.append("**")
+    if old.italic and not new.italic:
+        output.append("_")
+    if old.strikethrough and not new.strikethrough:
+        output.append("~")
+    # Insert whitespaces which we move from inside the tags
+    output.append(" " * add_spaces)
+    # Open the new style
+    if new.strikethrough and not old.strikethrough:
+        output.append("~")
+    if new.italic and not old.italic:
+        output.append("_")
+    if new.bold and not old.bold:
+        output.append("**")
+    if new.underline and not old.underline:
+        output.append("<ins>")
+    # Merge
+    return "".join(output)
+
+
+def _add_spans(spans):
+    output = []
+    move_spaces = 0
+    # Current style
+    style = document.Style()
+    # Process the spans
+    for s in spans:
+        # Don't allow for spaces between markup tags and the text
+        left_stripped_text = s.text.lstrip()
+        move_spaces += len(s.text) - len(left_stripped_text)
+        if not left_stripped_text:
+            continue
+        output.append(_change_style(style, s.style, move_spaces))
+        style = s.style
+        fully_stripped_text = left_stripped_text.rstrip()
+        assert(fully_stripped_text)
+        move_spaces = len(left_stripped_text) - len(fully_stripped_text)
+        output.append(_escape(fully_stripped_text))
+    output.append(_change_style(style, document.Style(), move_spaces))
+    # Merge
+    result = "".join(output)
+    assert(result)
+    return result
+
+
+
 class GitHubMdWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
@@ -20,6 +106,8 @@ class GitHubMdWriter:
                 self._add_paragraph(content)
             case document.List():
                 self._add_list(content)
+            case document.Table():
+                self._add_table(content)
             case _:
                 assert(False)
         self._output.append(self.PARAGRAPH_SEPARATOR)
@@ -31,7 +119,7 @@ class GitHubMdWriter:
         self._add_paragraph(header)
         
     def _add_paragraph(self, paragraph):
-        self._add_spans(paragraph.spans)
+        self._output.append(_add_spans(paragraph.spans))
         
     def _add_list(self, l, offset = 0):
         prefix = " " * offset
@@ -39,10 +127,10 @@ class GitHubMdWriter:
         # Differentiate between bulleted and numbered lists
         match l.kind:
             case document.ListStyle.BULLET:
-                method = self._make_list_bullet
+                method = _make_list_bullet
                 offset += 2
             case document.ListStyle.NUMBER:
-                method = self._make_list_number
+                method = _make_list_number
                 offset += 4
             case _:
                 assert(False)
@@ -59,72 +147,14 @@ class GitHubMdWriter:
                     assert(False)
             index += 1
     
-    # Low-level methods
-    def _add_spans(self, spans):
-        output = []
-        move_spaces = 0
-        # Current style
-        style = document.Style()
-        # Process the spans
-        for s in spans:
-            # Don't allow for spaces between markup tags and the text
-            left_stripped_text = s.text.lstrip()
-            move_spaces += len(s.text) - len(left_stripped_text)
-            if not left_stripped_text:
-                continue
-            output.append(self._change_style(style, s.style, move_spaces))
-            style = s.style
-            fully_stripped_text = left_stripped_text.rstrip()
-            assert(fully_stripped_text)
-            move_spaces = len(left_stripped_text) - len(fully_stripped_text)
-            output.append(self._escape(fully_stripped_text))
-        output.append(self._change_style(style, document.Style(), move_spaces))
-        # Merge
-        result = "".join(output)
-        assert(result)
-        self._output.append(result)
-            
-    @staticmethod
-    def _change_style(old, new, add_spaces):
-        output = []
-        # Close the old style
-        if old.underline and not new.underline:
-            output.append("</ins>")
-        if old.bold and not new.bold:
-            output.append("**")
-        if old.italic and not new.italic:
-            output.append("_")
-        if old.strikethrough and not new.strikethrough:
-            output.append("~")
-        # Insert whitespaces which we move from inside the tags
-        output.append(" " * add_spaces)
-        # Open the new style
-        if new.strikethrough and not old.strikethrough:
-            output.append("~")
-        if new.italic and not old.italic:
-            output.append("_")
-        if new.bold and not old.bold:
-            output.append("**")
-        if new.underline and not old.underline:
-            output.append("<ins>")
-        # Merge
-        return "".join(output)
-    
-    @staticmethod
-    def _escape(text):
-        output = []
-        for l in text:
-            if l in "\\`*_~(){}[]<>#+-.!|":
-                output.append("\\")
-            output.append(l)
-        return "".join(output)
-    
-    @staticmethod
-    def _make_list_bullet(index):
-        return "- "
-    
-    @staticmethod
-    def _make_list_number(index):
-        assert(index < 100)
-        return f"{str(index)+'.':<4}"
-        
+    def _add_table(self, table):
+        # Add table header
+        assert(len(table.rows))
+        assert(len(table.rows[0]) == table.num_columns)
+        self._output.append(_make_table_row(table.rows[0]))
+        if len(table.rows) > 1:
+            self._output.append(_make_table_separator(table.num_columns))
+        # Add the content
+        for r in range(1, len(table.rows)):
+            assert(len(table.rows[r]) == table.num_columns)
+            self._output.append(_make_table_row(table.rows[r]))

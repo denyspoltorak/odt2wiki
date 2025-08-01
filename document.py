@@ -43,6 +43,12 @@ class List(Content):
     def __init__(self):
         self.kind = None
         self.items = []
+        
+
+class Table(Content):
+    def __init__(self):
+        self.num_columns = 0
+        self.rows = []
 
 
 class _Section:

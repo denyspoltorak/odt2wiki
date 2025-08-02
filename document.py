@@ -31,6 +31,7 @@ class Content:
 class Paragraph(Content):
     def __init__(self):
         self.spans = []
+        self.grayed_out = False
 
   
 class Header(Paragraph):

@@ -8,11 +8,12 @@ import document
 
 # Data classes
 class _Style:
-    def __init__(self, bold=None, italic=None, underline=None, strikethrough=None):
-        self.bold = bold
-        self.italic = italic
-        self.underline = underline
-        self.strikethrough = strikethrough
+    def __init__(self):
+        self.bold = None
+        self.italic = None
+        self.underline = None
+        self.strikethrough = None
+        self.colored_background = None
     
     def __ior__(self, other):
         if self.bold is None:
@@ -23,6 +24,8 @@ class _Style:
             self.underline = other.underline
         if self.strikethrough is None:
             self.strikethrough = other.strikethrough
+        if self.colored_background is None:
+            self.colored_background = other.colored_background
         return self
     
     def normalize(self):
@@ -139,6 +142,7 @@ class FullVisitor(ContentVisitor):
             assert(not style)
             style = self._styles.get(v, _Style())
         assert(style)
+        output.grayed_out = style.colored_background
         # Parse text
         if paragraph.text:
             output.spans.append(_Span(paragraph.text, style))
@@ -148,10 +152,12 @@ class FullVisitor(ContentVisitor):
                 case "a":
                     span = self._process_a(child)
                     span.style |= style
+                    output.grayed_out = output.grayed_out or span.style.colored_background
                     output.spans.append(span)
                 case "span":
                     span = self._process_span(child)
                     span.style |= style
+                    output.grayed_out = output.grayed_out or span.style.colored_background
                     output.spans.append(span)
                 case "tab":
                     output.spans.append(_Span("\t", style))
@@ -278,6 +284,9 @@ class FullVisitor(ContentVisitor):
                 case "text-line-through-style":
                     assert(output.strikethrough is None)
                     output.strikethrough = (v == "solid")
+                case "background-color":
+                    assert(output.colored_background is None)
+                    output.colored_background = (v != "#ffffff")
                 case _:
                     self._unhandled_attrs["text-properties"].add(attr_name)
         return output

@@ -134,6 +134,8 @@ class GitHubMdWriter:
             self._output.append("</summary>")
         
     def _add_paragraph(self, paragraph):
+        if paragraph.grayed_out:
+            self._output.append("> ")
         self._output.append(_add_spans(paragraph.spans))
         
     def _add_list(self, l, offset = 0):

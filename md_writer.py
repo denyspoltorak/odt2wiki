@@ -92,10 +92,15 @@ def _add_spans(spans):
 class GitHubMdWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
-    def __init__(self):
+    def __init__(self, collapse_level):
         self._output = []
+        self._collapse_level = collapse_level
+        self._collapsing = False
     
     def get_output(self) -> str:
+        if self._collapsing:
+            self._output.append("</details>\n")
+            self._collapsing = False
         return "".join(self._output)
     
     def add(self, content: document.Content) -> None:
@@ -115,8 +120,18 @@ class GitHubMdWriter:
     # Methods to add document parts
     def _add_header(self, header):
         assert(header.outline_level)
+        # Close the previous section
+        if self._collapsing and header.outline_level <= self._collapse_level:
+            self._output.append("</details>\n")
+            self._collapsing = False
+        # Write the new section
+        if header.outline_level == self._collapse_level:
+            self._output.append("<details>\n<summary>")
+            self._collapsing = True
         self._output.append("#" * header.outline_level + " ")
         self._add_paragraph(header)
+        if self._collapsing:
+            self._output.append("</summary>")
         
     def _add_paragraph(self, paragraph):
         self._output.append(_add_spans(paragraph.spans))

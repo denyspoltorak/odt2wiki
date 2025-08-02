@@ -48,12 +48,12 @@ def extract_text(content, destination):
     with open(expanduser(destination), "x") as output:
         output.write(visitor.results())
         
-def convert_to_markdown(content, styles, destination):
+def convert_to_markdown(content, styles, destination, collapse_level):
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
     tree = visitor.to_document()
-    writer = md_writer.GitHubMdWriter()
+    writer = md_writer.GitHubMdWriter(collapse_level)
     tree.dump(writer)
     with open(expanduser(destination), "x") as output:
         output.write(writer.get_output())
@@ -70,6 +70,8 @@ def main():
     group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
     group.add_argument("-x", "--extract-text", action="store", help="extract text from ODT to this file")
     group.add_argument("-g", "--to-github-md", action="store", help="convert to GitHub markdown in the given dir")
+    
+    parser.add_argument("-c", "--collapse-level", action="store", type=int, default=0, help="collapse sections of this outline level")
     
     args = parser.parse_args()
     
@@ -104,7 +106,7 @@ def main():
                     tags_tree(parsed_content)
                 elif args.to_github_md:
                     print(f"Converting to GitHub markdown in {args.to_github_md}")
-                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md)
+                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md, args.collapse_level)
                 else:
                     assert(False)
     print()

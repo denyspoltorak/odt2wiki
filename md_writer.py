@@ -166,12 +166,10 @@ class GitHubMdWriter:
     
     def _add_table(self, table):
         # Add table header
-        assert(len(table.rows))
-        assert(len(table.rows[0]) == table.num_columns)
+        assert(table.is_valid())
         self._output.append(_make_table_row(table.rows[0]))
         if len(table.rows) > 1:
             self._output.append(_make_table_separator(table.num_columns))
         # Add the content
         for r in range(1, len(table.rows)):
-            assert(len(table.rows[r]) == table.num_columns)
             self._output.append(_make_table_row(table.rows[r]))

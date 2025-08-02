@@ -12,31 +12,6 @@ def parse(content):
     return xml.etree.ElementTree.fromstring(content)
 
 
-# Parent for text extraction
-class ContentVisitor:
-    def traverse(self, root):
-        tag = extract(root.tag)
-        assert(tag == "document-content")
-        for child in root:
-            child_tag = extract(child.tag)
-            if child_tag == "automatic-styles":
-                self.traverse_styles(child)
-            elif child_tag == "body":
-                self.traverse_body(child)
-        
-    def traverse_styles(self, styles):
-        pass
-    
-    def traverse_body(self, body):
-        assert(len(body) == 1)
-        text = body[0]
-        assert(extract(text.tag) == "text")
-        self.traverse_text(text)
-        
-    def traverse_text(self, text):
-        ...
-
-
 # Collects unique tags and their content from the entire XML treee
 class UniqueTagsVisitor:
     def __init__(self):
@@ -83,7 +58,7 @@ class TagsTreeVisitor:
 
 
 # Plain text extraction
-class TextVisitor(ContentVisitor):
+class TextVisitor():
     def __init__(self):
         self._content = []
         self._unhandled = set()
@@ -106,7 +81,22 @@ class TextVisitor(ContentVisitor):
             "list": self._on_list,
         }
         
-    def traverse_text(self, text):
+    def results(self):
+        print("Unhandles tags: " + ", ".join(sorted(self._unhandled)))
+        return "\n".join(self._content)
+    
+    def traverse(self, root):
+        tag = extract(root.tag)
+        assert(tag == "document-content")
+        for child in root:
+            child_tag = extract(child.tag)
+            if child_tag  == "body":
+                assert(len(child) == 1)
+                text = child[0]
+                assert(extract(text.tag) == "text")
+                self._traverse_text(text)
+    
+    def _traverse_text(self, text):
         for child in text:
             tag = extract(child.tag)
             handler = self._text_child_handlers.get(tag)
@@ -114,10 +104,6 @@ class TextVisitor(ContentVisitor):
                 self._content.append(handler(child))
             else:
                 self._unhandled.add(tag)
-
-    def results(self):
-        print("Unhandles tags: " + ", ".join(sorted(self._unhandled)))
-        return "\n".join(self._content)
     
     # Top-level elements
     def _on_h(self, h):

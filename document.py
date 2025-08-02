@@ -50,6 +50,9 @@ class Table(Content):
     def __init__(self):
         self.num_columns = 0
         self.rows = []
+    
+    def is_valid(self):
+        return self.num_columns and self.rows and all([len(r) == self.num_columns for r in self.rows])
 
 
 class _Section:

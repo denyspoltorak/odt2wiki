@@ -3,7 +3,7 @@
 from collections import defaultdict
 from xml.etree.ElementTree import Element
 
-from odt_tools import extract, ContentVisitor
+from odt_tools import extract
 import document
 
 # Data classes
@@ -39,7 +39,7 @@ class _Span:
 
 
 # Full-featured extraction class
-class FullVisitor(ContentVisitor):
+class FullVisitor():
     def __init__(self):
         self._content = []
         self._styles = {}
@@ -68,8 +68,21 @@ class FullVisitor(ContentVisitor):
             doc.add(elem)
         return doc
     
+    def traverse(self, root: Element) -> None:
+        tag = extract(root.tag)
+        assert(tag == "document-content")
+        for child in root:
+            child_tag = extract(child.tag)
+            if child_tag == "automatic-styles":
+                self._traverse_styles(child)
+            elif child_tag == "body":
+                assert(len(child) == 1)
+                text = child[0]
+                assert(extract(text.tag) == "text")
+                self._traverse_text(text)
+    
     # _Style extraction
-    def traverse_styles(self, styles: Element) -> None:
+    def _traverse_styles(self, styles):
         assert(not styles.attrib)
         for child in styles:
             child_tag = extract(child.tag)
@@ -81,7 +94,7 @@ class FullVisitor(ContentVisitor):
                 self._styles[name] = data
     
     # Information retrieval
-    def traverse_text(self, text: Element) -> None:
+    def _traverse_text(self, text):
         for child in text:
             child_tag = extract(child.tag)
             match child_tag:
@@ -211,8 +224,7 @@ class FullVisitor(ContentVisitor):
         # Validate and return
         assert(len(output.rows))
         output.num_columns = len(output.rows[0])
-        for i in range(1, len(output.rows)):
-            assert(len(output.rows[i]) == output.num_columns)
+        assert(output.is_valid())
         return output
 
     # Low-level methods

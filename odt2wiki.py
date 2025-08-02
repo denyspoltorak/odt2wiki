@@ -47,7 +47,8 @@ def extract_text(content, destination):
     visitor.traverse(content)
     with open(expanduser(destination), "x") as output:
         output.write(visitor.results())
-        
+
+
 def convert_to_markdown(content, styles, destination, collapse_level):
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
@@ -57,6 +58,7 @@ def convert_to_markdown(content, styles, destination, collapse_level):
     tree.dump(writer)
     with open(expanduser(destination), "x") as output:
         output.write(writer.get_output())
+
 
 def main():
     # Set up the CLI arguments

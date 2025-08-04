@@ -96,7 +96,7 @@ class _Section:
             if self.name:
                 destination = os.path.join(destination, filename)
             os.mkdir(destination)
-            self.filename = os.path.join(destination, filename if filename else UNNAMED_FILENAME)
+            self.filename = os.path.join(destination, UNNAMED_FILENAME)
         # Remember files
         elif self.header.outline_level == split_level:
             self.filename = os.path.join(destination, string_to_filename(self.name))

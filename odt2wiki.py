@@ -5,14 +5,16 @@
 from zipfile import ZipFile
 from os.path import expanduser
 from argparse import ArgumentParser
+from functools import partial
 
 import odt_tools
 import odt_parser
+import document
 import md_writer
 
 
-TEXT_XML_FILE_NAME="content.xml"
-STYLES_XML_FILE_NAME="styles.xml"
+TEXT_XML_FILE_NAME = "content.xml"
+STYLES_XML_FILE_NAME = "styles.xml"
 
 
 def _print_dict_tree(key, tree, level):
@@ -49,15 +51,17 @@ def extract_text(content, destination):
         output.write(visitor.results())
 
 
-def convert_to_markdown(content, styles, destination, collapse_level):
+def convert_to_markdown(content, styles, destination, collapse_level, split_level):
+    # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
-    tree = visitor.to_document()
-    writer = md_writer.GitHubMdWriter(collapse_level)
-    tree.dump(writer)
-    with open(expanduser(destination), "x") as output:
-        output.write(writer.get_output())
+    # Process the content
+    doc = document.Document(expanduser(destination), split_level)
+    visitor.fill_document(doc)
+    doc.create_folders(".md")
+    # Convert to markdown
+    doc.dump(partial(md_writer.GitHubMdWriter, collapse_level))
 
 
 def main():
@@ -74,6 +78,7 @@ def main():
     group.add_argument("-g", "--to-github-md", action="store", help="convert to GitHub markdown in the given dir")
     
     parser.add_argument("-c", "--collapse-level", action="store", type=int, default=0, help="collapse sections of this outline level")
+    parser.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
     
     args = parser.parse_args()
     
@@ -108,7 +113,7 @@ def main():
                     tags_tree(parsed_content)
                 elif args.to_github_md:
                     print(f"Converting to GitHub markdown in {args.to_github_md}")
-                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md, args.collapse_level)
+                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md, args.collapse_level, args.split_level)
                 else:
                     assert(False)
     print()

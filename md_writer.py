@@ -104,7 +104,6 @@ def _add_spans(spans):
     return result
 
 
-
 class GitHubMdWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     

@@ -2,6 +2,14 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
+import os
+
+
+def string_to_filename(string): #https://stackoverflow.com/questions/295135/turn-a-string-into-a-valid-filename
+    return "".join([x if x.isalnum() else "_" for x in string]) 
+
+
+UNNAMED_FILENAME = "intro"
 
 
 class ListStyle(Enum):
@@ -43,6 +51,9 @@ class Paragraph(Content):
     def __init__(self):
         self.spans = []
         self.grayed_out = False
+        
+    def to_string(self):
+        return "".join([s.text for s in self.spans])
 
   
 class Header(Paragraph):
@@ -72,23 +83,60 @@ class _Section:
         self.header = header
         self.content = []
         self.children = []
+        self.name = None
+        self.filename = None
         
-    def dump(self, writer):
+    def create_folders(self, destination, split_level, file_extension):
+        assert(not self.name)
+        assert(not self.filename)
+        self.name = self.header.to_string()
+        # Create top-level folders
+        if self.header.outline_level < split_level or (not self.header.outline_level and not split_level):
+            filename = string_to_filename(self.name)
+            if self.name:
+                destination = os.path.join(destination, filename)
+            os.mkdir(destination)
+            self.filename = os.path.join(destination, filename if filename else UNNAMED_FILENAME)
+        # Remember files
+        elif self.header.outline_level == split_level:
+            self.filename = os.path.join(destination, string_to_filename(self.name))
+        else:
+            self.filename = destination
+        self.filename += file_extension
+        # Propagate to child sections in any case
+        for child in self.children:
+            child.create_folders(destination, split_level, file_extension)
+        
+    def dump(self, writer, writer_factory, split_level):
+        assert(self.name is not None)
+        assert(self.filename)
+        # Start a new file if this is a book chapter or part
+        if self.header.outline_level <= split_level:
+            writer = writer_factory()
+        # Write our content
         if self.header.outline_level:
             writer.add(self.header)
         for c in self.content:
             writer.add(c)
         for child in self.children:
-            child.dump(writer)
-
+            child.dump(writer, writer_factory, split_level)
+        # Save it to the file
+        if self.header.outline_level <= split_level:
+            with open(self.filename, "x") as output:
+                output.write(writer.get_output())
 
 class Document:
-    def __init__(self):
+    def __init__(self, destination: str, split_level: int):
+        self._destination = destination
+        self._split_level = split_level
         self._root = _Section(None, Header())
         self._current_section = self._root
         
-    def dump(self, writer):
-        self._root.dump(writer)
+    def create_folders(self, file_extension: str) -> None:
+        self._root.create_folders(self._destination, self._split_level, file_extension)
+        
+    def dump(self, writer_factory) -> None:
+        self._root.dump(None, writer_factory, self._split_level)
     
     def add(self, content: Content) -> None:
         assert(isinstance(content, Content))

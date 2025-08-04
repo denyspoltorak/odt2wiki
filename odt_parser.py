@@ -67,13 +67,10 @@ class FullVisitor():
                         assert(not name in self._list_styles)
                         self._list_styles[name] = kind
         
-    def to_document(self) -> document.Document:
+    def fill_document(self, doc: document.Document) -> None:
         self._print_warnings()
-        # Export to an intermediary representation
-        doc = document.Document()
         for elem in self._content:
             doc.add(elem)
-        return doc
     
     def traverse(self, root: Element) -> None:
         tag = extract(root.tag)

@@ -35,11 +35,25 @@ def _make_table_separator(num_columns):
         output.append("---")
         output.append("|")
     return " ".join(output) + "\n"
-        
+
+
+def _make_html_color_name(color):
+    if not color:
+        return ""
+    elif color.r > 2 * color.g and color.r > 2 * color.b:
+        return "red"
+    elif color.g > 2 * color.r and color.g > 2 * color.b:
+        return "green"
+    else:
+        return ""
 
 def _change_style(old, new, add_spaces):
     output = []
+    old_color_name = _make_html_color_name(old.color)
+    new_color_name = _make_html_color_name(new.color)
     # Close the old style
+    if old_color_name and old_color_name != new_color_name:
+        output.append("</span>")
     if old.underline and not new.underline:
         output.append("</ins>")
     if old.bold and not new.bold:
@@ -59,6 +73,8 @@ def _change_style(old, new, add_spaces):
         output.append("**")
     if new.underline and not old.underline:
         output.append("<ins>")
+    if new_color_name and new_color_name != old_color_name:
+        output.append(f'<span style="color:{new_color_name}">')
     # Merge
     return "".join(output)
 

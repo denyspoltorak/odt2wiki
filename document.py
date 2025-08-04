@@ -9,12 +9,23 @@ class ListStyle(Enum):
     NUMBER = auto()
 
 
-@dataclass(repr=False, frozen=True)
+@dataclass(frozen=True)
+class Color:
+    r:  int = 0
+    g:  int = 0
+    b:  int = 0
+    
+    def __bool__(self):
+        return self.r != 0 or self.g != 0 or self.b != 0
+
+
+@dataclass(frozen=True)
 class Style:
     bold:           bool = False
     italic:         bool = False
     underline:      bool = False
     strikethrough:  bool = False
+    color:          Color = Color()
 
 
 # A chunk of text in a given style

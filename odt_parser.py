@@ -14,6 +14,7 @@ class _Style:
         self.underline = None
         self.strikethrough = None
         self.colored_background = None
+        self.color = None
     
     def __ior__(self, other):
         if self.bold is None:
@@ -26,10 +27,16 @@ class _Style:
             self.strikethrough = other.strikethrough
         if self.colored_background is None:
             self.colored_background = other.colored_background
+        if self.color is None:
+            self.color = other.color
         return self
     
     def normalize(self):
-        return document.Style(self.bold, self.italic, self.underline, self.strikethrough)
+        return document.Style(self.bold, self.italic, self.underline, self.strikethrough, self._convert_color(self.color))
+    
+    @staticmethod
+    def _convert_color(color):
+        return document.Color() if color is None else document.Color(int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16))
         
 
 class _Span:
@@ -299,6 +306,9 @@ class FullVisitor():
                 case "background-color":
                     assert(output.colored_background is None)
                     output.colored_background = (v != "#ffffff")
+                case "color":
+                    assert(output.color is None)
+                    output.color = v
                 case _:
                     self._unhandled_attrs["text-properties"].add(attr_name)
         return output

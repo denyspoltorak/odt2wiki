@@ -1,3 +1,5 @@
+"Tools for investigating ODT files"
+
 import xml.etree.ElementTree
 from collections import defaultdict
 

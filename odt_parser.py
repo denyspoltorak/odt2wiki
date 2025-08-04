@@ -1,4 +1,4 @@
-"See https://docs.oasis-open.org/office/v1.2/cs01/OpenDocument-v1.2-cs01-part1.html"
+"ODT parser. See https://docs.oasis-open.org/office/v1.2/cs01/OpenDocument-v1.2-cs01-part1.html"
 
 from collections import defaultdict
 from xml.etree.ElementTree import Element

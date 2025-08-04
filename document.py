@@ -6,10 +6,10 @@ import os
 
 
 def string_to_filename(string): #https://stackoverflow.com/questions/295135/turn-a-string-into-a-valid-filename
-    return "".join([x if x.isalnum() else "_" for x in string]) 
+    return "".join([x if x.isalnum() else "_" for x in string]).replace("__", "_")
 
 
-UNNAMED_FILENAME = "intro"
+UNNAMED_FILENAME = "Intro"
 
 
 class ListStyle(Enum):

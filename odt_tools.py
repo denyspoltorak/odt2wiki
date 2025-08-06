@@ -89,13 +89,13 @@ class TextVisitor():
     
     def traverse(self, root):
         tag = extract(root.tag)
-        assert(tag == "document-content")
+        assert tag == "document-content"
         for child in root:
             child_tag = extract(child.tag)
             if child_tag  == "body":
-                assert(len(child) == 1)
+                assert len(child) == 1
                 text = child[0]
-                assert(extract(text.tag) == "text")
+                assert extract(text.tag) == "text"
                 self._traverse_text(text)
     
     def _traverse_text(self, text):
@@ -133,19 +133,19 @@ class TextVisitor():
     def _on_table(self, table):
         rows = []
         # Extract cells
-        assert(not table.text)
+        assert not table.text
         for child in table:
             match extract(child.tag):
                 case "table-header-rows":
-                    assert(not child.text)
+                    assert not child.text
                     for r in child:
-                        assert(extract(r.tag) == "table-row")
+                        assert extract(r.tag) == "table-row"
                         rows.append(self._on_table_row(r))
                 case "table-row":
                     rows.append(self._on_table_row(child))
-        assert(len(rows) > 1)
+        assert len(rows) > 1
         for i in range(len(rows) - 1):
-            assert(len(rows[i]) == len(rows[i + 1]))
+            assert len(rows[i]) == len(rows[i + 1])
         # Output transposed
         output = ["",]
         for c in range(len(rows[0])):
@@ -158,27 +158,27 @@ class TextVisitor():
         
     def _on_list(self, l):
         output = []
-        assert(not l.text)
+        assert not l.text
         for child in l:
             tag = extract(child.tag)
-            assert(tag == "list-item")
+            assert tag == "list-item"
             for grandchild in child:
                 grandtag = extract(grandchild.tag)
                 handler = self._list_item_handlers.get(grandtag)
-                assert(handler)
+                assert handler
                 output.append(handler(grandchild))
-                assert(not grandchild.tail)
-            assert(not child.tail)
+                assert not grandchild.tail
+            assert not child.tail
         return "\n".join(output)
         
     # Low-level elements
     def _on_table_row(self, row):
-        assert(not row.text)
+        assert not row.text
         output = []
         for cell in row:
-            assert(extract(cell.tag) == "table-cell")
-            assert(len(cell) == 1)
-            assert(extract(cell[0].tag) == "p")
+            assert extract(cell.tag) == "table-cell"
+            assert len(cell) == 1
+            assert extract(cell[0].tag) == "p"
             output.append(self._on_p(cell[0]))
         return output
     
@@ -195,7 +195,7 @@ class TextVisitor():
     
     @staticmethod
     def _on_span(paragraph, span):
-        assert(span.text)
+        assert span.text
         paragraph.append(span.text)
     
     @staticmethod
@@ -204,7 +204,7 @@ class TextVisitor():
         for (k, v) in s.attrib.items():
             if extract(k) == "c":
                 count = int(v)
-                assert(count)
+                assert count
         paragraph.append(" " * count)
         
     @staticmethod

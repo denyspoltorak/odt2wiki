@@ -17,7 +17,7 @@ def _make_list_bullet(index):
 
 
 def _make_list_number(index):
-    assert(index < 100)
+    assert index < 100
     return f"{str(index)+'.':<4}"
 
 
@@ -94,13 +94,13 @@ def _add_spans(spans):
         output.append(_change_style(style, s.style, move_spaces))
         style = s.style
         fully_stripped_text = left_stripped_text.rstrip()
-        assert(fully_stripped_text)
+        assert fully_stripped_text
         move_spaces = len(left_stripped_text) - len(fully_stripped_text)
         output.append(_escape(fully_stripped_text))
     output.append(_change_style(style, document.Style(), move_spaces))
     # Merge
     result = "".join(output)
-    assert(result)
+    assert result
     return result
 
 
@@ -129,12 +129,12 @@ class GitHubMdWriter:
             case document.Table():
                 self._add_table(content)
             case _:
-                assert(False)
+                assert False
         self._output.append(self.PARAGRAPH_SEPARATOR)
     
     # Methods to add document parts
     def _add_header(self, header):
-        assert(header.outline_level)
+        assert header.outline_level
         # Close the previous section
         if self._collapsing and header.outline_level <= self._collapse_level:
             self._output.append("</details>\n")
@@ -165,7 +165,7 @@ class GitHubMdWriter:
                 method = _make_list_number
                 offset += 4
             case _:
-                assert(False)
+                assert False
         # Process the list items
         for i in l.items:
             match i:
@@ -176,12 +176,12 @@ class GitHubMdWriter:
                 case document.List():
                     self._add_list(i, offset)
                 case _:
-                    assert(False)
+                    assert False
             index += 1
     
     def _add_table(self, table):
         # Add table header
-        assert(table.is_valid())
+        assert table.is_valid()
         self._output.append(_make_table_row(table.rows[0]))
         if len(table.rows) > 1:
             self._output.append(_make_table_separator(table.num_columns))

@@ -87,8 +87,8 @@ class _Section:
         self.filename = None
         
     def create_folders(self, destination, split_level, file_extension):
-        assert(not self.name)
-        assert(not self.filename)
+        assert not self.name
+        assert not self.filename
         self.name = self.header.to_string()
         # Create top-level folders
         if self.header.outline_level < split_level or (not self.header.outline_level and not split_level):
@@ -108,8 +108,8 @@ class _Section:
             child.create_folders(destination, split_level, file_extension)
         
     def dump(self, writer, writer_factory, split_level):
-        assert(self.name is not None)
-        assert(self.filename)
+        assert self.name is not None
+        assert self.filename
         # Start a new file if this is a book chapter or part
         if self.header.outline_level <= split_level:
             writer = writer_factory()
@@ -139,14 +139,14 @@ class Document:
         self._root.dump(None, writer_factory, self._split_level)
     
     def add(self, content: Content) -> None:
-        assert(isinstance(content, Content))
+        assert isinstance(content, Content)
         if isinstance(content, Header):
             self._add_header(content)
         else:
             self._current_section.content.append(content)
     
     def _add_header(self, header):
-        assert(header.outline_level)
+        assert header.outline_level
         # Find a place for the new section in the tree
         parent_section = self._current_section
         while header.outline_level <= parent_section.header.outline_level:

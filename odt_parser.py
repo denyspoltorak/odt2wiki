@@ -56,7 +56,7 @@ class FullVisitor():
         
     def preload_styles(self, root: Element) -> None:
         tag = extract(root.tag)
-        assert(tag == "document-styles")
+        assert tag == "document-styles"
         for child in root:
             child_tag = extract(child.tag)
             if child_tag == "styles":
@@ -64,7 +64,7 @@ class FullVisitor():
                     grandchild_tag = extract(grandchild.tag)
                     if grandchild_tag == "list-style":
                         (name, kind) = self._process_list_style(grandchild)
-                        assert(not name in self._list_styles)
+                        assert name not in self._list_styles
                         self._list_styles[name] = kind
         
     def fill_document(self, doc: document.Document) -> None:
@@ -74,26 +74,26 @@ class FullVisitor():
     
     def traverse(self, root: Element) -> None:
         tag = extract(root.tag)
-        assert(tag == "document-content")
+        assert tag == "document-content"
         for child in root:
             child_tag = extract(child.tag)
             if child_tag == "automatic-styles":
                 self._traverse_styles(child)
             elif child_tag == "body":
-                assert(len(child) == 1)
+                assert len(child) == 1
                 text = child[0]
-                assert(extract(text.tag) == "text")
+                assert extract(text.tag) == "text"
                 self._traverse_text(text)
     
     # _Style extraction
     def _traverse_styles(self, styles):
-        assert(not styles.attrib)
+        assert not styles.attrib
         for child in styles:
             child_tag = extract(child.tag)
-            assert(child_tag == "style")
+            assert child_tag == "style"
             (name, data) = self._process_style(child)
-            assert(name)
-            assert(name not in self._styles)
+            assert name
+            assert name not in self._styles
             if data is not None:
                 self._styles[name] = data
     
@@ -123,15 +123,15 @@ class FullVisitor():
             attr_name = extract(k)
             match attr_name:
                 case "outline-level":
-                    assert(not output.outline_level)
+                    assert not output.outline_level
                     output.outline_level = int(v)
                 case "style-name":
-                    assert(not style)
+                    assert not style
                     style = self._styles.get(v, _Style())
                 case _:
                     self._unhandled_attrs["h"].add(attr_name)
-        assert(output.outline_level)
-        assert(style)
+        assert output.outline_level
+        assert style
         # Parse text
         if header.text:
             header.spans.append(_Span(header.text, style))
@@ -146,7 +146,7 @@ class FullVisitor():
             if child.tail:
                 output.spans.append(_Span(child.tail, style))
         # Commit
-        assert(output.spans)
+        assert output.spans
         output.spans = self._convert_spans(output.spans)
         return output
 
@@ -155,10 +155,10 @@ class FullVisitor():
         style = None
         # Parse style
         for (k, v) in paragraph.attrib.items():
-            assert(extract(k) == "style-name")
-            assert(not style)
+            assert extract(k) == "style-name"
+            assert not style
             style = self._styles.get(v, _Style())
-        assert(style)
+        assert style
         output.grayed_out = style.colored_background
         # Parse text
         if paragraph.text:
@@ -193,42 +193,42 @@ class FullVisitor():
         # Parse style
         for (k, v) in l.attrib.items():
             if(extract(k) == "style-name"):
-                assert(not output.kind)
+                assert not output.kind
                 output.kind = self._list_styles.get(v)
         if not output.kind:
             output.kind = kind
-        assert(output.kind)
+        assert output.kind
         # Parse items
-        assert(not l.text)
+        assert not l.text
         for child in l:
-            assert(extract(child.tag) == "list-item")
+            assert extract(child.tag) == "list-item"
             item = self._process_list_item(child, output.kind)
             if item:
                 output.items.extend(item)
-            assert(not child.tail)
+            assert not child.tail
         # Commit
-        assert(output.items)
+        assert output.items
         return output
     
     def _process_table(self, table):
         output = document.Table()
         # Extract cells
-        assert(not table.text)
+        assert not table.text
         for child in table:
             match extract(child.tag):
                 case "table-header-rows":
-                    assert(not child.text)
+                    assert not child.text
                     for r in child:
-                        assert(extract(r.tag) == "table-row")
+                        assert extract(r.tag) == "table-row"
                         output.rows.append(self._process_table_row(r))
-                        assert(not r.tail)
+                        assert not r.tail
                 case "table-row":
                     output.rows.append(self._process_table_row(child))
-            assert(not child.tail)
+            assert not child.tail
         # Validate and return
-        assert(len(output.rows))
+        assert len(output.rows)
         output.num_columns = len(output.rows[0])
-        assert(output.is_valid())
+        assert output.is_valid()
         return output
 
     # Low-level methods
@@ -240,17 +240,17 @@ class FullVisitor():
             attr_name = extract(k)
             match attr_name:
                 case "name":
-                    assert(not name)
+                    assert not name
                     name = v
                 case _:
                     self._unhandled_attrs["style"].add(attr_name)
-        assert(name)
+        assert name
         # _Style's data
         for child in style:
             child_tag = extract(child.tag)
             match child_tag:
                 case "text-properties":
-                    assert(output is None)
+                    assert output is None
                     output = self._process_text_properties(child)
                 case _:
                     self._unhandled_tags.add(child_tag)
@@ -261,10 +261,10 @@ class FullVisitor():
         kind = None
         # Extract style name
         for (k, v) in list_style.attrib.items():
-            assert(extract(k) == "name")
-            assert(not name)
+            assert extract(k) == "name"
+            assert not name
             name = v
-        assert(name)
+        assert name
         # Extract list kind
         for child in list_style:
             for (k, v) in child.attrib.items():
@@ -275,12 +275,12 @@ class FullVisitor():
                         case "list-level-style-number":
                             new_kind = document.ListStyle.NUMBER
                         case _:
-                            assert(False)
+                            assert False
                     if kind:
-                        assert(kind == new_kind)
+                        assert kind == new_kind
                     else:
                         kind = new_kind
-        assert(kind)
+        assert kind
         return name, kind
             
     def _process_text_properties(self, props):               
@@ -289,56 +289,56 @@ class FullVisitor():
             attr_name = extract(k)
             match attr_name:
                 case "font-weight":
-                    assert(output.bold is None)
+                    assert output.bold is None
                     output.bold = (v == "bold")
                 case "font-style":
-                    assert(output.italic is None)
+                    assert output.italic is None
                     output.italic = (v == "italic")
                 case "text-underline-style":
-                    assert(output.underline is None)
+                    assert output.underline is None
                     output.underline = (v == "solid")
                 case "text-line-through-style":
-                    assert(output.strikethrough is None)
+                    assert output.strikethrough is None
                     output.strikethrough = (v == "solid")
                 case "background-color":
-                    assert(output.colored_background is None)
+                    assert output.colored_background is None
                     output.colored_background = (v != "#ffffff")
                 case "color":
-                    assert(output.color is None)
+                    assert output.color is None
                     output.color = v
                 case _:
                     self._unhandled_attrs["text-properties"].add(attr_name)
         return output
 
     def _process_a(self, a):
-        assert(not a.text)
-        assert(len(a) == 1)
+        assert not a.text
+        assert len(a) == 1
         span = a[0]
-        assert(extract(span.tag) == "span")
+        assert extract(span.tag) == "span"
         return self._process_span(span)
     
     def _process_span(self, span):
         style = None
         for (k, v) in span.attrib.items():
-            assert(extract(k) == "style-name")
+            assert extract(k) == "style-name"
             style = self._styles.get(v, _Style())
-        assert(style)
-        assert(span.text)
+        assert style
+        assert span.text
         return _Span(span.text, style)
     
     def _process_s(self, s):
         count = 1
         for (k, v) in s.attrib.items():
-            assert(count == 1)
-            assert(extract(k) == "c")
+            assert count == 1
+            assert extract(k) == "c"
             count = int(v)
-            assert(count)
+            assert count
         return " " * count
     
     def _process_list_item(self, li, kind):
         output = []
-        assert(not li.attrib)
-        assert(not li.text)
+        assert not li.attrib
+        assert not li.text
         for child in li:
             match extract(child.tag):
                 case "p":
@@ -350,12 +350,12 @@ class FullVisitor():
         return output
     
     def _process_table_row(self, row):
-        assert(not row.text)
+        assert not row.text
         output = []
         for cell in row:
-            assert(extract(cell.tag) == "table-cell")
-            assert(len(cell) == 1)
-            assert(extract(cell[0].tag) == "p")
+            assert extract(cell.tag) == "table-cell"
+            assert len(cell) == 1
+            assert extract(cell[0].tag) == "p"
             output.append(self._process_p(cell[0]))
         return output
             

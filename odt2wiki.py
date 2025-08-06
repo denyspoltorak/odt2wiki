@@ -2,27 +2,28 @@
 
 "Convert ODT to markdown splitting the output into chapters."
 
-from zipfile import ZipFile
-from os.path import expanduser
 from argparse import ArgumentParser
-from functools import partial
+from zipfile import ZipFile
+import os.path
+import functools
 
 import odt_tools
 import odt_parser
 import document
 import md_writer
+import image_matcher
 
 
 TEXT_XML_FILE_NAME = "content.xml"
 STYLES_XML_FILE_NAME = "styles.xml"
+THUMBNAIL_FILE = "Thumbnails/thumbnail.png"
 
 
 def _print_dict_tree(key, tree, level):
     print((" " * 4 * level) + key)
     for (k, v) in sorted(tree.items()):
         _print_dict_tree(k, v, level + 1)
-        
-        
+   
 def list_files(archive):
     for f in archive.namelist():
         print(f)
@@ -47,21 +48,31 @@ def tags_tree(content):
 def extract_text(content, destination):
     visitor = odt_tools.TextVisitor()
     visitor.traverse(content)
-    with open(expanduser(destination), "x") as output:
+    with open(os.path.expanduser(destination), "x") as output:
         output.write(visitor.results())
 
 
-def convert_to_markdown(content, styles, destination, collapse_level, split_level):
+def convert_to_markdown(archive,
+                        content, 
+                        styles, 
+                        destination, 
+                        collapse_level, 
+                        split_level, 
+                        images_folder, 
+                        remote_images):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
     # Process the content
-    doc = document.Document(expanduser(destination), split_level)
+    doc = document.Document(os.path.expanduser(destination), split_level)
     visitor.fill_document(doc)
     doc.create_folders(".md")
+    # Map pictires inside the ODT to picture files in the destination folder
+    if images_folder:
+        matched, unmatched = image_matcher.match_images(archive, os.path.expanduser(images_folder))
     # Convert to markdown
-    doc.dump(partial(md_writer.GitHubMdWriter, collapse_level))
+    doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
 
 
 def main():
@@ -79,13 +90,15 @@ def main():
     
     parser.add_argument("-c", "--collapse-level", action="store", type=int, default=0, help="collapse sections of this outline level")
     parser.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
+    parser.add_argument("-i", "--images-folder", action="store", help="local folder with images used in the document")
+    parser.add_argument("-r", "--remote-images", action="store", help="path to a folder with images to be used in production")
     
     args = parser.parse_args()
     
     # Run the user's command
     print()
     print(f"Processing ODT archive {args.input_filename }...")
-    with ZipFile(expanduser(args.input_filename)) as archive:
+    with ZipFile(os.path.expanduser(args.input_filename)) as archive:
         # Print files in the archive
         if args.list_files:
             print("Archive contents:")
@@ -113,9 +126,16 @@ def main():
                     tags_tree(parsed_content)
                 elif args.to_github_md:
                     print(f"Converting to GitHub markdown in {args.to_github_md}")
-                    convert_to_markdown(parsed_content, parsed_styles, args.to_github_md, args.collapse_level, args.split_level)
+                    convert_to_markdown(archive,
+                                        parsed_content, 
+                                        parsed_styles, 
+                                        args.to_github_md, 
+                                        args.collapse_level, 
+                                        args.split_level,
+                                        args.images_folder,
+                                        args.remote_images)
                 else:
-                    assert(False)
+                    assert False
     print()
 
 

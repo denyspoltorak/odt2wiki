@@ -26,7 +26,6 @@ def _print_dict_tree(key, tree, level):
 def list_files(archive):
     for f in archive.namelist():
         print(f)
-        
 
 def list_attrs(content):
     visitor = odt_tools.UniqueTagsVisitor()
@@ -43,7 +42,6 @@ def tags_tree(content):
     for (k, v) in sorted(tags.items()):
         _print_dict_tree(k, v, 0)
 
-
 def extract_text(content, destination):
     visitor = odt_tools.TextVisitor()
     visitor.traverse(content)
@@ -57,7 +55,7 @@ def convert_to_markdown(archive,
                         collapse_level, 
                         split_level, 
                         images_folder, 
-                        remote_images):
+                        remote_image_path):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
@@ -69,23 +67,21 @@ def convert_to_markdown(archive,
     visitor.fill_document(doc)
     doc.create_folders(".md")
     # Map pictires inside the ODT to picture files in the destination folder
-    images = {}
+    external_images = {}
+    internal_images = {}
     if images_folder:
         full_local_path = os.path.expanduser(images_folder)
         matched, unmatched = image_matcher.match_images(archive, full_local_path)
-        if remote_images:
-            for k, v in matched.items():
-                images[k] = v.replace(full_local_path, remote_images)
+        if remote_image_path:
+            external_images = {k: v.replace(full_local_path, remote_image_path) for k, v in matched.items()}
         else:
-            images = matched
+            external_images = matched
         if unmatched:
-            extracted = image_matcher.extract_images(archive, dest_path, unmatched)
-            for k, v in extracted.items():
-                assert k not in images
-                images[k] = v
+            internal_images = image_matcher.extract_images(archive, dest_path, unmatched)
     else:
-        images = image_matcher.extract_all_images(archive, dest_path)
+        internal_images = image_matcher.extract_all_images(archive, dest_path)
     # Convert to markdown
+    doc.match_images(external_images, internal_images)
     doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
 
 

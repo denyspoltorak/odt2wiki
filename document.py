@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Optional
 import os
 
 
@@ -41,7 +42,14 @@ class Span:
     def __init__(self, text: str, style: Style):
         self.text = text
         self.style = style
-        
+
+
+# Link to an internal or external resource
+class Link:
+    def __init__(self, text: str, internal: Optional[bool] = None):
+        self.text = text
+        self.internal = internal
+
 
 class Content:
     pass
@@ -77,6 +85,12 @@ class Table(Content):
         return self.num_columns and self.rows and all([len(r) == self.num_columns for r in self.rows])
 
 
+class Image(Content):
+    def __init__(self, link, scale):
+        self.link = link
+        self.scale = scale
+
+
 class _Section:
     def __init__(self, parent, header):
         self.parent = parent
@@ -106,6 +120,27 @@ class _Section:
         # Propagate to child sections in any case
         for child in self.children:
             child.create_folders(destination, split_level, file_extension)
+    
+    def match_images(self, external_images, internal_images, split_level, parent_level):
+        # Calculate how many folders should we walk up to get to the root
+        if not split_level or self.header.outline_level < split_level:
+            parent_level += 1
+        # Update paths in all our images
+        for c in self.content:
+            if isinstance(c, Image):
+                assert(c.link)
+                link = external_images.get(c.link, None)
+                if link:
+                    c.link = link
+                else:
+                    link = internal_images.get(c.link, None)
+                    assert link
+                    for _ in range (parent_level):
+                        link = os.path.join("..", link)
+                    c.link = link
+        # Update child sections
+        for child in self.children:
+            child.match_images(external_images, internal_images, split_level, parent_level)
         
     def dump(self, writer, writer_factory, split_level):
         assert self.name is not None
@@ -134,6 +169,9 @@ class Document:
         
     def create_folders(self, file_extension: str) -> None:
         self._root.create_folders(self._destination, self._split_level, file_extension)
+        
+    def match_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
+        self._root.match_images(external_images, internal_images, self._split_level, -1)
         
     def dump(self, writer_factory) -> None:
         self._root.dump(None, writer_factory, self._split_level)

@@ -53,6 +53,7 @@ class FullVisitor():
         self._list_styles = {}
         self._unhandled_tags = set()
         self._unhandled_attrs = defaultdict(set)
+        self._max_image_width = 0
         
     def preload_styles(self, root: Element) -> None:
         tag = extract(root.tag)
@@ -84,6 +85,7 @@ class FullVisitor():
                 text = child[0]
                 assert extract(text.tag) == "text"
                 self._traverse_text(text)
+        self._postprocess()
     
     # _Style extraction
     def _traverse_styles(self, styles):
@@ -114,6 +116,14 @@ class FullVisitor():
                     self._content.append(self._process_table(child))
                 case _:
                     self._unhandled_tags.add(child_tag)
+    
+    def _postprocess(self):
+        # Translate image dimensions to relative scale
+        if self._max_image_width:
+            for c in self._content:
+                if isinstance(c, document.Image):
+                    assert c.scale
+                    c.scale /= self._max_image_width
 
     def _process_h(self, header):
         output = document.Header()
@@ -152,6 +162,7 @@ class FullVisitor():
 
     def _process_p(self, paragraph):
         output = document.Paragraph()
+        image = None
         style = None
         # Parse style
         for (k, v) in paragraph.attrib.items():
@@ -176,6 +187,9 @@ class FullVisitor():
                     span.style |= style
                     output.grayed_out = output.grayed_out or span.style.colored_background
                     output.spans.append(span)
+                case "frame":
+                    assert not image
+                    image = self._process_frame(child)
                 case "tab":
                     output.spans.append(_Span("\t", style))
                 case "s":
@@ -185,8 +199,12 @@ class FullVisitor():
             if child.tail:
                 output.spans.append(_Span(child.tail, style))
         # Commit
-        output.spans = self._convert_spans(output.spans)
-        return output if output.spans else None
+        if image:
+            assert not output.spans
+            return image
+        else:
+            output.spans = self._convert_spans(output.spans)
+            return output if output.spans else None
             
     def _process_list(self, l, kind = None):
         output = document.List()
@@ -340,13 +358,16 @@ class FullVisitor():
         assert not li.attrib
         assert not li.text
         for child in li:
-            match extract(child.tag):
+            child_tag = extract(child.tag)
+            match child_tag:
                 case "p":
                     result = self._process_p(child)
                     if result:
                         output.append(result)
                 case "list":
                     output.append(self._process_list(child, kind))
+                case _:
+                    self._unhandled_tags.add(child_tag)
         return output
     
     def _process_table_row(self, row):
@@ -358,6 +379,36 @@ class FullVisitor():
             assert extract(cell[0].tag) == "p"
             output.append(self._process_p(cell[0]))
         return output
+    
+    def _process_frame(self, frame):
+        assert not frame.text
+        # Read image width
+        width = 0
+        for (k, v) in frame.attrib.items():
+            attr_name = extract(k)
+            if attr_name == "width":
+                assert not width
+                assert v.endswith("in")
+                width = float(v[:-2])
+                assert(width)
+            else:
+                self._unhandled_attrs["frame"].add(attr_name)
+        if width > self._max_image_width:
+            self._max_image_width = width
+        # Read link to the image
+        link = None
+        assert len(frame) == 1
+        assert extract(frame[0].tag) == "image"
+        for (k, v) in frame[0].attrib.items():
+            attr_name = extract(k)
+            if attr_name == "href":
+                assert not link
+                link = v
+                assert(link)
+            else:
+                self._unhandled_attrs["frame"].add(attr_name)
+        # Results
+        return document.Image(link, width)
             
     def _print_warnings(self):
         print()

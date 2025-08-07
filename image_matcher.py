@@ -156,9 +156,9 @@ def extract_images(archive: ZipFile, destination: str, names: Iterable[str]) -> 
     output = {}
     for n in names:
         assert n.startswith(PICTURES_FOLDER)
-        suffix = n.rsplit(".")[1]
+        suffix = os.path.splitext(n)[1]
         assert suffix
-        new_rel_name = os.path.join(pictures_rel_path, f"{IMAGE_DEST_PREFIX}{index:03d}.{suffix}")
+        new_rel_name = os.path.join(pictures_rel_path, f"{IMAGE_DEST_PREFIX}{index:03d}{suffix}")
         os.rename(os.path.join(pictures_abs_path, n[pictures_folder_name_len:]), os.path.join(destination, new_rel_name))
         assert n not in output
         output[n] = new_rel_name

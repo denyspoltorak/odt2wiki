@@ -1,6 +1,7 @@
 "Markdown writers"
 
 import document
+import os.path
 
 
 def _escape(text):
@@ -128,6 +129,8 @@ class GitHubMdWriter:
                 self._add_list(content)
             case document.Table():
                 self._add_table(content)
+            case document.Image():
+                self._add_image(content)
             case _:
                 assert False
         self._output.append(self.PARAGRAPH_SEPARATOR)
@@ -188,3 +191,10 @@ class GitHubMdWriter:
         # Add the content
         for r in range(1, len(table.rows)):
             self._output.append(_make_table_row(table.rows[r]))
+
+    def _add_image(self, image):
+        assert image.link
+        assert image.scale <= 1
+        presentation = os.path.splitext(os.path.basename(image.link))[0]
+        #self._output.append(f"![{presentation}]({image.link})")
+        self._output.append(f'<img src="{image.link}" alt="{presentation}" width={image.scale:.0%} align="middle"/>')

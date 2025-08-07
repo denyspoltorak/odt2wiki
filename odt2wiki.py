@@ -16,7 +16,6 @@ import image_matcher
 
 TEXT_XML_FILE_NAME = "content.xml"
 STYLES_XML_FILE_NAME = "styles.xml"
-THUMBNAIL_FILE = "Thumbnails/thumbnail.png"
 
 
 def _print_dict_tree(key, tree, level):
@@ -51,7 +50,6 @@ def extract_text(content, destination):
     with open(os.path.expanduser(destination), "x") as output:
         output.write(visitor.results())
 
-
 def convert_to_markdown(archive,
                         content, 
                         styles, 
@@ -64,13 +62,29 @@ def convert_to_markdown(archive,
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
+    # Set up paths
+    dest_path = os.path.expanduser(destination)
     # Process the content
-    doc = document.Document(os.path.expanduser(destination), split_level)
+    doc = document.Document(dest_path, split_level)
     visitor.fill_document(doc)
     doc.create_folders(".md")
     # Map pictires inside the ODT to picture files in the destination folder
+    images = {}
     if images_folder:
-        matched, unmatched = image_matcher.match_images(archive, os.path.expanduser(images_folder))
+        full_local_path = os.path.expanduser(images_folder)
+        matched, unmatched = image_matcher.match_images(archive, full_local_path)
+        if remote_images:
+            for k, v in matched.items():
+                images[k] = v.replace(full_local_path, remote_images)
+        else:
+            images = matched
+        if unmatched:
+            extracted = image_matcher.extract_images(archive, dest_path, unmatched)
+            for k, v in extracted.items():
+                assert k not in images
+                images[k] = v
+    else:
+        images = image_matcher.extract_all_images(archive, dest_path)
     # Convert to markdown
     doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
 

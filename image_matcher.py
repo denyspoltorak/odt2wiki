@@ -3,11 +3,14 @@
 from PIL import Image, UnidentifiedImageError
 from zipfile import ZipFile
 from collections import defaultdict
+from typing import Iterable
 import os
 import math
 
 
 PICTURES_FOLDER = "Pictures/"
+THUMBNAIL_FILE = "Thumbnails/thumbnail.png"
+IMAGE_DEST_PREFIX = "image"
 
 
 def _assert(_):
@@ -66,7 +69,7 @@ class _FileRecord:
         return self.filename + ": " + repr(self.stats)
 
 
-def match_images(archive: ZipFile, image_folder: str):
+def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], set[str]]:
     # Calculate statistics for each image in the local images directory
     has_ambiguous = False
     aspect_ratios = defaultdict(list)
@@ -143,3 +146,25 @@ def match_images(archive: ZipFile, image_folder: str):
     assert not has_ambiguous
     print(f"ODT images were processed sucessfully. Matched: {len(matched)}, unmatched: {len(unmatched)}")
     return matched, unmatched
+
+def extract_images(archive: ZipFile, destination: str, names: Iterable[str]) -> dict[str, str]:
+    archive.extractall(destination, names)
+    pictures_folder_name_len = len(PICTURES_FOLDER)
+    pictures_rel_path = os.path.join(PICTURES_FOLDER[:-1], "")
+    pictures_abs_path = os.path.join(destination, pictures_rel_path)
+    index = 0
+    output = {}
+    for n in names:
+        assert n.startswith(PICTURES_FOLDER)
+        suffix = n.rsplit(".")[1]
+        assert suffix
+        new_rel_name = os.path.join(pictures_rel_path, f"{IMAGE_DEST_PREFIX}{index:03d}.{suffix}")
+        os.rename(os.path.join(pictures_abs_path, n[pictures_folder_name_len:]), os.path.join(destination, new_rel_name))
+        assert n not in output
+        output[n] = new_rel_name
+        index += 1
+    print(f"Extracted {index} images to {pictures_abs_path}")
+    return output
+
+def extract_all_images(archive: ZipFile, destination: str) -> dict[str, str]:
+    return extract_images(archive, destination, [n for n in archive.namelist() if n.startswith(PICTURES_FOLDER)])

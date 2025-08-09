@@ -86,65 +86,80 @@ def convert_to_markdown(archive,
 
 
 def main():
+    description = "Convert ODT to wiki markdown. It can split a book into chapters and match images from the document to those on your drive."
+    usage = """odt2wiki.py <input.odt> --print={files|attrs|tags}
+odt2wiki.py <input.odt> <output.txt> --convert=text
+odt2wiki.py <input.odt> <output_folder> --convert=github [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] """
+    
     # Set up the CLI arguments
-    parser = ArgumentParser(description=__doc__)
+    parser = ArgumentParser(description=description, usage=usage)
     
-    parser.add_argument("input_filename", help="input ODT file")
+    parser.add_argument("input", help="input ODT file")
+    parser.add_argument("output", help="output file or folder", default=None, nargs="?")
     
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-f", "--list-files", action="store_true", help="list files inside the ODT")
-    group.add_argument("-a", "--list-attrs", action="store_true", help="list attributes for each tag")
-    group.add_argument("-t", "--tags-tree", action="store_true", help="print the hierarchy of tags")
-    group.add_argument("-x", "--extract-text", action="store", help="extract text from ODT to this file")
-    group.add_argument("-g", "--to-github-md", action="store", help="convert to GitHub markdown in the given dir")
+    group = parser.add_argument_group("Mode of action")
+    group = group.add_mutually_exclusive_group(required=True)
+    group.add_argument("-p", "--print", choices=("files", "attrs", "tags"), help="print info about the ODT: %(choices)s")
+    group.add_argument("-c", "--convert", choices=("text", "github"), help="convert the ODT into a chosen format: %(choices)s")
     
-    parser.add_argument("-c", "--collapse-level", action="store", type=int, default=0, help="collapse sections of this outline level")
-    parser.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
-    parser.add_argument("-i", "--images-folder", action="store", help="local folder with images used in the document")
-    parser.add_argument("-r", "--remote-images", action="store", help="path to a folder with images to be used in production")
+    group = parser.add_argument_group("Options for markdown conversion")
+    group.add_argument("-l", "--collapse-level", action="store", type=int, default=0, help="collapse sections at this outline level")
+    group.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
+    group.add_argument("-i", "--images-folder", action="store", help="local folder with images used throughout the document")
+    group.add_argument("-r", "--remote-images", action="store", help="route image requests from wiki to this folder")
     
     args = parser.parse_args()
     
     # Run the user's command
     print()
-    print(f"Processing ODT archive {args.input_filename }...")
-    with ZipFile(os.path.expanduser(args.input_filename)) as archive:
-        # Print files in the archive
-        if args.list_files:
-            print("Archive contents:")
-            list_files(archive)
-        else: # Process content.xml in the archive
-            parsed_content = odt_tools.parse(archive.read(TEXT_XML_FILE_NAME))
-            if args.extract_text:
-                print(f"Extracting text from {TEXT_XML_FILE_NAME} to {args.extract_text}")
-                extract_text(parsed_content, args.extract_text)
-            else:
-                parsed_styles = odt_tools.parse(archive.read(STYLES_XML_FILE_NAME))
-                # Print tags from content.xml
-                if args.list_attrs:
+    print(f"Processing ODT archive {args.input}...")
+    with ZipFile(os.path.expanduser(args.input)) as archive:
+        assert args.input
+        parsed_content = odt_tools.parse(archive.read(TEXT_XML_FILE_NAME))
+        parsed_styles = odt_tools.parse(archive.read(STYLES_XML_FILE_NAME))
+        if args.print:
+            if args.output:
+                parser.print_usage()
+                print("Output file is not supported with --print")
+                exit()
+            match args.print:
+                case "files":
+                    print("Archive contents:")
+                    list_files(archive)
+                case "attrs":
                     print(f"Attributes for each tag in {STYLES_XML_FILE_NAME}:")
                     list_attrs(parsed_styles)
                     print()
                     print(f"Attributes for each tag in {TEXT_XML_FILE_NAME}:")
                     list_attrs(parsed_content)
-                # Print the tree of tags from content.xml
-                elif args.tags_tree:
+                case "tags":
                     print(f"Hierarchy of tags for {STYLES_XML_FILE_NAME}:")
                     tags_tree(parsed_styles)
                     print()
                     print(f"Hierarchy of tags for {TEXT_XML_FILE_NAME}:")
                     tags_tree(parsed_content)
-                elif args.to_github_md:
-                    print(f"Converting to GitHub markdown in {args.to_github_md}")
+                case _:
+                    assert False
+        elif args.convert:
+            if not args.output:
+                parser.print_usage()
+                print("Output file or folder is required for --convert")
+                exit()
+            match args.convert:
+                case "text":
+                    print(f"Extracting text from {TEXT_XML_FILE_NAME} to {args.output}")
+                    extract_text(parsed_content, args.output)
+                case "github":
+                    print(f"Converting to GitHub markdown in {args.output}")
                     convert_to_markdown(archive,
                                         parsed_content, 
                                         parsed_styles, 
-                                        args.to_github_md, 
+                                        args.output,
                                         args.collapse_level, 
                                         args.split_level,
                                         args.images_folder,
                                         args.remote_images)
-                else:
+                case _:
                     assert False
     print()
 

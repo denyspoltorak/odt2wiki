@@ -81,7 +81,10 @@ def convert_to_markdown(archive,
     else:
         internal_images = image_matcher.extract_all_images(archive, dest_path)
     # Convert to markdown
-    doc.match_images(external_images, internal_images)
+    doc.link_images(external_images, internal_images)
+    doc.crosslink(md_writer.GitHubMdWriter.make_ref_for_header, 
+                  md_writer.GitHubMdWriter.make_ref_for_text, 
+                  md_writer.GitHubMdWriter.resolve_refs_conflict)
     doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
 
 

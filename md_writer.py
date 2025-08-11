@@ -113,6 +113,34 @@ class GitHubMdWriter:
         self._collapse_level = collapse_level
         self._collapsing = False
     
+    @staticmethod
+    def make_ref_for_header(rel_path, header):
+        # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
+        output = []
+        for c in header.strip():
+            if c.isalnum():
+                output.append(c.lower())
+            elif c == " ":
+                output.append("-")
+        return rel_path + "#" + "".join(output)
+    
+    @staticmethod
+    def make_ref_for_text(rel_path, text):
+        return rel_path + "#" + "".join([c.lower() for c in text.split()[0] if c.isalnum()])
+    
+    @staticmethod
+    def resolve_refs_conflict(anchor, links):
+        # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
+        assert len(links) > 1
+        output = []
+        for l in links[0]:
+            output.append((l, anchor))
+        for i in range(1, len(links)):
+            new_anchor = anchor + "-" + str(i)
+            for l in links[i]:
+                output.append((l, new_anchor))
+        return output
+    
     def get_output(self) -> str:
         if self._collapsing:
             self._output.append("</details>\n")
@@ -195,6 +223,6 @@ class GitHubMdWriter:
     def _add_image(self, image):
         assert image.link
         assert image.scale <= 1
-        presentation = os.path.splitext(os.path.basename(image.link))[0]
+        presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
         #self._output.append(f"![{presentation}]({image.link})")
         self._output.append(f'<img src="{image.link}" alt="{presentation}" width={image.scale:.0%} align="middle"/>')

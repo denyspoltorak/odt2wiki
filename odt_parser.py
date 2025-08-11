@@ -43,6 +43,7 @@ class _Span:
     def __init__(self, text, style):
         self.text = text
         self.style = style
+        self.link = None
 
 
 # Full-featured extraction class
@@ -85,7 +86,7 @@ class FullVisitor():
                 text = child[0]
                 assert extract(text.tag) == "text"
                 self._traverse_text(text)
-        self._postprocess()
+        self._rescale_images()
     
     # _Style extraction
     def _traverse_styles(self, styles):
@@ -117,7 +118,7 @@ class FullVisitor():
                 case _:
                     self._unhandled_tags.add(child_tag)
     
-    def _postprocess(self):
+    def _rescale_images(self):
         # Translate image dimensions to relative scale
         if self._max_image_width:
             for c in self._content:
@@ -147,12 +148,15 @@ class FullVisitor():
             header.spans.append(_Span(header.text, style))
         for child in header:
             child_tag = extract(child.tag)
-            if child_tag == "a":
-                span = self._process_a(child)
-                span.style |= style
-                output.spans.append(span)
-            else:
-                self._unhandled_tags.add(child_tag)
+            match child_tag:
+                case "a":
+                    span = self._process_a(child)
+                    span.style |= style
+                    output.spans.append(span)
+                case "bookmark":
+                    output.bookmarks.append(self._process_bookmark(child))
+                case _:
+                    self._unhandled_tags.add(child_tag)
             if child.tail:
                 output.spans.append(_Span(child.tail, style))
         # Commit
@@ -187,6 +191,8 @@ class FullVisitor():
                     span.style |= style
                     output.grayed_out = output.grayed_out or span.style.colored_background
                     output.spans.append(span)
+                case "bookmark":
+                    output.bookmarks.append(self._process_bookmark(child))
                 case "frame":
                     assert not image
                     image = self._process_frame(child)
@@ -329,11 +335,23 @@ class FullVisitor():
         return output
 
     def _process_a(self, a):
+        # Extract text
         assert not a.text
         assert len(a) == 1
         span = a[0]
         assert extract(span.tag) == "span"
-        return self._process_span(span)
+        output = self._process_span(span)
+        # Extract link
+        for (k, v) in a.attrib.items():
+            attr_name = extract(k)
+            if attr_name == "href":
+                assert not output.link
+                output.link = v.lstrip("#")
+            else:
+                self._unhandled_attrs["a"].add(attr_name)
+        # Validate and return
+        assert output.link
+        return output
     
     def _process_span(self, span):
         style = None
@@ -352,6 +370,16 @@ class FullVisitor():
             count = int(v)
             assert count
         return " " * count
+    
+    @staticmethod
+    def _process_bookmark(b):
+        anchor = None
+        for (k, v) in b.attrib.items():
+            assert not anchor
+            assert extract(k) == "name"
+            anchor = v
+            assert anchor
+        return anchor
     
     def _process_list_item(self, li, kind):
         output = []
@@ -426,6 +454,11 @@ class FullVisitor():
             converted_style = s.style.normalize()
             if len(output) and output[-1].style == converted_style:
                 output[-1].text += s.text
+                if s.link:
+                    if not output[-1].link:
+                        output[-1].link = s.link
+                    else:
+                        assert output[-1].link == s.link
             else:
-                output.append(document.Span(s.text, converted_style))
+                output.append(document.Span(s.text, converted_style, s.link))
         return output

@@ -62,11 +62,11 @@ class _Stats:
 
 class _FileRecord:
     def __init__(self, filename, stats):
-        self.filename = filename
+        self.abs_filename = filename
         self.stats = stats
     
     def __repr__(self):
-        return self.filename + ": " + repr(self.stats)
+        return self.abs_filename + ": " + repr(self.stats)
 
 
 def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], set[str]]:
@@ -90,7 +90,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], s
                             has_ambiguous = True
                             print(f"Similar images:")
                             print(f"{a}: {r}")
-                            print(f"{aspect}: {_FileRecord(filename, stats)}")
+                            print(f"{aspect}: {_FileRecord(abs_filename, stats)}")
                             print()
                 # Register the image
                 aspect_ratios[aspect].append(_FileRecord(filename, stats))
@@ -106,9 +106,9 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], s
     loose_matches = 0
     print("Processing images in the ODT...")
     for i in infos:
-        if i.filename.startswith(PICTURES_FOLDER):
-            assert i.filename not in matched
-            assert i.filename not in unmatched
+        if i.abs_filename.startswith(PICTURES_FOLDER):
+            assert i.abs_filename not in matched
+            assert i.abs_filename not in unmatched
             # Open the image
             with archive.open(i) as img_file:
                 img = _load_image(img_file)
@@ -119,7 +119,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], s
             for r in aspect_ratios[aspect]:
                 if r.stats.eq_strict(stats):
                     assert not found
-                    found = r.filename
+                    found = r.abs_filename
                     perfect_matches += 1
             # Looser match for resized images
             if not found:
@@ -128,11 +128,11 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], s
                         if r.stats.eq_loose(stats):
                             if found:
                                 has_ambiguous = True
-                                print(f"Ambiguous match from {i.filename} to: {r.filename} and {found}")
-                            found = r.filename
+                                print(f"Ambiguous match from {i.abs_filename} to: {r.abs_filename} and {found}")
+                            found = r.abs_filename
                             loose_matches += 1
             if not found:
-                print("Unmatched:", i.filename, aspect, stats)
+                print("Unmatched:", i.abs_filename, aspect, stats)
                 for a in range(aspect - 1, aspect + 2):
                     print("->", a)
                     for r in aspect_ratios[a]:
@@ -140,9 +140,9 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], s
                 print()
             # Write down results
             if found:
-                matched[i.filename] = found
+                matched[i.abs_filename] = found
             else:
-                unmatched.add(i.filename)
+                unmatched.add(i.abs_filename)
     assert not has_ambiguous
     print(f"ODT images were processed sucessfully. Matched: {len(matched)}, unmatched: {len(unmatched)}")
     return matched, unmatched

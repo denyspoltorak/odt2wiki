@@ -84,13 +84,16 @@ def convert_to_markdown(archive,
     doc.link_images(external_images, internal_images)
     doc.crosslink(md_writer.GitHubMdWriter.make_ref_for_header, 
                   md_writer.GitHubMdWriter.make_ref_for_text, 
-                  md_writer.GitHubMdWriter.resolve_refs_conflict)
+                  md_writer.GitHubMdWriter.resolve_refs_conflict,
+                  md_writer.GitHubMdWriter.process_internal_link)
     doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
+    print(f"Markdown created in {dest_path}")
 
 
 def main():
     description = "Convert ODT to wiki markdown. It can split a book into chapters and match images from the document to those on your drive."
-    usage = """odt2wiki.py <input.odt> --print={files|attrs|tags}
+    usage = """
+odt2wiki.py <input.odt> --print={files|attrs|tags}
 odt2wiki.py <input.odt> <output.txt> --convert=text
 odt2wiki.py <input.odt> <output_folder> --convert=github [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] """
     

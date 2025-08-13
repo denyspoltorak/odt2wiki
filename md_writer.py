@@ -47,6 +47,37 @@ def _make_html_color_name(color):
         return "green"
     else:
         return ""
+    
+    
+def _close_style(color, underline, bold, italic, strikethrough):
+    output = []
+    if color:
+        output.append("</span>")
+    if underline:
+        output.append("</ins>")
+    if bold:
+        output.append("**")
+    if italic:
+        output.append("*")
+    if strikethrough:
+        output.append("~")
+    return output
+
+
+def _open_style(color, underline, bold, italic, strikethrough):
+    output = []
+    if strikethrough:
+        output.append("~")
+    if italic:
+        output.append("*")
+    if bold:
+        output.append("**")
+    if underline:
+        output.append("<ins>")
+    if color:
+        output.append(f'<span style="color:{color}">')
+    return output
+    
 
 def _change_style(old, new, old_link, new_link, add_spaces):
     output = []
@@ -55,16 +86,21 @@ def _change_style(old, new, old_link, new_link, add_spaces):
     old_underline = old.underline and not old_link
     new_underline = new.underline and not new_link
     # Close the old style
-    if old_color_name and old_color_name != new_color_name:
-        output.append("</span>")
-    if old_underline and not new_underline:
-        output.append("</ins>")
-    if old.bold and not new.bold:
-        output.append("**")
-    if old.italic and not new.italic:
-        output.append("_")
-    if old.strikethrough and not new.strikethrough:
-        output.append("~")
+    if old_link != new_link:
+        # A style cannot cross a link's border - reset
+        output.extend(_close_style(old_color_name, old_underline, old.bold, old.italic, old.strikethrough))
+    else:
+        # Apply the style diff
+        if old_color_name and old_color_name != new_color_name:
+            output.append("</span>")
+        if old_underline and not new_underline:
+            output.append("</ins>")
+        if old.bold and not new.bold:
+            output.append("**")
+        if old.italic and not new.italic:
+            output.append("*")
+        if old.strikethrough and not new.strikethrough:
+            output.append("~")
     if old_link and old_link != new_link:
         output.append(f"]({old_link})")
     # Insert whitespaces which we move from inside the tags
@@ -72,16 +108,21 @@ def _change_style(old, new, old_link, new_link, add_spaces):
     # Open the new style
     if new_link and new_link != old_link:
         output.append("[")
-    if new.strikethrough and not old.strikethrough:
-        output.append("~")
-    if new.italic and not old.italic:
-        output.append("_")
-    if new.bold and not old.bold:
-        output.append("**")
-    if new_underline and not old_underline:
-        output.append("<ins>")
-    if new_color_name and new_color_name != old_color_name:
-        output.append(f'<span style="color:{new_color_name}">')
+    if old_link != new_link:
+        # A style cannot cross a link's border - reload
+        output.extend(_open_style(new_color_name, new_underline, new.bold, new.italic, new.strikethrough))
+    else:
+        # Apply the style diff
+        if new.strikethrough and not old.strikethrough:
+            output.append("~")
+        if new.italic and not old.italic:
+            output.append("*")
+        if new.bold and not old.bold:
+            output.append("**")
+        if new_underline and not old_underline:
+            output.append("<ins>")
+        if new_color_name and new_color_name != old_color_name:
+            output.append(f'<span style="color:{new_color_name}">')
     # Merge
     return "".join(output)
 
@@ -149,16 +190,25 @@ class GitHubMdWriter:
                 output.append((l, new_anchor))
         return output
     
+    @staticmethod
+    def process_internal_link(link):
+        if link.startswith("#"):
+            return link
+        else:
+            # Github wiki wants stripped filenames - without directories and extensions
+            filename, anchor = link.split("#")
+            filename = os.path.basename(filename)
+            assert filename.endswith(".md")
+            return "#".join((filename[:-3], anchor))
+    
     def get_output(self) -> str:
         if self._collapsing:
             self._output.append("</details>\n")
             self._collapsing = False
         return "".join(self._output)
-    
+
     def add(self, content: document.Content) -> None:
         match content:
-            case document.Header():
-                self._add_header(content)
             case document.Paragraph():
                 self._add_paragraph(content, True)
             case document.List():
@@ -172,21 +222,24 @@ class GitHubMdWriter:
         self._output.append(self.PARAGRAPH_SEPARATOR)
     
     # Methods to add document parts
-    def _add_header(self, header):
+    def add_header(self, header: document.Header, split_level: int) -> None:
         assert header.outline_level
         # Close the previous section
         if self._collapsing and header.outline_level <= self._collapse_level:
-            self._output.append("</details>\n")
+            self._output.append("</details>\n\n")
             self._collapsing = False
         # Write the new section
         if header.outline_level == self._collapse_level:
-            self._output.append("<details>\n<summary>")
+            self._output.append("<details>\n<summary>\n\n")
             self._collapsing = True
-        self._output.append("#" * header.outline_level + " ")
+        # Promote the file-level header
+        promoted = max(header.outline_level - split_level + 1, 1)
+        self._output.append("#" * promoted + " ")
         self._add_paragraph(header, False)
         if self._collapsing:
-            self._output.append("</summary>")
-        
+            self._output.append("\n</summary>")
+        self._output.append(self.PARAGRAPH_SEPARATOR)
+      
     def _add_paragraph(self, paragraph, write_anchor):
         if write_anchor and paragraph.bookmarks:
             assert len(paragraph.bookmarks) == 1

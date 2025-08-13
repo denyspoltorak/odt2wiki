@@ -199,29 +199,29 @@ class _Section:
         for child in self.children:
             child.replace_bookmarks(direct, remap)
             
-    def replace_links(self, mapping):
+    def replace_links(self, mapping, process_internal_link):
         for s in self.header.spans:
             if s.link:
-                s.link = self._replace_single_link(s.link, mapping)
+                s.link = self._replace_single_link(s.link, mapping, process_internal_link)
         for c in self.content:
-            self._replace_links_in_content(c, mapping)
+            self._replace_links_in_content(c, mapping, process_internal_link)
         for child in self.children:
-            child.replace_links(mapping)
+            child.replace_links(mapping, process_internal_link)
         
-    def dump(self, writer, writer_factory, split_level):
+    def dump(self, writer, writer_factory):
         assert self.abs_filename
         # Start a new file if this is a book chapter or part
-        if self.header.outline_level <= split_level:
+        if self.header.outline_level <= self.split_level:
             writer = writer_factory()
         # Write our content
         if self.header.outline_level:
-            writer.add(self.header)
+            writer.add_header(self.header, self.split_level)
         for c in self.content:
             writer.add(c)
         for child in self.children:
-            child.dump(writer, writer_factory, split_level)
+            child.dump(writer, writer_factory)
         # Save it to the file
-        if self.header.outline_level <= split_level:
+        if self.header.outline_level <= self.split_level:
             with open(self.abs_filename, "x") as output:
                 output.write(writer.get_output())
         
@@ -249,19 +249,19 @@ class _Section:
                 for i in c.items:
                     self._replace_bookmarks_in_content(i, mapping)
     
-    def _replace_links_in_content(self, c, mapping):
+    def _replace_links_in_content(self, c, mapping, process_internal_link):
         match c:
             case Paragraph():
                 for s in c.spans:
                     if s.link:
-                        s.link = self._replace_single_link(s.link, mapping)
+                        s.link = self._replace_single_link(s.link, mapping, process_internal_link)
             case List():
                 for i in c.items:
-                    self._replace_links_in_content(i, mapping)
+                    self._replace_links_in_content(i, mapping, process_internal_link)
             case Table():
                 for r in c.rows:
                     for col in r:
-                        self._replace_links_in_content(col, mapping)
+                        self._replace_links_in_content(col, mapping, process_internal_link)
     
     def _replace_single_bookmark(self, bookmarks, mapping):
         assert bookmarks
@@ -271,13 +271,13 @@ class _Section:
         assert new_bookmark.startswith(self.rel_filename)
         return new_bookmark[len(self.rel_filename):]
     
-    def _replace_single_link(self, link, mapping):
+    def _replace_single_link(self, link, mapping, process_internal_link):
         new_link = mapping.get(link)
         if new_link:
             if new_link.startswith(self.rel_filename):
-                return new_link[len(self.rel_filename):]
+                return process_internal_link(new_link[len(self.rel_filename):])
             else:
-                return self._join_paths(self.path_to_root, new_link)
+                return process_internal_link(self._join_paths(self.path_to_root, new_link))
         else:
             assert link.startswith("http") or link.startswith("mailto"), link
             return link
@@ -306,7 +306,7 @@ class Document:
     def link_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
         self._root.match_images(external_images, internal_images)
         
-    def crosslink(self, make_ref_for_header, make_ref_for_text, resolve_refs_conflict):
+    def crosslink(self, make_ref_for_header, make_ref_for_text, resolve_refs_conflict, process_internal_link):
         # Translate bookmarks (links) into markdown format (anchors) and find duplicate anchors
         direct = {}             # link, anchor              - ODT to markdown headers links map
         reverse = {}            # anchor, list[link]        - markdown to ODT multiple links map
@@ -332,10 +332,10 @@ class Document:
                 direct[l] = p
         # Commit the changes
         self._root.replace_bookmarks(direct, remap)
-        self._root.replace_links(direct | remap)
+        self._root.replace_links(direct | remap, process_internal_link)
         
     def dump(self, writer_factory) -> None:
-        self._root.dump(None, writer_factory, self._split_level)
+        self._root.dump(None, writer_factory)
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)

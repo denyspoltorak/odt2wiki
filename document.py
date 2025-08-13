@@ -277,7 +277,7 @@ class _Section:
             if new_link.startswith(self.rel_filename):
                 return new_link[len(self.rel_filename):]
             else:
-                return new_link
+                return self._join_paths(self.path_to_root, new_link)
         else:
             assert link.startswith("http") or link.startswith("mailto"), link
             return link

@@ -48,14 +48,16 @@ def _make_html_color_name(color):
     else:
         return ""
 
-def _change_style(old, new, add_spaces):
+def _change_style(old, new, old_link, new_link, add_spaces):
     output = []
     old_color_name = _make_html_color_name(old.color)
     new_color_name = _make_html_color_name(new.color)
+    old_underline = old.underline and not old_link
+    new_underline = new.underline and not new_link
     # Close the old style
     if old_color_name and old_color_name != new_color_name:
         output.append("</span>")
-    if old.underline and not new.underline:
+    if old_underline and not new_underline:
         output.append("</ins>")
     if old.bold and not new.bold:
         output.append("**")
@@ -63,16 +65,20 @@ def _change_style(old, new, add_spaces):
         output.append("_")
     if old.strikethrough and not new.strikethrough:
         output.append("~")
+    if old_link and old_link != new_link:
+        output.append(f"]({old_link})")
     # Insert whitespaces which we move from inside the tags
     output.append(" " * add_spaces)
     # Open the new style
+    if new_link and new_link != old_link:
+        output.append("[")
     if new.strikethrough and not old.strikethrough:
         output.append("~")
     if new.italic and not old.italic:
         output.append("_")
     if new.bold and not old.bold:
         output.append("**")
-    if new.underline and not old.underline:
+    if new_underline and not old_underline:
         output.append("<ins>")
     if new_color_name and new_color_name != old_color_name:
         output.append(f'<span style="color:{new_color_name}">')
@@ -85,6 +91,7 @@ def _add_spans(spans):
     move_spaces = 0
     # Current style
     style = document.Style()
+    link = ""
     # Process the spans
     for s in spans:
         # Don't allow for spaces between markup tags and the text
@@ -92,13 +99,14 @@ def _add_spans(spans):
         move_spaces += len(s.text) - len(left_stripped_text)
         if not left_stripped_text:
             continue
-        output.append(_change_style(style, s.style, move_spaces))
+        output.append(_change_style(style, s.style, link, s.link, move_spaces))
         style = s.style
+        link = s.link
         fully_stripped_text = left_stripped_text.rstrip()
         assert fully_stripped_text
         move_spaces = len(left_stripped_text) - len(fully_stripped_text)
         output.append(_escape(fully_stripped_text))
-    output.append(_change_style(style, document.Style(), move_spaces))
+    output.append(_change_style(style, document.Style(), link, "", move_spaces))
     # Merge
     result = "".join(output)
     assert result
@@ -152,7 +160,7 @@ class GitHubMdWriter:
             case document.Header():
                 self._add_header(content)
             case document.Paragraph():
-                self._add_paragraph(content)
+                self._add_paragraph(content, True)
             case document.List():
                 self._add_list(content)
             case document.Table():
@@ -175,11 +183,15 @@ class GitHubMdWriter:
             self._output.append("<details>\n<summary>")
             self._collapsing = True
         self._output.append("#" * header.outline_level + " ")
-        self._add_paragraph(header)
+        self._add_paragraph(header, False)
         if self._collapsing:
             self._output.append("</summary>")
         
-    def _add_paragraph(self, paragraph):
+    def _add_paragraph(self, paragraph, write_anchor):
+        if write_anchor and paragraph.bookmarks:
+            assert len(paragraph.bookmarks) == 1
+            anchor_name = paragraph.bookmarks[0].split("#")[1]
+            self._output.append(f'<a name="{anchor_name}"></a>\n')
         if paragraph.grayed_out:
             self._output.append("> ")
         self._output.append(_add_spans(paragraph.spans))
@@ -202,7 +214,7 @@ class GitHubMdWriter:
             match i:
                 case document.Paragraph():
                     self._output.append(prefix + method(index))
-                    self._add_paragraph(i)
+                    self._add_paragraph(i, True)
                     self._output.append("\n")
                 case document.List():
                     self._add_list(i, offset)

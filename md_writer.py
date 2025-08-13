@@ -290,4 +290,4 @@ class GitHubMdWriter:
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
         #self._output.append(f"![{presentation}]({image.link})")
-        self._output.append(f'<img src="{image.link}" alt="{presentation}" width={image.scale:.0%} align="middle"/>')
+        self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')

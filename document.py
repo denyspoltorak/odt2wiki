@@ -108,7 +108,8 @@ class _Section:
         assert not self.rel_filename
         assert not self.abs_filename
         assert not self.path_to_root
-        filename = string_to_filename(self.header.to_string())
+        header_text = self.header.to_string()
+        filename = string_to_filename(header_text)
         # Create the root folder
         if not self.header.outline_level:
             assert not filename
@@ -120,7 +121,12 @@ class _Section:
             assert filename
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
-            self.rel_filename = self._join_paths(root_to_parent, UNNAMED_FILENAME + file_extension)
+            # Try making a unique intro file name
+            intro_name = UNNAMED_FILENAME
+            split_header = header_text.split(".")
+            if len(split_header):
+                intro_name = string_to_filename(" ".join((split_header[0], intro_name)))
+            self.rel_filename = self._join_paths(root_to_parent, intro_name + file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         # Remember the file to create
         elif self.header.outline_level == self.split_level:

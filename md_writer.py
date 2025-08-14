@@ -305,15 +305,15 @@ class GitHubMdWriter:
             assert i.level > 0
             assert i.name
             assert i.link
-            item_text = f"[{i.name}]({_strip_filename(i.link)})\n"
             if i.level > 1:
-                self._output.append("  " * (i.level - 2) + "- " + item_text)
+                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({_strip_filename(i.link)})\n")
             else:        
                 if self._collapsing:
                     self._output.append("\n</details>\n\n")
                 if self._collapse_level:
-                    self._output.append("<details>\n<summary>\n")
+                    self._output.append("")
                     self._collapsing = True
-                self._output.append("\n" + item_text)
-                if self._collapsing:
-                    self._output.append("\n</summary>\n\n")
+                    # Markdown does not work inside <summary>
+                    self._output.append(f'<details>\n<summary><a href="{_strip_filename(i.link)}">{i.name}</a></summary>\n\n')
+                else:
+                    self._output.append(f"\n### [{i.name}]({_strip_filename(i.link)})\n\n")

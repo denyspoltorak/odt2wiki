@@ -335,12 +335,9 @@ class Document:
         self._split_level = split_level
         self._root = Section(None, Header(), split_level)
         self._current_section = self._root
-        self._toc = None
         
-    def create_folders(self, file_extension: str, toc_filename: str = None) -> None:
+    def create_folders(self, file_extension: str) -> None:
         self._root.create_folders(self._destination, "", file_extension)
-        if toc_filename:
-            self._toc = os.path.join(self._destination, toc_filename + file_extension)
         
     def link_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
         self._root.match_images(external_images, internal_images)
@@ -375,8 +372,9 @@ class Document:
         
     def dump(self, writer_factory) -> None:
         self._root.dump(None, writer_factory)
-        if self._toc:
-            TocMaker(self._toc, writer_factory).make(self._root)
+    
+    def dump_toc(self, writer_factory, toc_filename) -> None:
+        TocMaker(os.path.join(self._destination, toc_filename), writer_factory).make(self._root)
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)

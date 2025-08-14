@@ -299,6 +299,7 @@ class GitHubMdWriter:
         self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
     
     def _add_toc(self, toc):
+        assert self._collapse_level in (0, 1) # Cannot collapse inside a list
         assert toc.items[0].level == 1
         for i in toc.items:
             assert i.level > 0
@@ -306,7 +307,13 @@ class GitHubMdWriter:
             assert i.link
             item_text = f"[{i.name}]({_strip_filename(i.link)})\n"
             if i.level > 1:
-                output = "  " * (i.level - 2) + "- " + item_text
-            else:
-                output = "\n" + item_text
-            self._output.append(output)
+                self._output.append("  " * (i.level - 2) + "- " + item_text)
+            else:        
+                if self._collapsing:
+                    self._output.append("\n</details>\n\n")
+                if self._collapse_level:
+                    self._output.append("<details>\n<summary>\n")
+                    self._collapsing = True
+                self._output.append("\n" + item_text)
+                if self._collapsing:
+                    self._output.append("\n</summary>\n\n")

@@ -13,6 +13,12 @@ def _escape(text):
     return "".join(output)
 
 
+def _strip_filename(filename):
+    filename = os.path.basename(filename)
+    assert filename.endswith(".md")
+    return filename[:-3]
+
+
 def _make_list_bullet(index):
     return "- "
 
@@ -197,9 +203,7 @@ class GitHubMdWriter:
         else:
             # Github wiki wants stripped filenames - without directories and extensions
             filename, anchor = link.split("#")
-            filename = os.path.basename(filename)
-            assert filename.endswith(".md")
-            return "#".join((filename[:-3], anchor))
+            return _strip_filename(filename) + "#" + anchor
     
     def get_output(self) -> str:
         if self._collapsing:
@@ -217,6 +221,8 @@ class GitHubMdWriter:
                 self._add_table(content)
             case document.Image():
                 self._add_image(content)
+            case document.ToC():
+                self._add_toc(content)
             case _:
                 assert False
         self._output.append(self.PARAGRAPH_SEPARATOR)
@@ -291,3 +297,16 @@ class GitHubMdWriter:
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
         #self._output.append(f"![{presentation}]({image.link})")
         self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
+    
+    def _add_toc(self, toc):
+        assert toc.items[0].level == 1
+        for i in toc.items:
+            assert i.level > 0
+            assert i.name
+            assert i.link
+            item_text = f"[{i.name}]({_strip_filename(i.link)})\n"
+            if i.level > 1:
+                output = "  " * (i.level - 2) + "- " + item_text
+            else:
+                output = "\n" + item_text
+            self._output.append(output)

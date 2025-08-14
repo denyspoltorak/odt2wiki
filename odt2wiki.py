@@ -65,7 +65,7 @@ def convert_to_markdown(archive,
     # Process the content
     doc = document.Document(dest_path, split_level)
     visitor.fill_document(doc)
-    doc.create_folders(".md")
+    doc.create_folders(".md", "Home")
     # Map pictires inside the ODT to picture files in the destination folder
     external_images = {}
     internal_images = {}

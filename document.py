@@ -45,11 +45,11 @@ class Span:
         self.link = link
 
 
-# Link to an internal or external resource
-class Link:
-    def __init__(self, text: str, internal: Optional[bool] = None):
-        self.text = text
-        self.internal = internal
+class TocItem:
+    def __init__(self, name: str, link: str, level: int):
+        self.name = name
+        self.link = link
+        self.level = level
 
 
 class Content:
@@ -91,9 +91,14 @@ class Image(Content):
     def __init__(self, link, scale):
         self.link = link
         self.scale = scale
+        
+
+class ToC(Content):
+    def __init__(self):
+        self.items = []
 
 
-class _Section:
+class Section:
     def __init__(self, parent, header, split_level):
         self.parent = parent
         self.split_level = split_level
@@ -230,6 +235,11 @@ class _Section:
         if self.header.outline_level <= self.split_level:
             with open(self.abs_filename, "x") as output:
                 output.write(writer.get_output())
+    
+    def traverse(self, handler):
+        handler(self)
+        for child in self.children:
+            child.traverse(handler)
         
     def _process_bookmarks(self, bookmarks, text, direct, reverse, reverse_duplicates, make_ref):
         assert bookmarks
@@ -299,15 +309,38 @@ class _Section:
         else:
             return ""
 
+
+class TocMaker:
+    def __init__(self, filename, writer_factory):
+        self._filename = filename
+        self._writer = writer_factory()
+        self._toc = ToC()
+    
+    def make(self, root):
+        root.traverse(self)
+        self._writer.add(self._toc)
+        with open(self._filename, "x") as output:
+            output.write(self._writer.get_output())
+    
+    def __call__(self, section):
+        if section.header.outline_level <= section.split_level:
+            name = section.header.to_string()
+            level = section.header.outline_level
+            self._toc.items.append(TocItem(name if name else "Introduction", section.rel_filename, max(level, 1)))
+
+
 class Document:
     def __init__(self, destination: str, split_level: int):
         self._destination = destination
         self._split_level = split_level
-        self._root = _Section(None, Header(), split_level)
+        self._root = Section(None, Header(), split_level)
         self._current_section = self._root
+        self._toc = None
         
-    def create_folders(self, file_extension: str) -> None:
+    def create_folders(self, file_extension: str, toc_filename: str = None) -> None:
         self._root.create_folders(self._destination, "", file_extension)
+        if toc_filename:
+            self._toc = os.path.join(self._destination, toc_filename + file_extension)
         
     def link_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
         self._root.match_images(external_images, internal_images)
@@ -342,6 +375,8 @@ class Document:
         
     def dump(self, writer_factory) -> None:
         self._root.dump(None, writer_factory)
+        if self._toc:
+            TocMaker(self._toc, writer_factory).make(self._root)
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)
@@ -357,6 +392,6 @@ class Document:
         while header.outline_level <= parent_section.header.outline_level:
             parent_section = parent_section.parent
         # Create the new section
-        new_section = _Section(parent_section, header, self._split_level)
+        new_section = Section(parent_section, header, self._split_level)
         parent_section.children.append(new_section)
         self._current_section = new_section

@@ -1,6 +1,12 @@
 "Matching images from the ODT to local files"
 
-from PIL import Image, UnidentifiedImageError
+has_image_matcher = True
+
+try:
+    from PIL import Image, UnidentifiedImageError
+except ModuleNotFoundError:
+    has_image_matcher = False
+
 from zipfile import ZipFile
 from collections import defaultdict
 from typing import Iterable
@@ -70,6 +76,7 @@ class _FileRecord:
 
 
 def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, str], set[str]]:
+    assert has_image_matcher
     # Calculate statistics for each image in the local images directory
     has_ambiguous = False
     aspect_ratios = defaultdict(list)

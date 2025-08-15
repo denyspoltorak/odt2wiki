@@ -311,7 +311,6 @@ class GitHubMdWriter:
                 if self._collapsing:
                     self._output.append("\n</details>\n\n")
                 if self._collapse_level:
-                    self._output.append("")
                     self._collapsing = True
                     # Markdown does not work inside <summary>
                     self._output.append(f'<details>\n<summary><a href="{_strip_filename(i.link)}">{i.name}</a></summary>\n\n')

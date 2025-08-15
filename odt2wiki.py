@@ -70,6 +70,9 @@ def convert_to_markdown(archive,
     external_images = {}
     internal_images = {}
     if images_folder:
+        if not image_matcher.has_image_matcher:
+            print("FATAL: Matching images requires Pillow to be installed\n")
+            exit(1)
         full_local_path = os.path.expanduser(images_folder)
         matched, unmatched = image_matcher.match_images(archive, full_local_path)
         if remote_image_path:

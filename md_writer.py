@@ -15,7 +15,7 @@ def _escape(text):
 
 def _strip_filename(filename):
     filename = os.path.basename(filename)
-    assert filename.endswith(".md")
+    assert filename.endswith(".md"), filename
     return filename[:-3]
 
 
@@ -169,18 +169,23 @@ class GitHubMdWriter:
         self._collapsing = False
     
     @staticmethod
-    def make_ref_for_header(rel_path, header):
+    def make_ref_for_header(rel_path, header, is_title):
         # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
-        output = []
-        for c in header.strip():
-            if c.isalnum():
-                output.append(c.lower())
-            elif c == " ":
-                output.append("-")
-        return rel_path + "#" + "".join(output)
+        if is_title:
+            # Title od a wiki page is not rendered - we rely on file name instead, therefore the reference leads to the file
+            return rel_path
+        else:
+            output = []
+            for c in header.strip():
+                if c.isalnum():
+                    output.append(c.lower())
+                elif c == " ":
+                    output.append("-")
+            return rel_path + "#" + "".join(output)
     
     @staticmethod
-    def make_ref_for_text(rel_path, text):
+    def make_ref_for_text(rel_path, text, is_title):
+        assert not is_title
         return rel_path + "#" + "".join([c.lower() for c in text.split()[0] if c.isalnum()])
     
     @staticmethod
@@ -198,12 +203,19 @@ class GitHubMdWriter:
     
     @staticmethod
     def process_internal_link(link):
-        if link.startswith("#"):
-            return link
+        if not link:
+            return "#"
         else:
-            # Github wiki wants stripped filenames - without directories and extensions
-            filename, anchor = link.split("#")
-            return f"<{_strip_filename(filename)}#{anchor}>"
+            index = link.find("#")
+            if index == -1:
+                # 'filename'
+                return f"<{_strip_filename(link)}>"
+            elif index == 0:
+                # '#section'
+                return link
+            else:
+                # 'filename#section'
+                return f"<{_strip_filename(link[:index])}{link[index:]}>"
     
     def get_output(self) -> str:
         if self._collapsing:
@@ -230,6 +242,9 @@ class GitHubMdWriter:
     # Methods to add document parts
     def add_header(self, header: document.Header, split_level: int) -> None:
         assert header.outline_level
+        # Skip chapter names as GitHub wiki shows file names anyway, and file names are the same as chapter names
+        if header.outline_level <= split_level:
+            return
         # Close the previous section
         if self._collapsing and header.outline_level <= self._collapse_level:
             self._output.append("</details>\n\n")

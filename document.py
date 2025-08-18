@@ -173,7 +173,8 @@ class Section:
                                     direct, 
                                     reverse, 
                                     reverse_duplicates, 
-                                    make_ref_for_header)
+                                    make_ref_for_header,
+                                    self.header.outline_level <= self.split_level)
         else:
             assert not self.header.spans
         # Extract bookmarks from the section's text
@@ -236,9 +237,9 @@ class Section:
         for child in self.children:
             child.traverse(handler)
         
-    def _process_bookmarks(self, bookmarks, text, direct, reverse, reverse_duplicates, make_ref):
+    def _process_bookmarks(self, bookmarks, text, direct, reverse, reverse_duplicates, make_ref, is_title = False):
         assert bookmarks
-        ref = make_ref(self.rel_filename, text)
+        ref = make_ref(self.rel_filename, text, is_title)
         # Add mappings from ODT to markdown anchors
         for b in bookmarks:
             assert b not in direct

@@ -6,11 +6,11 @@ from typing import Optional
 import os
 
 
-def string_to_filename(string): #https://stackoverflow.com/questions/295135/turn-a-string-into-a-valid-abs_filename
-    return "".join([x if x.isalnum() else "_" for x in string]).replace("__", "_")
+def string_to_filename(string):
+    return string.rstrip(". ")
 
 
-UNNAMED_FILENAME = "Intro"
+UNNAMED_FILENAME = "Introduction"
 
 
 class ListStyle(Enum):
@@ -39,7 +39,7 @@ class Style:
 
 # A chunk of text in a given style
 class Span:
-    def __init__(self, text: str, style: Style, link: Optional[str] = None):
+    def __init__(self, text: str, style: Style = Style(), link: Optional[str] = None):
         self.text = text
         self.style = style
         self.link = link
@@ -126,12 +126,7 @@ class Section:
             assert filename
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
-            # Try making a unique intro file name
-            intro_name = UNNAMED_FILENAME
-            split_header = header_text.split(".")
-            if len(split_header):
-                intro_name = string_to_filename(" ".join((split_header[0], intro_name)))
-            self.rel_filename = self._join_paths(root_to_parent, intro_name + file_extension)
+            self.rel_filename = self._join_paths(root_to_parent, filename + file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         # Remember the file to create
         elif self.header.outline_level == self.split_level:

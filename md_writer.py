@@ -203,7 +203,7 @@ class GitHubMdWriter:
         else:
             # Github wiki wants stripped filenames - without directories and extensions
             filename, anchor = link.split("#")
-            return _strip_filename(filename) + "#" + anchor
+            return f"<{_strip_filename(filename)}#{anchor}>"
     
     def get_output(self) -> str:
         if self._collapsing:
@@ -306,7 +306,7 @@ class GitHubMdWriter:
             assert i.name
             assert i.link
             if i.level > 1:
-                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({_strip_filename(i.link)})\n")
+                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}](<{_strip_filename(i.link)}>)\n")
             else:        
                 if self._collapsing:
                     self._output.append("\n</details>\n\n")
@@ -315,4 +315,4 @@ class GitHubMdWriter:
                     # Markdown does not work inside <summary>
                     self._output.append(f'<details>\n<summary><a href="{_strip_filename(i.link)}">{i.name}</a></summary>\n\n')
                 else:
-                    self._output.append(f"\n### [{i.name}]({_strip_filename(i.link)})\n\n")
+                    self._output.append(f"\n### [{i.name}](<{_strip_filename(i.link)}>)\n\n")

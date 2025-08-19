@@ -63,13 +63,14 @@ def convert_to_markdown(archive,
     # Set up paths
     dest_path = os.path.expanduser(destination)
     # Process the content
-    doc = document.Document(dest_path, split_level)
+    strategy = md_writer.github_strategy
+    doc = document.Document(dest_path, split_level, strategy)
     visitor.fill_document(doc)
-    doc.create_folders(".md")
+    doc.create_folders()
     # Create tables of contents
-    index = document.TocMaker().make(doc.root())
-    main_toc = document.Section.create("Home", dest_path, ".md", split_level, [index,])
-    side_toc = document.Section.create("_Sidebar", dest_path, ".md", split_level, [index,])
+    index = document.TocMaker(strategy).make(doc.root())
+    main_toc = document.Section.create("Home", dest_path, split_level, [index,], strategy)
+    side_toc = document.Section.create("_Sidebar", dest_path, split_level, [index,], strategy)
     # Map pictires inside the ODT to picture files in the destination folder
     external_images = {}
     internal_images = {}
@@ -89,13 +90,10 @@ def convert_to_markdown(archive,
         internal_images = image_matcher.extract_all_images(archive, dest_path)
     # Convert to markdown
     doc.link_images(external_images, internal_images)
-    doc.crosslink(md_writer.GitHubMdWriter.make_ref_for_header, 
-                  md_writer.GitHubMdWriter.make_ref_for_text, 
-                  md_writer.GitHubMdWriter.resolve_refs_conflict,
-                  md_writer.GitHubMdWriter.process_internal_link)
-    doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
-    main_toc.dump(functools.partial(md_writer.GitHubMdWriter, 0))   # Don't collapse anything
-    side_toc.dump(functools.partial(md_writer.GitHubMdWriter, 1))   # Collapse book parts
+    doc.crosslink()
+    doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
+    doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level=collapse_level))
+    side_toc.dump(functools.partial(md_writer.GitHubMdWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
     print(f"Markdown created in {dest_path}")
 
 

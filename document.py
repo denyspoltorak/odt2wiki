@@ -52,6 +52,15 @@ class TocItem:
         self.level = level
 
 
+class NavItem:
+    def __init__(self, name, link):
+        self.name = name
+        self.link = link
+    
+    def to_paragraph(self):
+        return Paragraph.from_link(self.name, self.link)
+
+
 class Content:
     pass
 
@@ -61,6 +70,12 @@ class Paragraph(Content):
         self.spans = []
         self.bookmarks = []
         self.grayed_out = False
+    
+    @staticmethod
+    def from_link(text, link):
+        output = Paragraph()
+        output.spans.append(Span(text, link=link))
+        return output
         
     def to_string(self):
         return "".join([s.text for s in self.spans])
@@ -98,12 +113,29 @@ class Image(Content):
 class ToC(Content):
     def __init__(self):
         self.items = []
+        
+
+class NavBar(Content):
+    def __init__(self):
+        self.prev = None
+        self.next = None
+        self.up = None
+        
+        
+class Strategy:
+    def __init__(self, file_extension, make_ref_for_header, make_ref_for_text, resolve_refs_conflict, process_internal_link):
+        self.file_extension = file_extension
+        self.make_ref_for_header = make_ref_for_header
+        self.make_ref_for_text = make_ref_for_text
+        self.resolve_refs_conflict = resolve_refs_conflict
+        self.process_internal_link = process_internal_link
 
 
 class Section:
-    def __init__(self, parent, header, split_level):
+    def __init__(self, parent, header, split_level, strategy):
         self.parent = parent
         self.split_level = split_level
+        self.strategy = strategy
         self.header = header
         self.content = []
         self.children = []
@@ -112,14 +144,14 @@ class Section:
         self.path_to_root = ""
         
     @staticmethod
-    def create(name, abs_path, extension, split_level, content):
-        output = Section(None, Header(name), split_level)
-        output.rel_filename = name + extension
+    def create(name, abs_path, split_level, content, strategy):
+        output = Section(None, Header(name), split_level, strategy)
+        output.rel_filename = name + strategy.file_extension
         output.abs_filename = output._join_paths(abs_path, output.rel_filename)
         output.content = content
         return output
         
-    def create_folders(self, abs_root, root_to_parent, file_extension):
+    def create_folders(self, abs_root, root_to_parent):
         assert not self.rel_filename
         assert not self.abs_filename
         assert not self.path_to_root
@@ -130,16 +162,16 @@ class Section:
         if not self.header.outline_level:
             assert not root_to_parent
             os.mkdir(abs_root)
-            self.rel_filename = filename + file_extension
+            self.rel_filename = filename + self.strategy.file_extension
         # Create top-level folders
         elif self.header.outline_level < self.split_level:
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
-            self.rel_filename = self._join_paths(root_to_parent, filename + file_extension)
+            self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         # Remember the file to create
         elif self.header.outline_level == self.split_level:
-            self.rel_filename = self._join_paths(root_to_parent, filename + file_extension)
+            self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
             self.path_to_root = self.parent.path_to_root
         # Inherit the file from parent
         else:
@@ -149,7 +181,7 @@ class Section:
         self.abs_filename = self._join_paths(abs_root, self.rel_filename)
         # Propagate to child sections in any case
         for child in self.children:
-            child.create_folders(abs_root, root_to_parent, file_extension)
+            child.create_folders(abs_root, root_to_parent)
     
     def match_images(self, external_images, internal_images):
         # Update paths in all our images
@@ -167,13 +199,7 @@ class Section:
         for child in self.children:
             child.match_images(external_images, internal_images)
     
-    def collect_bookmarks(  self, 
-                            direct, 
-                            reverse, 
-                            reverse_duplicates, 
-                            remap,
-                            make_ref_for_header,
-                            make_ref_for_text):
+    def collect_bookmarks(self, direct, reverse, reverse_duplicates, remap):
         # Extract bookmark from the header
         if self.header.bookmarks:
             self._process_bookmarks(self.header.bookmarks, 
@@ -181,7 +207,7 @@ class Section:
                                     direct, 
                                     reverse, 
                                     reverse_duplicates, 
-                                    make_ref_for_header,
+                                    self.strategy.make_ref_for_header,
                                     self.header.outline_level <= self.split_level)
         else:
             assert self.header.spans[0].text == DEFAULT_NAME, self.header.spans[0].text
@@ -194,15 +220,10 @@ class Section:
                                             remap, 
                                             reverse, 
                                             reverse_duplicates, 
-                                            make_ref_for_text)
+                                            self.strategy.make_ref_for_text)
         # Traverse children
         for child in self.children:
-            child.collect_bookmarks(direct, 
-                                    reverse, 
-                                    reverse_duplicates, 
-                                    remap, 
-                                    make_ref_for_header, 
-                                    make_ref_for_text)
+            child.collect_bookmarks(direct, reverse, reverse_duplicates, remap)
     
     def replace_bookmarks(self, direct, remap):
         if self.header.bookmarks:
@@ -214,14 +235,14 @@ class Section:
         for child in self.children:
             child.replace_bookmarks(direct, remap)
             
-    def replace_links(self, mapping, process_internal_link):
+    def replace_links(self, mapping):
         for s in self.header.spans:
             if s.link:
-                s.link = self._replace_single_link(s.link, mapping, process_internal_link)
+                s.link = self._replace_single_link(s.link, mapping)
         for c in self.content:
-            self._replace_links_in_content(c, mapping, process_internal_link)
+            self._replace_links_in_content(c, mapping)
         for child in self.children:
-            child.replace_links(mapping, process_internal_link)
+            child.replace_links(mapping)
         
     def dump(self, writer_factory, writer = None):
         assert self.abs_filename
@@ -237,6 +258,7 @@ class Section:
             child.dump(writer_factory, writer)
         # Save it to the file
         if self.header.outline_level <= self.split_level:
+            writer.add(self._make_navigation())
             with open(self.abs_filename, "x") as output:
                 output.write(writer.get_output())
     
@@ -269,19 +291,19 @@ class Section:
                 for i in c.items:
                     self._replace_bookmarks_in_content(i, mapping)
     
-    def _replace_links_in_content(self, c, mapping, process_internal_link):
+    def _replace_links_in_content(self, c, mapping):
         match c:
             case Paragraph():
                 for s in c.spans:
                     if s.link:
-                        s.link = self._replace_single_link(s.link, mapping, process_internal_link)
+                        s.link = self._replace_single_link(s.link, mapping)
             case List():
                 for i in c.items:
-                    self._replace_links_in_content(i, mapping, process_internal_link)
+                    self._replace_links_in_content(i, mapping)
             case Table():
                 for r in c.rows:
                     for col in r:
-                        self._replace_links_in_content(col, mapping, process_internal_link)
+                        self._replace_links_in_content(col, mapping)
     
     def _replace_single_bookmark(self, bookmarks, mapping):
         assert bookmarks
@@ -291,16 +313,47 @@ class Section:
         assert new_bookmark.startswith(self.rel_filename)
         return new_bookmark[len(self.rel_filename):]
     
-    def _replace_single_link(self, link, mapping, process_internal_link):
+    def _replace_single_link(self, link, mapping):
         new_link = mapping.get(link)
         if new_link:
             if new_link.startswith(self.rel_filename):
-                return process_internal_link(new_link[len(self.rel_filename):])
+                return self.strategy.process_internal_link(new_link[len(self.rel_filename):])
             else:
-                return process_internal_link(self._join_paths(self.path_to_root, new_link))
+                return self.strategy.process_internal_link(self._join_paths(self.path_to_root, new_link))
         else:
             assert link.startswith("http") or link.startswith("mailto"), link
             return link
+        
+    def _make_navigation(self):
+        navigation = NavBar()
+        for c in self.children:
+            if c.header.outline_level <= self.split_level:
+                navigation.next = self._make_nav_item(c)
+                break
+        if self.parent:
+            navigation.up = self._make_nav_item(self.parent)
+            index = self.parent.children.index(self)
+            if index > 0 and self.parent.children[index - 1].header.outline_level <= self.split_level:
+                navigation.prev = self._make_nav_item(self.parent.children[index - 1])
+            else:
+                navigation.prev = self._make_nav_item(self.parent)
+            if not navigation.next:
+                next_section = self._find_next_in_parent(self)
+                if next_section:
+                    navigation.next = self._make_nav_item(next_section)
+        return navigation
+    
+    def _find_next_in_parent(self, current):
+        while current.parent:
+            index = current.parent.children.index(current)
+            if index < len(current.parent.children) - 1:
+                return current.parent.children[index + 1]
+            current = current.parent
+        return None
+    
+    def _make_nav_item(self, other):
+        return NavItem(other.header.to_string(), 
+                       self.strategy.process_internal_link(self._join_paths(self.path_to_root, other.rel_filename)))
     
     @staticmethod   
     def _join_paths(l, r):
@@ -315,7 +368,8 @@ class Section:
 
 
 class TocMaker:
-    def __init__(self):
+    def __init__(self, strategy):
+        self._strategy = strategy
         self._toc = ToC()
     
     def make(self, root):
@@ -326,34 +380,32 @@ class TocMaker:
         if section.header.outline_level <= section.split_level:
             name = section.header.to_string()
             level = section.header.outline_level
-            self._toc.items.append(TocItem(name, section.rel_filename, max(level, 1)))
+            self._toc.items.append(TocItem(name, 
+                                           self._strategy.process_internal_link(section.rel_filename), 
+                                           max(level, 1)))
 
 
 class Document:
-    def __init__(self, destination: str, split_level: int):
+    def __init__(self, destination: str, split_level: int, strategy: Strategy):
         self._destination = destination
         self._split_level = split_level
-        self._root = Section(None, Header(DEFAULT_NAME), split_level)
+        self._strategy = strategy
+        self._root = Section(None, Header(DEFAULT_NAME), split_level, strategy)
         self._current_section = self._root
         
-    def create_folders(self, file_extension: str) -> None:
-        self._root.create_folders(self._destination, "", file_extension)
+    def create_folders(self) -> None:
+        self._root.create_folders(self._destination, "")
         
     def link_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
         self._root.match_images(external_images, internal_images)
         
-    def crosslink(self, make_ref_for_header, make_ref_for_text, resolve_refs_conflict, process_internal_link):
+    def crosslink(self):
         # Translate bookmarks (links) into markdown format (anchors) and find duplicate anchors
         direct = {}             # link, anchor              - ODT to markdown headers links map
         reverse = {}            # anchor, list[link]        - markdown to ODT multiple links map
         reverse_duplicates = {} # anchor, list[list[link]]  - duplicate markdown links
         remap = {}              # link, anchor              - these anchors are not headers, therefore they will be output as HTML
-        self._root.collect_bookmarks(   direct, 
-                                        reverse, 
-                                        reverse_duplicates, 
-                                        remap,
-                                        make_ref_for_header,
-                                        make_ref_for_text)
+        self._root.collect_bookmarks(direct, reverse, reverse_duplicates, remap)
         assert not direct.keys() & remap.keys()
         # Rename duplicates
         print(f"Resolving {len(reverse_duplicates)} anchor conflicts:")
@@ -361,20 +413,38 @@ class Document:
             print(k)
         print()
         for anchor, links in reverse_duplicates.items():
-            mapping = resolve_refs_conflict(anchor, links)
+            mapping = self._strategy.resolve_refs_conflict(anchor, links)
             for l, p in mapping:
                 assert l in direct
                 assert l not in remap   # We cannot resolve conflicts from headers and conflicts from text paragraphs together
                 direct[l] = p
         # Commit the changes
         self._root.replace_bookmarks(direct, remap)
-        self._root.replace_links(direct | remap, process_internal_link)
+        self._root.replace_links(direct | remap)
         
     def dump(self, writer_factory) -> None:
         self._root.dump(writer_factory)
         
     def root(self):
         return self._root
+    
+    def push_root(self, new_root):
+        assert isinstance(new_root, Section)
+        assert new_root.header.outline_level == 0
+        assert self._root.header.outline_level == 0
+        children = self._root.children
+        self._root.children = []
+        self._root.parent = new_root
+        new_root.children.append(self._root)
+        for c in children:
+            assert c.header.outline_level
+            if c.header.outline_level == 1:
+                new_root.children.append(c)
+                c.parent = new_root
+            else:
+                self._root.children.append(c)
+        self._root.header.outline_level = 1
+        self._root = new_root
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)
@@ -390,6 +460,6 @@ class Document:
         while header.outline_level <= parent_section.header.outline_level:
             parent_section = parent_section.parent
         # Create the new section
-        new_section = Section(parent_section, header, self._split_level)
+        new_section = Section(parent_section, header, self._split_level, self._strategy)
         parent_section.children.append(new_section)
         self._current_section = new_section

@@ -163,9 +163,10 @@ def _add_spans(spans):
 class GitHubMdWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
-    def __init__(self, collapse_level):
+    def __init__(self, *, collapse_level = 0, toc_collapse_level = 0):
         self._output = []
         self._collapse_level = collapse_level
+        self._toc_collapse_level = toc_collapse_level
         self._collapsing = False
     
     @staticmethod
@@ -179,7 +180,7 @@ class GitHubMdWriter:
             for c in header.strip():
                 if c.isalnum():
                     output.append(c.lower())
-                elif c == " ":
+                elif c in " -":
                     output.append("-")
             return rel_path + "#" + "".join(output)
     
@@ -235,6 +236,8 @@ class GitHubMdWriter:
                 self._add_image(content)
             case document.ToC():
                 self._add_toc(content)
+            case document.NavBar():
+                self._add_nav_bar(content)
             case _:
                 assert False
         self._output.append(self.PARAGRAPH_SEPARATOR)
@@ -314,20 +317,58 @@ class GitHubMdWriter:
         self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
     
     def _add_toc(self, toc):
-        assert self._collapse_level in (0, 1) # Cannot collapse inside a list
+        assert self._toc_collapse_level in (0, 1) # Cannot collapse inside a list
         assert toc.items[0].level == 1
         for i in toc.items:
             assert i.level > 0
             assert i.name
             assert i.link
+            assert i.link.startswith("<")
+            assert i.link.endswith(">")
             if i.level > 1:
-                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}](<{_strip_filename(i.link)}>)\n")
+                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({i.link})\n")
             else:        
                 if self._collapsing:
                     self._output.append("\n</details>\n\n")
-                if self._collapse_level:
+                if self._toc_collapse_level:
                     self._collapsing = True
                     # Markdown does not work inside <summary>
-                    self._output.append(f'<details>\n<summary><a href="{_strip_filename(i.link)}">{i.name}</a></summary>\n\n')
+                    self._output.append(f'<details>\n<summary><a href="{i.link.strip("<>")}">{i.name}</a></summary>\n\n')
                 else:
-                    self._output.append(f"\n### [{i.name}](<{_strip_filename(i.link)}>)\n\n")
+                    self._output.append(f"\n### [{i.name}]({i.link})\n\n")
+    
+    def _add_nav_bar(self, navbar):
+        if navbar.prev or navbar.next or navbar.up:
+            links = []
+            # Prev
+            if navbar.prev:
+                item = navbar.prev.to_paragraph()
+                item.spans.insert(0, document.Span("<< "))
+                links.append(item)
+            else:
+                links.append(None)
+            # Up
+            if navbar.up:
+                item = navbar.up.to_paragraph()
+                item.spans.insert(0, document.Span("^ "))
+                item.spans.append(document.Span(" ^"))
+                links.append(item)
+            else:
+                links.append(None)
+            # Next
+            if navbar.next:
+                item = navbar.next.to_paragraph()
+                item.spans.append(document.Span(" >>"))
+                links.append(item)
+            else:
+                links.append(None)
+            # Output
+            self._output.append(_make_table_row(links))
+            self._output.append(_make_table_separator(3))
+
+
+github_strategy = document.Strategy(".md",
+                                    GitHubMdWriter.make_ref_for_header, 
+                                    GitHubMdWriter.make_ref_for_text, 
+                                    GitHubMdWriter.resolve_refs_conflict,
+                                    GitHubMdWriter.process_internal_link)

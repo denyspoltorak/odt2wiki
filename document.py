@@ -10,7 +10,7 @@ def string_to_filename(string):
     return string.rstrip(". ")
 
 
-UNNAMED_FILENAME = "Introduction"
+DEFAULT_NAME = "Introduction"
 
 
 class ListStyle(Enum):
@@ -67,9 +67,11 @@ class Paragraph(Content):
 
   
 class Header(Paragraph):
-    def __init__(self):
+    def __init__(self, text = None):
         super(Header, self).__init__()
         self.outline_level = 0
+        if text:
+            self.spans.append(Span(text))
 
    
 class List(Content):
@@ -109,28 +111,34 @@ class Section:
         self.abs_filename = None
         self.path_to_root = ""
         
+    @staticmethod
+    def create(name, abs_path, extension, split_level, content):
+        output = Section(None, Header(name), split_level)
+        output.rel_filename = name + extension
+        output.abs_filename = output._join_paths(abs_path, output.rel_filename)
+        output.content = content
+        return output
+        
     def create_folders(self, abs_root, root_to_parent, file_extension):
         assert not self.rel_filename
         assert not self.abs_filename
         assert not self.path_to_root
         header_text = self.header.to_string()
         filename = string_to_filename(header_text)
+        assert filename
         # Create the root folder
         if not self.header.outline_level:
-            assert not filename
             assert not root_to_parent
             os.mkdir(abs_root)
-            self.rel_filename = UNNAMED_FILENAME + file_extension
+            self.rel_filename = filename + file_extension
         # Create top-level folders
         elif self.header.outline_level < self.split_level:
-            assert filename
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
             self.rel_filename = self._join_paths(root_to_parent, filename + file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         # Remember the file to create
         elif self.header.outline_level == self.split_level:
-            assert filename
             self.rel_filename = self._join_paths(root_to_parent, filename + file_extension)
             self.path_to_root = self.parent.path_to_root
         # Inherit the file from parent
@@ -176,7 +184,7 @@ class Section:
                                     make_ref_for_header,
                                     self.header.outline_level <= self.split_level)
         else:
-            assert not self.header.spans
+            assert self.header.spans[0].text == DEFAULT_NAME, self.header.spans[0].text
         # Extract bookmarks from the section's text
         for c in self.content:
             if isinstance(c, Paragraph):
@@ -200,7 +208,7 @@ class Section:
         if self.header.bookmarks:
             self.header.bookmarks = [self._replace_single_bookmark(self.header.bookmarks, direct),]
         else:
-            assert not self.header.spans
+            assert self.header.spans[0].text == DEFAULT_NAME, self.header.spans[0].text
         for c in self.content:
             self._replace_bookmarks_in_content(c, remap)
         for child in self.children:
@@ -215,7 +223,7 @@ class Section:
         for child in self.children:
             child.replace_links(mapping, process_internal_link)
         
-    def dump(self, writer, writer_factory):
+    def dump(self, writer_factory, writer = None):
         assert self.abs_filename
         # Start a new file if this is a book chapter or part
         if self.header.outline_level <= self.split_level:
@@ -226,7 +234,7 @@ class Section:
         for c in self.content:
             writer.add(c)
         for child in self.children:
-            child.dump(writer, writer_factory)
+            child.dump(writer_factory, writer)
         # Save it to the file
         if self.header.outline_level <= self.split_level:
             with open(self.abs_filename, "x") as output:
@@ -307,29 +315,25 @@ class Section:
 
 
 class TocMaker:
-    def __init__(self, filename, writer_factory):
-        self._filename = filename
-        self._writer = writer_factory()
+    def __init__(self):
         self._toc = ToC()
     
     def make(self, root):
         root.traverse(self)
-        self._writer.add(self._toc)
-        with open(self._filename, "x") as output:
-            output.write(self._writer.get_output())
+        return self._toc
     
     def __call__(self, section):
         if section.header.outline_level <= section.split_level:
             name = section.header.to_string()
             level = section.header.outline_level
-            self._toc.items.append(TocItem(name if name else "Introduction", section.rel_filename, max(level, 1)))
+            self._toc.items.append(TocItem(name, section.rel_filename, max(level, 1)))
 
 
 class Document:
     def __init__(self, destination: str, split_level: int):
         self._destination = destination
         self._split_level = split_level
-        self._root = Section(None, Header(), split_level)
+        self._root = Section(None, Header(DEFAULT_NAME), split_level)
         self._current_section = self._root
         
     def create_folders(self, file_extension: str) -> None:
@@ -367,10 +371,10 @@ class Document:
         self._root.replace_links(direct | remap, process_internal_link)
         
     def dump(self, writer_factory) -> None:
-        self._root.dump(None, writer_factory)
-    
-    def dump_toc(self, writer_factory, toc_filename) -> None:
-        TocMaker(os.path.join(self._destination, toc_filename), writer_factory).make(self._root)
+        self._root.dump(writer_factory)
+        
+    def root(self):
+        return self._root
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)

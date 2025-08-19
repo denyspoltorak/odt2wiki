@@ -66,6 +66,10 @@ def convert_to_markdown(archive,
     doc = document.Document(dest_path, split_level)
     visitor.fill_document(doc)
     doc.create_folders(".md")
+    # Create tables of contents
+    index = document.TocMaker().make(doc.root())
+    main_toc = document.Section.create("Home", dest_path, ".md", split_level, [index,])
+    side_toc = document.Section.create("_Sidebar", dest_path, ".md", split_level, [index,])
     # Map pictires inside the ODT to picture files in the destination folder
     external_images = {}
     internal_images = {}
@@ -90,8 +94,8 @@ def convert_to_markdown(archive,
                   md_writer.GitHubMdWriter.resolve_refs_conflict,
                   md_writer.GitHubMdWriter.process_internal_link)
     doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level))
-    doc.dump_toc(functools.partial(md_writer.GitHubMdWriter, 0), "Home.md")
-    doc.dump_toc(functools.partial(md_writer.GitHubMdWriter, 1), "_Sidebar.md")
+    main_toc.dump(functools.partial(md_writer.GitHubMdWriter, 0))   # Don't collapse anything
+    side_toc.dump(functools.partial(md_writer.GitHubMdWriter, 1))   # Collapse book parts
     print(f"Markdown created in {dest_path}")
 
 

@@ -14,11 +14,11 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 ### Killer features
 
-* odt2wiki preserves cross-references between sections. You document is processed coherently and is transformed into a cohesive wiki.
+* odt2wiki preserves cross-references between sections. Your document is processed coherently and is transformed into a cohesive wiki.
 
 * If you have a folder with diagrams which were used in your document, odt2wiki can rely on them for the wiki, creating meaningful captions from file names. That works even if the diagrams were resized by GoogleDocs behind the scene.
 
-* odt2wiki adds a navigation bar and a sidebar with collapsible table of contents.
+* odt2wiki adds a navigation bar and a sidebar with a collapsible table of contents.
 
 * Image size is preserved. You won't see a small diagram from your document take a whole page of wiki.
 
@@ -40,11 +40,11 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * Mixed bulleted and numbered lists. If a list uses bullets at level 1, numbers at level 2, then again bullets at level 3, all its levels are output as bulleted. Mixed lists should be easy to implement in case someone uses them in practice.
 
-* Non-uniform tables (the ones with merged cells). I don't think that GitHub dialect of markdown supports them.
+* Non-uniform tables (the ones with merged cells). I don't think that the GitHub dialect of markdown supports them.
 
 * Lists or images inside table cells.
 
-* Identical names for multiple wiki pages. This is a limitation of GihHub wiki engine - they don't support folders, therefore files with identical names but different paths are treated as duplicates. Please check the Pages sidebar on GitHub wiki to make sure that you don't have duplicates. Duplicates break cross-references and navigation - all the links lead to the first page.
+* Identical names for multiple wiki pages. This is a limitation of GitHub wiki engine - they don't support folders, therefore files with identical names but different paths are treated as duplicates. Please check the Pages sidebar on GitHub wiki to make sure that you don't have duplicates. Duplicates break cross-references and navigation - all the links lead to the first page.
 
 ## Usage
 
@@ -62,25 +62,25 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
    
    * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level.
    
-   * ### Matching images:
+   * <details><summary> Matching images:</summary>
    
-    * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
+         * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
     
-    * If you want to match images from the document to external images, you need to [install Pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html): `pip install pillow`.
+         * If you want to match images from the document to external images, you need to [install Pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html): `pip install pillow`.
     
-    * `-i` or `--images-folder` is the path to a folder on your drive which contains images used throughout your document.
+         * `-i` or `--images-folder` is the path to a folder on your drive which contains images used throughout your document.
     
-    * `-r` or `--remote-images` is the path to corresponding folder with images on the server where your wiki will run.
+         * `-r` or `--remote-images` is the path to the corresponding folder with images on the server where your wiki will run.
     
-    * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
+         * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
     
-    * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
+         * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.</details>
 
 3. Customize your wiki by editing:
 
    * The generated `Home.md` which now has the table of contents listing all your wiki pages. You will want to add an introduction.
 
-   * `_Sidebar.md` is a good place for extra links of you logo. It already contains a generated table of contents.
+   * `_Sidebar.md` is a good place for extra links of your logo. It already contains a generated table of contents.
     
    * `_Footer.md` was not generated - it's up to you to fill.
    
@@ -96,9 +96,9 @@ If anything goes wrong (you get a failed assertion or some content from the docu
 
   * `content.xml` which contains all the text from the document.
   
-  * `styles.xml` with prefedined settings and styles, such as paragraph indents and options for list bullets.
+  * `styles.xml` with predefined settings and styles, such as paragraph indents and options for list bullets.
   
-  * `Pictures/*` - here belong all your diagrams.
+  * `Pictures/*` - here are all your diagrams.
   
   * `Thumbnails/thumbnail.png` - the thumbnail for your document.
   
@@ -142,9 +142,9 @@ If you decide to fix or extend the script, here are its components:
   
 * `odt_parser.py` - my simplistic parser for the ODT format. It creates a `Document`
 
-* `odt_tool.py` - event simpler ODT parsers for troubleshooting modes.
+* `odt_tool.py` - even simpler ODT parsers for troubleshooting modes.
 
-* `md_writer.py` - writes GitHub mrkdown given `Content`. Is used by `Section`s to output wiki pages.
+* `md_writer.py` - writes GitHub markdown from `Content`. Is used by `Section`s to output wiki pages.
 
 * `image_matcher.py` - extracts matches images from the document and matches them to local files.
 
@@ -158,13 +158,13 @@ There are no tests since there are no external users or committers.
 
 #### What is the algorithm for image matching?
 
-A kind of [*Spatial Partition*](https://gameprogrammingpatterns.com/spatial-partition.html) algorithm. The trouble is that Google Docs resizes uploded images, therefore a simple checksum or even histogram does not work. Funnily, the resulting diagram files become larger because downsizing blurs lines which creates new colors and makes compression inefficient.
+A kind of [*Spatial Partition*](https://gameprogrammingpatterns.com/spatial-partition.html) algorithm. The trouble is that Google Docs resizes uploaded images, therefore a simple checksum or even histogram does not work. Funnily, the resulting diagram files become larger because downsizing blurs lines which creates new colors and makes compression inefficient.
 
 The algorithm relies on image parameters which are resilient to resizing and recompression, namely its proportions and colors:
 
-- The algorithm precalculates average brightness for R, G and B channes of the image.
+- The algorithm precalculates average brightness for R, G and B channels of the image.
 
-- The image is placed into a bin accoridng to its shape (width / height).
+- The image is placed into a bin according to its shape (width / height).
 
 - When an image is to be matched to an existing one:
 
@@ -174,11 +174,11 @@ The algorithm relies on image parameters which are resilient to resizing and rec
   
     - Now we also take the neighboring bins with slightly changed width to height ratio.
     
-    - We go over the content of the 3 bins and compare the RGB stats of every image in the bins to those of our image, allowing for looser match.
+    - We go over the content of the 3 bins and compare the RGB stats of every image in the bins to those of our image, allowing for a looser match.
     
-    - If there is only one match, then we've done it. Otherwise matching failed and the image file from the document is extracted to the wiki folder.
+    - If there is only one match, then we've done it. Otherwise matching has failed and the image file from the document is extracted to the wiki folder.
 
-#### Why not use [odfdo](https://github.com/jdum/odfdo/tree/master) as ODT parser?
+#### Why not use [odfdo](https://github.com/jdum/odfdo/tree/master) as an ODT parser?
 
 I tried. Twice. [Just read the docs](https://jdum.github.io/odfdo/reference.html).
 

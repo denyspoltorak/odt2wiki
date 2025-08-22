@@ -64,17 +64,17 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
    
    * #### Matching images:
    
-         * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
+     * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
     
-         * If you want to match images from the document to external images, you need to [install Pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html): `pip install pillow`.
+     * If you want to match images from the document to external images, you need to [install Pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html): `pip install pillow`.
     
-         * `-i` or `--images-folder` is the path to a folder on your drive which contains images used throughout your document.
+     * `-i` or `--images-folder` is the path to a folder on your drive which contains images used throughout your document.
     
-         * `-r` or `--remote-images` is the path to the corresponding folder with images on the server where your wiki will run.
+     * `-r` or `--remote-images` is the path to the corresponding folder with images on the server where your wiki will run.
     
-         * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
+     * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
     
-         * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
+     * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
 
 3. Customize your wiki by editing:
 

@@ -62,7 +62,7 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
    
    * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level.
    
-   * <details><summary> Matching images:</summary>
+   * #### Matching images:
    
          * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
     
@@ -74,7 +74,7 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
     
          * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
     
-         * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.</details>
+         * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
 
 3. Customize your wiki by editing:
 

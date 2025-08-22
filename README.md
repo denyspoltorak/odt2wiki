@@ -1,0 +1,217 @@
+# ODT to wiki converter
+
+odt2wiki is a small tool that converts an OpenOffice / LibreOffice text document into GitHub wiki. It was designed for processing large documents with hundreds of diagrams and thousands of cross-links.
+
+## Use cases
+
+* You wrote a document or a book in Google Docs or MS Office benefiting from their grammar checks and online collaboration. Now you are to publish it online, but the document is too large for a single file. It is much better to have a page per chapter, but the available tools don't preserve cross-references between chapters or meaningful diagram names.
+
+* You have downloaded a large standard and want to make it easily accessible to your team and users.
+
+## Features
+
+odt2wiki aims at remaining simple to use and to extend while producing [best in the class output](https://github.com/denyspoltorak/metapatterns/wiki).
+
+### Killer features
+
+* odt2wiki preserves cross-references between sections. You document is processed coherently and is transformed into a cohesive wiki.
+
+* If you have a folder with diagrams which were used in your document, odt2wiki can rely on them for the wiki, creating meaningful captions from file names. That works even if the diagrams were resized by GoogleDocs behind the scene.
+
+* odt2wiki adds a navigation bar and a sidebar with collapsible table of contents.
+
+* Image size is preserved. You won't see a small diagram from your document take a whole page of wiki.
+
+* Grayed-out sections are converted to quotes, retaining their distinct style.
+
+### Ordinary features
+
+* Support for bold, italic, underlined and strikethrough text.
+
+* Bulleted and numbered lists, including nested lists.
+
+* Tables
+
+* An option to collapse sections
+
+### Unsupported features
+
+* Colorized text - GitHub aggressively removes colors. Though odt2wiki generates color tags, they are ignored. Colors may be supported in other output formats in the future.
+
+* Mixed bulleted and numbered lists. If a list uses bullets at level 1, numbers at level 2, then again bullets at level 3, all its levels are output as bulleted. Mixed lists should be easy to implement in case someone uses them in practice.
+
+* Non-uniform tables (the ones with merged cells). I don't think that GitHub dialect of markdown supports them.
+
+* Lists or images inside table cells.
+
+* Identical names for multiple wiki pages. This is a limitation of GihHub wiki engine - they don't support folders, therefore files with identical names but different paths are treated as duplicates. Please check the Pages sidebar on GitHub wiki to make sure that you don't have duplicates. Duplicates break cross-references and navigation - all the links lead to the first page.
+
+## Usage
+
+1. You need an ODT document with outline levels set up. If they are, the table of contents in LibreOffice's navbar represents the structure of the document.
+
+   * If it is empty (e.g. because the document was exported from GoogleDocs), please follow the "Document structure" step of [this instruction](https://medium.com/@denyspoltorak/guide-on-converting-a-google-docs-text-into-an-ebook-5b1abc65f69d).
+
+2. Run the script, for example: `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc`
+
+   * Positional arguments are the input ODT file (`~/Documents/MyDoc.odt`) and the output folder to be created (`~/Work/MyWiki`). The output folder should not already exist.
+   
+   * `-c` or `--convert` is the output format. Use `github` for GitHub wiki.
+   
+   * `-s` or `--split-level` is where you divide your wiki into pages. If your document is structured into parts (level 1), chapters (level 2) and sections (level 3) and you specify `-s 2` you will have a wiki folder per part and a wiki page per chapter.
+   
+   * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level.
+   
+   * ### Matching images:
+   
+    * By default, all the images from the document are extracted to the `Pictures` subfolder in the destination and given names `image000`, `image001`, etc.
+    
+    * If you want to match images from the document to external images, you need to [install Pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html): `pip install pillow`.
+    
+    * `-i` or `--images-folder` is the path to a folder on your drive which contains images used throughout your document.
+    
+    * `-r` or `--remote-images` is the path to corresponding folder with images on the server where your wiki will run.
+    
+    * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
+    
+    * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
+
+3. Customize your wiki by editing:
+
+   * The generated `Home.md` which now has the table of contents listing all your wiki pages. You will want to add an introduction.
+
+   * `_Sidebar.md` is a good place for extra links of you logo. It already contains a generated table of contents.
+    
+   * `_Footer.md` was not generated - it's up to you to fill.
+   
+   * And you will likely need to remove the remnants of your title page from the beginning of `Introduction.md`.
+
+4. [Commit to GitHub](https://gist.github.com/subfuzion/0d3f19c4f780a7d75ba2).
+
+## Troubleshooting
+
+If anything goes wrong (you get a failed assertion or some content from the document does not appear on the wiki), there is a bunch of troubleshooting modes:
+
+* `odt2wiki.py MyBook.odt --print=files` prints all the files archived inside the ODT (which is merely a ZIP archive). The ones of interest are:
+
+  * `content.xml` which contains all the text from the document.
+  
+  * `styles.xml` with prefedined settings and styles, such as paragraph indents and options for list bullets.
+  
+  * `Pictures/*` - here belong all your diagrams.
+  
+  * `Thumbnails/thumbnail.png` - the thumbnail for your document.
+  
+* `odt2wiki.py MyBook.odt --print=attrs` lists attributes found in the document for each XML tag. Yes, ODT is an archived XML.
+
+* `odt2wiki.py MyBook.odt --print=tags` outputs a tree of tags for your document.
+
+* `odt2wiki.py MyBook.odt MyBook.txt --convert=text` extracts all the text odt2wiki recognizes in the document to a txt file. This can be useful if some content is missing in the wiki output.
+
+* Finally, you can extract `content.xml` and `styles.xml` from the ODT archive by using any unzip software and view them in your browser. There is hardly anything as useful for debugging as looking at the data.
+
+## Under the hood
+
+If you decide to fix or extend the script, here are its components:
+
+* `odt2wiki.py` - the main file with command-line arguments and application-level logic.
+
+* `document.py` is a domain-agnostic representation of a document. You don't need to learn ODT or markdown formats to use it. It is built around several classes:
+
+  * `Style` - text properties, such as bold or italic.
+  
+  * `Span` - a piece of text in a given style. It may be a hyperlink.
+  
+	* `Content` - a parent class for everything found in a document.
+	  
+	* `Paragraph` - a kind of `Content` that carries several `Span`s and may have a bookmark for other content to link to.
+	  
+	  * `Header` - a kind of `Paragraph` which is also a section header. Features outline level - its rank in the document's hierarchical table of contents.
+	  
+	* `List` - a numbered or bulleted list. Contains multiple `Paragraph`s or `List`s as items.
+	  
+	* `Table` - a list of rows. Each row is a list of cells. Each cell is a `Paragraph` or empty.
+	  
+	* `Image` - a diagram. Has a link to an image file and size as % of the page's width.
+  
+  * `Strategy` - A few methods to prepare the document for conversion to markdown. Depends on the markdown dialect. Currently deals with cross-references but may be extended to other elements.
+  
+  * `Section` - A header with associated content. `Section`s make a DOM tree.
+  
+  * `Document` - A tree of sections.
+  
+* `odt_parser.py` - my simplistic parser for the ODT format. It creates a `Document`
+
+* `odt_tool.py` - event simpler ODT parsers for troubleshooting modes.
+
+* `md_writer.py` - writes GitHub mrkdown given `Content`. Is used by `Section`s to output wiki pages.
+
+* `image_matcher.py` - extracts matches images from the document and matches them to local files.
+
+## Q&A
+
+#### What's the status of the project?
+
+Prototype. It works for me. Please feel free to extend it.
+
+There are no tests since there are no external users or committers.
+
+#### What is the algorithm for image matching?
+
+A kind of [*Spatial Partition*](https://gameprogrammingpatterns.com/spatial-partition.html) algorithm. The trouble is that Google Docs resizes uploded images, therefore a simple checksum or even histogram does not work. Funnily, the resulting diagram files become larger because downsizing blurs lines which creates new colors and makes compression inefficient.
+
+The algorithm relies on image parameters which are resilient to resizing and recompression, namely its proportions and colors:
+
+- The algorithm precalculates average brightness for R, G and B channes of the image.
+
+- The image is placed into a bin accoridng to its shape (width / height).
+
+- When an image is to be matched to an existing one:
+
+  - A bin is calculated based on its shape.
+  
+  - RGB stats are checked for every image in that bin. If there is no strict match, our image should have been resized:
+  
+    - Now we also take the neighboring bins with slightly changed width to height ratio.
+    
+    - We go over the content of the 3 bins and compare the RGB stats of every image in the bins to those of our image, allowing for looser match.
+    
+    - If there is only one match, then we've done it. Otherwise matching failed and the image file from the document is extracted to the wiki folder.
+
+#### Why not use [odfdo](https://github.com/jdum/odfdo/tree/master) as ODT parser?
+
+I tried. Twice. [Just read the docs](https://jdum.github.io/odfdo/reference.html).
+
+If I need to learn the whole ODF standard to understand anything, I may [write my own ODT parser](https://andre-rendeiro.com/2024/11/10/sanitize-odt-comments-with-python), learning the ODT format on my way.
+
+Now that I understand the structure and elements of ODT, I think I can use odfdo, but I don't need it. I think I will integrate it if odt2wiki ever sees wide use requiring compatibility and tolerance to border cases. Right now my simple parser fits my personal needs.
+
+#### Will any other input / output formats be supported?
+
+Yes, if someone implements them. I intend on trying odt2wiki with [Hugo Book](https://hugo-book-demo.netlify.app/) or [Sphinx book theme](https://sphinx-book-theme.readthedocs.io/en/stable/index.html). That will add one or two output formats. Everything else will be done on demand or will wait for contributors.
+
+#### The navigation bar is strange
+
+The backward and forward navigation are not symmetric. The forward navigation enters subfolders while the backward goes up.
+
+Example: 
+
+- Let X.Y is chapter Y of part X.
+
+- Let's start at 2.4
+
+- Forward 4 times: 2.4 -> 2.5 -> 3.0 -> 3.1 -> 3.2
+
+- Backward 4 times: 3.2 -> 3.1 -> 3.0 -> 2.0 -> 1.0
+
+I don't know if this is a bug or feature. On one hand, it does not make much sense to return to the last chapter of the previous part. On the other hand, forward and backward buttons are expected to be symmetric.
+
+If you believe that it's wrong I may fix it.
+
+#### I have a bug!
+
+Yep. There should have been at least one. Please [contact me](https://www.linkedin.com/in/denyspoltorak/) or try to fix it by yourself and commit the changes.
+
+## Portfolio
+
+[Architectural Metapatterns wiki](https://github.com/denyspoltorak/metapatterns/wiki)

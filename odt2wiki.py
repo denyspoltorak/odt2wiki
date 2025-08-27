@@ -10,7 +10,7 @@ import functools
 import odt_tools
 import odt_parser
 import document
-import md_writer, github_writer, hugo_writer
+import github_writer, hugo_writer
 import image_matcher
 
 
@@ -22,6 +22,12 @@ def _print_dict_tree(key, tree, level):
     print((" " * 4 * level) + key)
     for (k, v) in sorted(tree.items()):
         _print_dict_tree(k, v, level + 1)
+        
+def _print_visitor(section):
+    print("  " * section.header.outline_level + section.header.to_string())
+
+def _print_doc_tree(doc):
+    doc.root().traverse(_print_visitor)
 
 
 # Troubleshooting methods
@@ -62,7 +68,6 @@ def _create_document(content, styles, dest_path, split_level, strategy):
     # Process the content
     doc = document.Document(dest_path, split_level, strategy)
     visitor.fill_document(doc)
-    doc.create_folders()
     return doc
 
 def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
@@ -97,10 +102,11 @@ def convert_to_github_markdown( archive,
     dest_path = os.path.expanduser(destination)
     strategy = github_writer.github_strategy
     doc = _create_document(content, styles, destination, split_level, strategy)
+    doc.create_folders()
     # Create tables of contents
     index = document.TocMaker(strategy).make(doc.root())
-    main_toc = document.Section.create("Home", dest_path, [index,])
-    side_toc = document.Section.create("_Sidebar", dest_path, [index,])
+    main_toc = document.Section.create("Home", [index,], dest_path)
+    side_toc = document.Section.create("_Sidebar", [index,], dest_path)
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown
@@ -118,19 +124,21 @@ def convert_to_hugo_markdown(   archive,
                                 split_level, 
                                 images_folder, 
                                 remote_image_path):
+    assert not collapse_level, "Not implemented"
     # Set up
     dest_path = os.path.expanduser(destination)
     strategy = hugo_writer.hugo_strategy
     doc = _create_document(content, styles, destination, split_level, strategy)
-    # Create tables of contents
-    index = document.TocMaker(strategy).make(doc.root())
-    main_toc = document.Section.create("_index", dest_path, [index,])
+    # Add the landing page
+    doc.push_root(document.Section.create("Table of Contents"))
+    doc.create_folders()
+    # Create the table of contents
+    doc.root().content.append(document.TocMaker(strategy).make(doc.root()))
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown
     doc.crosslink()
-    doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
-    doc.dump(functools.partial(hugo_writer.HugoMarkdownWriter, collapse_level=collapse_level))
+    doc.dump(hugo_writer.HugoMarkdownWriter)
     print(f"Hugo markdown created in {dest_path}")
 
 

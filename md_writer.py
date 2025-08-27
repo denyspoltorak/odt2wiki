@@ -4,6 +4,9 @@ import document
 import os.path
 
 
+PARAGRAPH_SEPARATOR = "\n\n"
+
+
 def _escape(text):
     output = []
     for l in text:
@@ -155,8 +158,6 @@ def _add_spans(spans):
 
 
 class MarkdownWriter:
-    PARAGRAPH_SEPARATOR = "\n\n"
-    
     def __init__(self, *, collapse_level = 0, toc_collapse_level = 0):
         self._output = []
         self._collapse_level = collapse_level
@@ -185,14 +186,11 @@ class MarkdownWriter:
                 self._add_nav_bar(content)
             case _:
                 assert False
-        self._output.append(self.PARAGRAPH_SEPARATOR)
+        self._output.append(PARAGRAPH_SEPARATOR)
     
     # Methods to add document parts
     def add_header(self, header: document.Header, split_level: int) -> None:
         assert header.outline_level
-        # Skip chapter names as GitHub wiki shows file names anyway, and file names are the same as chapter names
-        if header.outline_level <= split_level:
-            return
         # Close the previous section
         if self._collapsing and header.outline_level <= self._collapse_level:
             self._output.append("</details>\n\n")
@@ -207,7 +205,7 @@ class MarkdownWriter:
         self._add_paragraph(header, False)
         if self._collapsing:
             self._output.append("\n</summary>")
-        self._output.append(self.PARAGRAPH_SEPARATOR)
+        self._output.append(PARAGRAPH_SEPARATOR)
       
     def _add_paragraph(self, paragraph, write_anchor):
         if write_anchor and paragraph.bookmarks:
@@ -352,3 +350,6 @@ def process_internal_link(link):
 
 def string_to_filename(string):
     return string.rstrip(". ")
+
+def index_filename(string):
+    return string

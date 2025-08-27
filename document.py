@@ -121,17 +121,21 @@ class NavBar(Content):
 class Strategy:
     def __init__(self, 
                  file_extension, 
+                 needs_navigation,
                  make_ref_for_header, 
                  make_ref_for_text, 
                  resolve_refs_conflict, 
                  process_internal_link, 
-                 string_to_filename):
+                 string_to_filename,
+                 index_filename):
         self.file_extension = file_extension
+        self.needs_navigation = needs_navigation
         self.make_ref_for_header = make_ref_for_header
         self.make_ref_for_text = make_ref_for_text
         self.resolve_refs_conflict = resolve_refs_conflict
         self.process_internal_link = process_internal_link
         self.string_to_filename = string_to_filename
+        self.index_filename = index_filename
 
 
 class Section:
@@ -153,11 +157,12 @@ class Section:
         self.path_to_root = ""
         
     @staticmethod
-    def create(name, abs_path, content):
+    def create(name, content = [], abs_path = None):
         output = Section(None, Header(name))
-        output.rel_filename = name + output.strategy.file_extension
-        output.abs_filename = output._join_paths(abs_path, output.rel_filename)
         output.content = content
+        if abs_path:
+            output.rel_filename = name + output.strategy.file_extension
+            output.abs_filename = output._join_paths(abs_path, output.rel_filename)
         return output
         
     def create_folders(self, abs_root, root_to_parent):
@@ -171,12 +176,12 @@ class Section:
         if not self.header.outline_level:
             assert not root_to_parent
             os.mkdir(abs_root)
-            self.rel_filename = filename + self.strategy.file_extension
+            self.rel_filename = self.strategy.index_filename(filename) + self.strategy.file_extension
         # Create top-level folders
         elif self.header.outline_level < self.split_level:
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
-            self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
+            self.rel_filename = self._join_paths(root_to_parent, self.strategy.index_filename(filename) + self.strategy.file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         # Remember the file to create
         elif self.header.outline_level == self.split_level:
@@ -219,7 +224,7 @@ class Section:
                                     self.strategy.make_ref_for_header,
                                     self.header.outline_level <= self.split_level)
         else:
-            assert self.header.spans[0].text == DEFAULT_NAME, self.header.spans[0].text
+            assert not self.parent or self.header.spans[0].text == DEFAULT_NAME, self.header.to_string()
         # Extract bookmarks from the section's text
         for c in self.content:
             if isinstance(c, Paragraph):
@@ -238,7 +243,7 @@ class Section:
         if self.header.bookmarks:
             self.header.bookmarks = [self._replace_single_bookmark(self.header.bookmarks, direct),]
         else:
-            assert self.header.spans[0].text == DEFAULT_NAME, self.header.spans[0].text
+            assert not self.parent or self.header.spans[0].text == DEFAULT_NAME, self.header.to_string()
         for c in self.content:
             self._replace_bookmarks_in_content(c, remap)
         for child in self.children:
@@ -257,7 +262,7 @@ class Section:
         assert self.abs_filename
         # Start a new file if this is a book chapter or part
         if self.header.outline_level <= self.split_level:
-            writer = writer_factory()
+            writer = writer_factory(self)
         # Write our content
         if self.header.outline_level:
             writer.add_header(self.header, self.split_level)
@@ -267,7 +272,8 @@ class Section:
             child.dump(writer_factory, writer)
         # Save it to the file
         if self.header.outline_level <= self.split_level:
-            writer.add(self._make_navigation())
+            if self.strategy.needs_navigation:
+                writer.add(self._make_navigation())
             with open(self.abs_filename, "x") as output:
                 output.write(writer.get_output())
     
@@ -444,14 +450,15 @@ class Document:
         children = self._root.children
         self._root.children = []
         self._root.parent = new_root
-        new_root.children.append(self._root)
-        for c in children:
+        # Prepend the moved elements into the existing tree
+        new_root.children.insert(0, self._root)     # push front
+        for c in reversed(children):
             assert c.header.outline_level
             if c.header.outline_level == 1:
-                new_root.children.append(c)
+                new_root.children.insert(1, c)      # insert after self
                 c.parent = new_root
             else:
-                self._root.children.append(c)
+                self._root.children.insert(0, c)    # compensate for the reverse
         self._root.header.outline_level = 1
         self._root = new_root
     

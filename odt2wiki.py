@@ -10,7 +10,7 @@ import functools
 import odt_tools
 import odt_parser
 import document
-import md_writer
+import md_writer, github_writer, hugo_writer
 import image_matcher
 
 
@@ -22,7 +22,10 @@ def _print_dict_tree(key, tree, level):
     print((" " * 4 * level) + key)
     for (k, v) in sorted(tree.items()):
         _print_dict_tree(k, v, level + 1)
-   
+
+
+# Troubleshooting methods
+
 def list_files(archive):
     for f in archive.namelist():
         print(f)
@@ -47,31 +50,22 @@ def extract_text(content, destination):
     visitor.traverse(content)
     with open(os.path.expanduser(destination), "x") as output:
         output.write(visitor.results())
+        
 
-def convert_to_markdown(archive,
-                        content, 
-                        styles, 
-                        destination, 
-                        collapse_level, 
-                        split_level, 
-                        images_folder, 
-                        remote_image_path):
+# Main methods        
+
+def _create_document(content, styles, dest_path, split_level, strategy):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
-    # Set up paths
-    dest_path = os.path.expanduser(destination)
     # Process the content
-    strategy = md_writer.github_strategy
     doc = document.Document(dest_path, split_level, strategy)
     visitor.fill_document(doc)
     doc.create_folders()
-    # Create tables of contents
-    index = document.TocMaker(strategy).make(doc.root())
-    main_toc = document.Section.create("Home", dest_path, [index,])
-    side_toc = document.Section.create("_Sidebar", dest_path, [index,])
-    # Map pictires inside the ODT to picture files in the destination folder
+    return doc
+
+def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
     external_images = {}
     internal_images = {}
     if images_folder:
@@ -88,13 +82,56 @@ def convert_to_markdown(archive,
             internal_images = image_matcher.extract_images(archive, dest_path, unmatched)
     else:
         internal_images = image_matcher.extract_all_images(archive, dest_path)
-    # Convert to markdown
     doc.link_images(external_images, internal_images)
+
+
+def convert_to_github_markdown( archive,
+                                content, 
+                                styles, 
+                                destination, 
+                                collapse_level, 
+                                split_level, 
+                                images_folder, 
+                                remote_image_path):
+    # Set up
+    dest_path = os.path.expanduser(destination)
+    strategy = github_writer.github_strategy
+    doc = _create_document(content, styles, destination, split_level, strategy)
+    # Create tables of contents
+    index = document.TocMaker(strategy).make(doc.root())
+    main_toc = document.Section.create("Home", dest_path, [index,])
+    side_toc = document.Section.create("_Sidebar", dest_path, [index,])
+    # Map pictires inside the ODT to picture files in the destination folder
+    _process_images(doc, archive, dest_path, images_folder, remote_image_path)
+    # Convert to markdown
     doc.crosslink()
     doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
-    doc.dump(functools.partial(md_writer.GitHubMdWriter, collapse_level=collapse_level))
-    side_toc.dump(functools.partial(md_writer.GitHubMdWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
-    print(f"Markdown created in {dest_path}")
+    doc.dump(functools.partial(github_writer.GithubMarkdownWriter, collapse_level=collapse_level))
+    side_toc.dump(functools.partial(github_writer.GithubMarkdownWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
+    print(f"GitHub markdown created in {dest_path}")
+
+def convert_to_hugo_markdown(   archive,
+                                content, 
+                                styles, 
+                                destination, 
+                                collapse_level, 
+                                split_level, 
+                                images_folder, 
+                                remote_image_path):
+    # Set up
+    dest_path = os.path.expanduser(destination)
+    strategy = hugo_writer.hugo_strategy
+    doc = _create_document(content, styles, destination, split_level, strategy)
+    # Create tables of contents
+    index = document.TocMaker(strategy).make(doc.root())
+    main_toc = document.Section.create("_index", dest_path, [index,])
+    # Map pictires inside the ODT to picture files in the destination folder
+    _process_images(doc, archive, dest_path, images_folder, remote_image_path)
+    # Convert to markdown
+    doc.crosslink()
+    doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
+    doc.dump(functools.partial(md_writer.MarkdownWriter, collapse_level=collapse_level))
+    print(f"Hugo markdown created in {dest_path}")
 
 
 def main():
@@ -164,14 +201,24 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
                     extract_text(parsed_content, args.output)
                 case "github":
                     print(f"Converting to GitHub markdown in {args.output}")
-                    convert_to_markdown(archive,
-                                        parsed_content, 
-                                        parsed_styles, 
-                                        args.output,
-                                        args.collapse_level, 
-                                        args.split_level,
-                                        args.images_folder,
-                                        args.remote_images)
+                    convert_to_github_markdown( archive,
+                                                parsed_content, 
+                                                parsed_styles, 
+                                                args.output,
+                                                args.collapse_level, 
+                                                args.split_level,
+                                                args.images_folder,
+                                                args.remote_images)
+                case "hugo":
+                    print(f"Converting to Hugo markdown in {args.output}")
+                    convert_to_hugo_markdown(   archive,
+                                                parsed_content, 
+                                                parsed_styles, 
+                                                args.output,
+                                                args.collapse_level, 
+                                                args.split_level,
+                                                args.images_folder,
+                                                args.remote_images)
                 case _:
                     assert False
     print()

@@ -13,12 +13,6 @@ def _escape(text):
     return "".join(output)
 
 
-def _strip_filename(filename):
-    filename = os.path.basename(filename)
-    assert filename.endswith(".md"), filename
-    return filename[:-3]
-
-
 def _make_list_bullet(index):
     return "- "
 
@@ -160,7 +154,7 @@ def _add_spans(spans):
     return result
 
 
-class GitHubMdWriter:
+class MarkdownWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
     def __init__(self, *, collapse_level = 0, toc_collapse_level = 0):
@@ -168,56 +162,7 @@ class GitHubMdWriter:
         self._collapse_level = collapse_level
         self._toc_collapse_level = toc_collapse_level
         self._collapsing = False
-    
-    @staticmethod
-    def make_ref_for_header(rel_path, header, is_title):
-        # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
-        if is_title:
-            # Title od a wiki page is not rendered - we rely on file name instead, therefore the reference leads to the file
-            return rel_path
-        else:
-            output = []
-            for c in header.strip():
-                if c.isalnum():
-                    output.append(c.lower())
-                elif c in " -":
-                    output.append("-")
-            return rel_path + "#" + "".join(output)
-    
-    @staticmethod
-    def make_ref_for_text(rel_path, text, is_title):
-        assert not is_title
-        return rel_path + "#" + "".join([c.lower() for c in text.split()[0] if c.isalnum()])
-    
-    @staticmethod
-    def resolve_refs_conflict(anchor, links):
-        # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
-        assert len(links) > 1
-        output = []
-        for l in links[0]:
-            output.append((l, anchor))
-        for i in range(1, len(links)):
-            new_anchor = anchor + "-" + str(i)
-            for l in links[i]:
-                output.append((l, new_anchor))
-        return output
-    
-    @staticmethod
-    def process_internal_link(link):
-        if not link:
-            return "#"
-        else:
-            index = link.find("#")
-            if index == -1:
-                # 'filename'
-                return f"<{_strip_filename(link)}>"
-            elif index == 0:
-                # '#section'
-                return link
-            else:
-                # 'filename#section'
-                return f"<{_strip_filename(link[:index])}{link[index:]}>"
-    
+     
     def get_output(self) -> str:
         if self._collapsing:
             self._output.append("</details>\n")
@@ -367,8 +312,40 @@ class GitHubMdWriter:
             self._output.append(_make_table_separator(3))
 
 
-github_strategy = document.Strategy(".md",
-                                    GitHubMdWriter.make_ref_for_header, 
-                                    GitHubMdWriter.make_ref_for_text, 
-                                    GitHubMdWriter.resolve_refs_conflict,
-                                    GitHubMdWriter.process_internal_link)
+# Methods for strategies
+
+def make_ref_for_header(rel_path, header, is_title):
+    # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
+    if is_title:
+        # Title od a wiki page is not rendered - we rely on file name instead, therefore the reference leads to the file
+        return rel_path
+    else:
+        output = []
+        for c in header.strip():
+            if c.isalnum():
+                output.append(c.lower())
+            elif c in " -":
+                output.append("-")
+        return rel_path + "#" + "".join(output)
+
+
+def make_ref_for_text(rel_path, text, is_title):
+    assert not is_title
+    return rel_path + "#" + "".join([c.lower() for c in text.split()[0] if c.isalnum()])
+
+
+def resolve_refs_conflict(anchor, links):
+    # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
+    assert len(links) > 1
+    output = []
+    for l in links[0]:
+        output.append((l, anchor))
+    for i in range(1, len(links)):
+        new_anchor = anchor + "-" + str(i)
+        for l in links[i]:
+            output.append((l, new_anchor))
+    return output
+
+
+def process_internal_link(link):
+    return link if link else "#"

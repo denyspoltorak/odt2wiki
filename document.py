@@ -132,10 +132,16 @@ class Strategy:
 
 
 class Section:
-    def __init__(self, parent, header, split_level, strategy):
+    strategy = None
+    split_level = None
+    
+    @classmethod
+    def set_strategy(cls, strategy, split_level):
+        cls.strategy = strategy
+        cls.split_level = split_level
+        
+    def __init__(self, parent, header):
         self.parent = parent
-        self.split_level = split_level
-        self.strategy = strategy
         self.header = header
         self.content = []
         self.children = []
@@ -144,9 +150,9 @@ class Section:
         self.path_to_root = ""
         
     @staticmethod
-    def create(name, abs_path, split_level, content, strategy):
-        output = Section(None, Header(name), split_level, strategy)
-        output.rel_filename = name + strategy.file_extension
+    def create(name, abs_path, content):
+        output = Section(None, Header(name))
+        output.rel_filename = name + output.strategy.file_extension
         output.abs_filename = output._join_paths(abs_path, output.rel_filename)
         output.content = content
         return output
@@ -387,10 +393,10 @@ class TocMaker:
 
 class Document:
     def __init__(self, destination: str, split_level: int, strategy: Strategy):
+        Section.set_strategy(strategy, split_level)
         self._destination = destination
-        self._split_level = split_level
         self._strategy = strategy
-        self._root = Section(None, Header(DEFAULT_NAME), split_level, strategy)
+        self._root = Section(None, Header(DEFAULT_NAME))
         self._current_section = self._root
         
     def create_folders(self) -> None:
@@ -460,6 +466,6 @@ class Document:
         while header.outline_level <= parent_section.header.outline_level:
             parent_section = parent_section.parent
         # Create the new section
-        new_section = Section(parent_section, header, self._split_level, self._strategy)
+        new_section = Section(parent_section, header)
         parent_section.children.append(new_section)
         self._current_section = new_section

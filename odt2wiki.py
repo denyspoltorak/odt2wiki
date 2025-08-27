@@ -69,8 +69,8 @@ def convert_to_markdown(archive,
     doc.create_folders()
     # Create tables of contents
     index = document.TocMaker(strategy).make(doc.root())
-    main_toc = document.Section.create("Home", dest_path, split_level, [index,], strategy)
-    side_toc = document.Section.create("_Sidebar", dest_path, split_level, [index,], strategy)
+    main_toc = document.Section.create("Home", dest_path, [index,])
+    side_toc = document.Section.create("_Sidebar", dest_path, [index,])
     # Map pictires inside the ODT to picture files in the destination folder
     external_images = {}
     internal_images = {}
@@ -102,7 +102,7 @@ def main():
     usage = """
 odt2wiki.py <input.odt> --print={files|attrs|tags}
 odt2wiki.py <input.odt> <output.txt> --convert=text
-odt2wiki.py <input.odt> <output_folder> --convert=github [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] """
+odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] """
     
     # Set up the CLI arguments
     parser = ArgumentParser(description=description, usage=usage)
@@ -113,7 +113,7 @@ odt2wiki.py <input.odt> <output_folder> --convert=github [--collapse=<level>] [-
     group = parser.add_argument_group("Mode of action")
     group = group.add_mutually_exclusive_group(required=True)
     group.add_argument("-p", "--print", choices=("files", "attrs", "tags"), help="print info about the ODT: %(choices)s")
-    group.add_argument("-c", "--convert", choices=("text", "github"), help="convert the ODT into a chosen format: %(choices)s")
+    group.add_argument("-c", "--convert", choices=("text", "github", "hugo"), help="convert the ODT into a chosen format: %(choices)s")
     
     group = parser.add_argument_group("Options for markdown conversion")
     group.add_argument("-l", "--collapse-level", action="store", type=int, default=0, help="collapse sections at this outline level")

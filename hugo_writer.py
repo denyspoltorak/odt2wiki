@@ -32,6 +32,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         output = [METADATA_SEPARATOR,]
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
+        output.append(f'title = "{creator.header.to_string()}"')
         if creator.header.outline_level == 1:
             output.append("bookCollapseSection = true")
         output.append(METADATA_SEPARATOR)

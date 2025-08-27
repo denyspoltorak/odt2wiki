@@ -6,10 +6,6 @@ from typing import Optional
 import os
 
 
-def string_to_filename(string):
-    return string.rstrip(". ")
-
-
 DEFAULT_NAME = "Introduction"
 
 
@@ -123,12 +119,19 @@ class NavBar(Content):
         
         
 class Strategy:
-    def __init__(self, file_extension, make_ref_for_header, make_ref_for_text, resolve_refs_conflict, process_internal_link):
+    def __init__(self, 
+                 file_extension, 
+                 make_ref_for_header, 
+                 make_ref_for_text, 
+                 resolve_refs_conflict, 
+                 process_internal_link, 
+                 string_to_filename):
         self.file_extension = file_extension
         self.make_ref_for_header = make_ref_for_header
         self.make_ref_for_text = make_ref_for_text
         self.resolve_refs_conflict = resolve_refs_conflict
         self.process_internal_link = process_internal_link
+        self.string_to_filename = string_to_filename
 
 
 class Section:
@@ -162,7 +165,7 @@ class Section:
         assert not self.abs_filename
         assert not self.path_to_root
         header_text = self.header.to_string()
-        filename = string_to_filename(header_text)
+        filename = self.strategy.string_to_filename(header_text)
         assert filename
         # Create the root folder
         if not self.header.outline_level:

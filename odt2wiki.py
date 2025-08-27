@@ -130,7 +130,7 @@ def convert_to_hugo_markdown(   archive,
     # Convert to markdown
     doc.crosslink()
     doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
-    doc.dump(functools.partial(md_writer.MarkdownWriter, collapse_level=collapse_level))
+    doc.dump(functools.partial(hugo_writer.HugoMarkdownWriter, collapse_level=collapse_level))
     print(f"Hugo markdown created in {dest_path}")
 
 

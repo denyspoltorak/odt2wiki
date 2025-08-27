@@ -268,8 +268,6 @@ class MarkdownWriter:
             assert i.level > 0
             assert i.name
             assert i.link
-            assert i.link.startswith("<")
-            assert i.link.endswith(">")
             if i.level > 1:
                 self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({i.link})\n")
             else:        
@@ -278,7 +276,7 @@ class MarkdownWriter:
                 if self._toc_collapse_level:
                     self._collapsing = True
                     # Markdown does not work inside <summary>
-                    self._output.append(f'<details>\n<summary><a href="{i.link.strip("<>")}">{i.name}</a></summary>\n\n')
+                    self._output.append(f'<details>\n<summary><a href="{self._strip_link(i.link)}">{i.name}</a></summary>\n\n')
                 else:
                     self._output.append(f"\n### [{i.name}]({i.link})\n\n")
     
@@ -310,6 +308,11 @@ class MarkdownWriter:
             # Output
             self._output.append(_make_table_row(links))
             self._output.append(_make_table_separator(3))
+    
+    def _strip_link(self, link):
+        assert link.startswith("<")
+        assert link.endswith(">")
+        return link.strip("<>")
 
 
 # Methods for strategies
@@ -328,11 +331,9 @@ def make_ref_for_header(rel_path, header, is_title):
                 output.append("-")
         return rel_path + "#" + "".join(output)
 
-
 def make_ref_for_text(rel_path, text, is_title):
     assert not is_title
     return rel_path + "#" + "".join([c.lower() for c in text.split()[0] if c.isalnum()])
-
 
 def resolve_refs_conflict(anchor, links):
     # https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links
@@ -346,6 +347,8 @@ def resolve_refs_conflict(anchor, links):
             output.append((l, new_anchor))
     return output
 
-
 def process_internal_link(link):
-    return link if link else "#"
+    return f"<{link}>" if link else "#"
+
+def string_to_filename(string):
+    return string.rstrip(". ")

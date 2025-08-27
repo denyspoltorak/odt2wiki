@@ -38,4 +38,5 @@ github_strategy = document.Strategy(".md",
                                     md_writer.make_ref_for_header, 
                                     md_writer.make_ref_for_text, 
                                     md_writer.resolve_refs_conflict,
-                                    _process_internal_link)
+                                    _process_internal_link,
+                                    md_writer.string_to_filename)

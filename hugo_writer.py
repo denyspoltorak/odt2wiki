@@ -25,8 +25,8 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         assert link.enswith('" >}}')
         return link[len('{{< relref "'):-len('" >}}')]
     
-    def _add_nav_bar(self, navbar):
-        assert False
+#    def _add_nav_bar(self, navbar):
+#        assert False
     
     def _make_metadata(self, creator):
         output = [METADATA_SEPARATOR,]
@@ -41,7 +41,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         
 
 hugo_strategy = document.Strategy(  ".md",
-                                    False,
+                                    True, #False,    # Hugo Book will release its navbar in v12 in May 2026.
                                     md_writer.make_ref_for_header, 
                                     md_writer.make_ref_for_text, 
                                     md_writer.resolve_refs_conflict,

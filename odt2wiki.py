@@ -79,7 +79,7 @@ def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
             exit(1)
         full_local_path = os.path.expanduser(images_folder)
         matched, unmatched = image_matcher.match_images(archive, full_local_path)
-        if remote_image_path:
+        if remote_image_path is not None:
             external_images = {k: v.replace(full_local_path, remote_image_path) for k, v in matched.items()}
         else:
             external_images = matched

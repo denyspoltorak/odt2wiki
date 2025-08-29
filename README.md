@@ -1,6 +1,12 @@
 # ODT to wiki converter
 
-odt2wiki is a small tool that converts an OpenOffice / LibreOffice text document into GitHub wiki. It was designed for processing large documents with hundreds of diagrams and thousands of cross-links.
+odt2wiki is a small tool that converts an OpenOffice / LibreOffice text document into a markdown-based wiki. It was designed for processing large documents with hundreds of diagrams and thousands of cross-links.
+
+Supported output formats:
+
+* [GitHub wiki](https://docs.github.com/en/communities/documenting-your-project-with-wikis).
+
+* [Hugo Book](https://github.com/alex-shpak/hugo-book/).
 
 ## Use cases
 
@@ -18,7 +24,7 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * If you have a folder with diagrams which were used in your document, odt2wiki can rely on them for the wiki, creating meaningful captions from file names. That works even if the diagrams were resized by GoogleDocs behind the scene.
 
-* odt2wiki adds a navigation bar and a sidebar with a collapsible table of contents.
+* odt2wiki adds a navigation bar and a sidebar with a collapsible table of contents for GitHub wiki. Hugo Book provides its own navigation which looks better.
 
 * Image size is preserved. You won't see a small diagram from your document take a whole page of wiki.
 
@@ -30,13 +36,11 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * Bulleted and numbered lists, including nested lists.
 
-* Tables
+* Tables.
 
-* An option to collapse sections
+* An option to collapse sections (only with GitHub wiki for now, can be implemented for Hugo Book).
 
 ### Unsupported features
-
-* Colorized text - GitHub aggressively removes colors. Though odt2wiki generates color tags, they are ignored. Colors may be supported in other output formats in the future.
 
 * Mixed bulleted and numbered lists. If a list uses bullets at level 1, numbers at level 2, then again bullets at level 3, all its levels are output as bulleted. Mixed lists should be easy to implement in case someone uses them in practice.
 
@@ -44,9 +48,17 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * Lists or images inside table cells.
 
+#### Unsupported with GitHub wiki
+
+A couple of features are not supported by the GitHub wiki engine:
+
+* Colorized text - GitHub aggressively removes colors. Though odt2wiki generates color tags, they are ignored. Colors may be supported in other output formats in the future.
+
 * Identical names for multiple wiki pages. This is a limitation of GitHub wiki engine - they don't support folders, therefore files with identical names but different paths are treated as duplicates. Please check the Pages sidebar on GitHub wiki to make sure that you don't have duplicates. Duplicates break cross-references and navigation - all the links lead to the first page.
 
 ## Usage
+
+odt2wiki generates markdown files which are the main content for wikis. Below is a general instruction, with target-specific steps outlined in the section that follow:
 
 1. You need an ODT document with outline levels set up. If they are, the table of contents in LibreOffice's navbar represents the structure of the document.
 
@@ -60,7 +72,7 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
    
    * `-s` or `--split-level` is where you divide your wiki into pages. If your document is structured into parts (level 1), chapters (level 2) and sections (level 3) and you specify `-s 2` you will have a wiki folder per part and a wiki page per chapter.
    
-   * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level.
+   * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level (GitHub format only).
    
    * #### Matching images:
    
@@ -76,7 +88,15 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
     
      * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
 
-3. Customize your wiki by editing:
+3. Customize the generated content.
+
+4. Deploy it.
+
+### Generating a GitHub wiki
+
+Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc`
+
+Customize your wiki by editing:
 
    * The generated `Home.md` which now has the table of contents listing all your wiki pages. You will want to add an introduction.
 
@@ -86,7 +106,33 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
    
    * And you will likely need to remove the remnants of your title page from the beginning of `Introduction.md`.
 
-4. [Commit to GitHub](https://gist.github.com/subfuzion/0d3f19c4f780a7d75ba2).
+[Commit to GitHub](https://gist.github.com/subfuzion/0d3f19c4f780a7d75ba2).
+
+### Generating a Hugo-Book-based website
+
+[Install Hugo](https://gohugo.io/installation/linux/) by running `sudo snap install hugo`.
+
+[Create a project](https://cloudcannon.com/tutorials/hugo-beginner-tutorial/): `hugo new site my-wiki`.
+
+[Set up Hugo Book](https://github.com/alex-shpak/hugo-book/?tab=readme-ov-file#installation) from the latest release (v11.0.0) tag.
+
+Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r ""`
+
+Copy the script's output from `~/Work/Hugo` to your newly created Hugo project's `content` folder.
+
+Move `Pictures` from the Hugo's `content` to its `static` folder.
+
+Copy the original images you ran odt2wiki against from `~/Diagrams/MyDoc` to `static` Hugo folder.
+
+Edit `hugo.toml` in the project's root and the generated markdown files.
+
+Check the results by running `hugo server -D` in the Hugo project's folder.
+
+See if you can [do SEO](https://cloudcannon.com/tutorials/hugo-seo-best-practices/).
+
+Generate your website: `hugo`.
+
+Publish it.
 
 ## Troubleshooting
 
@@ -107,6 +153,8 @@ If anything goes wrong (you get a failed assertion or some content from the docu
 * `odt2wiki.py MyBook.odt --print=tags` outputs a tree of tags for your document.
 
 * `odt2wiki.py MyBook.odt MyBook.txt --convert=text` extracts all the text odt2wiki recognizes in the document to a txt file. This can be useful if some content is missing in the wiki output.
+
+* `_print_doc_tree(doc)` in odt2wiki.py prints the tree of headers (DOM) in a document.
 
 * Finally, you can extract `content.xml` and `styles.xml` from the ODT archive by using any unzip software and view them in your browser. There is hardly anything as useful for debugging as looking at the data.
 
@@ -144,7 +192,11 @@ If you decide to fix or extend the script, here are its components:
 
 * `odt_tool.py` - even simpler ODT parsers for troubleshooting modes.
 
-* `md_writer.py` - writes GitHub markdown from `Content`. Is used by `Section`s to output wiki pages.
+* `md_writer.py` - Conversion of `Content` to generic markdown. Is used by `Section`s to output wiki pages.
+
+* `github_writer.py` - GitHub-wiki-specific code (file naming and markdown format).
+
+* `hugo_writer.py` - Hugo-Book-specific code (index files, relrefs, [front matter](https://gohugo.io/content-management/front-matter/) (metadata)).
 
 * `image_matcher.py` - extracts matches images from the document and matches them to local files.
 
@@ -188,11 +240,11 @@ Now that I understand the structure and elements of ODT, I think I can use odfdo
 
 #### Will any other input / output formats be supported?
 
-Yes, if someone implements them. I intend on trying odt2wiki with [Hugo Book](https://hugo-book-demo.netlify.app/) or [Sphinx book theme](https://sphinx-book-theme.readthedocs.io/en/stable/index.html). That will add one or two output formats. Everything else will be done on demand or will wait for contributors.
+Yes, if someone implements them.
 
 #### The navigation bar is strange
 
-The backward and forward navigation are not symmetric. The forward navigation enters subfolders while the backward goes up.
+The backward and forward navigation generated for GitHub wiki are not symmetric. The forward navigation enters subfolders while the backward goes up.
 
 Example: 
 

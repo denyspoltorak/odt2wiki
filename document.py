@@ -149,6 +149,8 @@ class Section:
         
     def __init__(self, parent, header):
         self.parent = parent
+        self.next = None
+        self.prev = None
         self.header = header
         self.content = []
         self.children = []
@@ -272,7 +274,8 @@ class Section:
             child.dump(writer_factory, writer)
         # Save it to the file
         if self.header.outline_level <= self.split_level:
-            if self.strategy.needs_navigation:
+            assert (not self.prev) == (not self.next)
+            if self.next and self.split_level and self.strategy.needs_navigation:   # No navbar for stand-alone ToC or a single-file project
                 writer.add(self._make_navigation())
             with open(self.abs_filename, "x") as output:
                 output.write(writer.get_output())
@@ -340,22 +343,24 @@ class Section:
             return link
         
     def _make_navigation(self):
+        assert self.prev and self.next
         navigation = NavBar()
-        for c in self.children:
-            if c.header.outline_level <= self.split_level:
-                navigation.next = self._make_nav_item(c)
-                break
+        # Find the next chapter
+        other = self
+        while other.next.header.outline_level > self.split_level:
+            other = other.next
+            assert other != self
+        navigation.next = self._make_nav_item(other.next)
+        # Find the prev chapter
+        other = self
+        while other.prev.header.outline_level > self.split_level:
+            other = other.prev
+            assert other != self
+        navigation.prev = self._make_nav_item(other.prev)
+        # Find the parent
         if self.parent:
             navigation.up = self._make_nav_item(self.parent)
-            index = self.parent.children.index(self)
-            if index > 0 and self.parent.children[index - 1].header.outline_level <= self.split_level:
-                navigation.prev = self._make_nav_item(self.parent.children[index - 1])
-            else:
-                navigation.prev = self._make_nav_item(self.parent)
-            if not navigation.next:
-                next_section = self._find_next_in_parent(self)
-                if next_section:
-                    navigation.next = self._make_nav_item(next_section)
+        # Done
         return navigation
     
     def _find_next_in_parent(self, current):
@@ -447,6 +452,14 @@ class Document:
         assert isinstance(new_root, Section)
         assert new_root.header.outline_level == 0
         assert self._root.header.outline_level == 0
+        assert not self._current_section
+        assert self._root.prev.next == self._root
+        # Update the navigation list
+        new_root.next = self._root
+        new_root.prev = self._root.prev
+        self._root.prev = new_root
+        new_root.prev.next = new_root
+        # Update the DOM tree
         children = self._root.children
         self._root.children = []
         self._root.parent = new_root
@@ -464,13 +477,24 @@ class Document:
     
     def add(self, content: Content) -> None:
         assert isinstance(content, Content)
+        assert self._current_section
         if isinstance(content, Header):
             self._add_header(content)
         else:
             self._current_section.content.append(content)
     
+    def finalize(self) -> None:
+        assert self._current_section
+        assert not self._root.prev
+        assert not self._current_section.next
+        self._root.prev = self._current_section
+        self._current_section.next = self._root
+        self._current_section = None        
+    
     def _add_header(self, header):
         assert header.outline_level
+        assert self._current_section
+        assert not self._current_section.next
         # Find a place for the new section in the tree
         parent_section = self._current_section
         while header.outline_level <= parent_section.header.outline_level:
@@ -478,4 +502,6 @@ class Document:
         # Create the new section
         new_section = Section(parent_section, header)
         parent_section.children.append(new_section)
+        self._current_section.next = new_section
+        new_section.prev = self._current_section
         self._current_section = new_section

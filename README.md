@@ -48,7 +48,7 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * Lists or images inside table cells.
 
-#### Unsupported with GitHub wiki
+#### Unsupported with GitHub wiki:
 
 A couple of features are not supported by the GitHub wiki engine:
 
@@ -241,24 +241,6 @@ Now that I understand the structure and elements of ODT, I think I can use odfdo
 #### Will any other input / output formats be supported?
 
 Yes, if someone implements them.
-
-#### The navigation bar is strange
-
-The backward and forward navigation generated for GitHub wiki are not symmetric. The forward navigation enters subfolders while the backward goes up.
-
-Example: 
-
-- Let X.Y is chapter Y of part X.
-
-- Let's start at 2.4
-
-- Forward 4 times: 2.4 -> 2.5 -> 3.0 -> 3.1 -> 3.2
-
-- Backward 4 times: 3.2 -> 3.1 -> 3.0 -> 2.0 -> 1.0
-
-I don't know if this is a bug or feature. On one hand, it does not make much sense to return to the last chapter of the previous part. On the other hand, forward and backward buttons are expected to be symmetric.
-
-If you believe that it's wrong I may fix it.
 
 #### I have a bug!
 

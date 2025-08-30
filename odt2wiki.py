@@ -68,6 +68,7 @@ def _create_document(content, styles, dest_path, split_level, strategy):
     # Process the content
     doc = document.Document(dest_path, split_level, strategy)
     visitor.fill_document(doc)
+    doc.finalize()
     return doc
 
 def _process_images(doc, archive, dest_path, images_folder, remote_image_path):

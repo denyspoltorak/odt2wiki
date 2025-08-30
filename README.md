@@ -126,9 +126,9 @@ Copy the original images you ran odt2wiki against from `~/Diagrams/MyDoc` to `st
 
 Edit `hugo.toml` in the project's root and the generated markdown files.
 
-Check the results by running `hugo server -D` in the Hugo project's folder.
+Check the results by running `hugo server` in the Hugo project's folder.
 
-See if you can [do SEO](https://cloudcannon.com/tutorials/hugo-seo-best-practices/).
+See if you can [do SEO](https://bullaki.com/projects/web-design/).
 
 Generate your website: `hugo`.
 
@@ -267,3 +267,4 @@ Yep. There should have been at least one. Please [contact me](https://www.linked
 ## Portfolio
 
 [Architectural Metapatterns wiki](https://github.com/denyspoltorak/metapatterns/wiki)
+[Architectural Metapatterns website](https://metapatterns.io/)

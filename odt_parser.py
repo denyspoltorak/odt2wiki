@@ -191,7 +191,7 @@ class FullVisitor():
                     span.style |= style
                     output.grayed_out = output.grayed_out or span.style.colored_background
                     output.spans.append(span)
-                case "bookmark":
+                case "bookmark" | "bookmark-end":
                     output.bookmarks.append(self._process_bookmark(child))
                 case "frame":
                     assert not image

@@ -60,7 +60,7 @@ def extract_text(content, destination):
 
 # Main methods        
 
-def _create_document(content, styles, dest_path, split_level, strategy):
+def _create_document(content, styles, dest_path, split_level, strategy, landing_name):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
@@ -69,7 +69,14 @@ def _create_document(content, styles, dest_path, split_level, strategy):
     doc = document.Document(dest_path, split_level, strategy)
     visitor.fill_document(doc)
     doc.finalize()
-    return doc
+    # Add the landing page
+    doc.push_root(document.Section.create(landing_name))
+    doc.create_folders()
+    # Create the table of contents
+    index = document.TocMaker(strategy).make(doc.root())
+    doc.root().content.append(index)
+    # The index may be reused
+    return doc, index
 
 def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
     external_images = {}
@@ -102,17 +109,12 @@ def convert_to_github_markdown( archive,
     # Set up
     dest_path = os.path.expanduser(destination)
     strategy = github_writer.github_strategy
-    doc = _create_document(content, styles, destination, split_level, strategy)
-    doc.create_folders()
-    # Create tables of contents
-    index = document.TocMaker(strategy).make(doc.root())
-    main_toc = document.Section.create("Home", [index,], dest_path)
+    doc, index = _create_document(content, styles, destination, split_level, strategy, "Home")
     side_toc = document.Section.create("_Sidebar", [index,], dest_path)
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown
     doc.crosslink()
-    doc.push_root(main_toc) # We need the table of contents to be in the sections tree to link to it in the navigation bar
     doc.dump(functools.partial(github_writer.GithubMarkdownWriter, collapse_level=collapse_level))
     side_toc.dump(functools.partial(github_writer.GithubMarkdownWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
     print(f"GitHub markdown created in {dest_path}")
@@ -129,12 +131,7 @@ def convert_to_hugo_markdown(   archive,
     # Set up
     dest_path = os.path.expanduser(destination)
     strategy = hugo_writer.hugo_strategy
-    doc = _create_document(content, styles, destination, split_level, strategy)
-    # Add the landing page
-    doc.push_root(document.Section.create("Table of Contents"))
-    doc.create_folders()
-    # Create the table of contents
-    doc.root().content.append(document.TocMaker(strategy).make(doc.root()))
+    doc, _ = _create_document(content, styles, destination, split_level, strategy, "Table of Contents")
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown

@@ -397,7 +397,7 @@ class TocMaker:
         return self._toc
     
     def __call__(self, section):
-        if section.header.outline_level <= section.split_level:
+        if section.header.outline_level and section.header.outline_level <= section.split_level:
             name = section.header.to_string()
             level = section.header.outline_level
             self._toc.items.append(TocItem(name, 

@@ -117,7 +117,10 @@ class NavBar(Content):
         self.next = None
         self.up = None
         
-        
+
+# Customization
+
+# Customization by the output dialect
 class Strategy:
     def __init__(self, 
                  file_extension, 
@@ -137,14 +140,21 @@ class Strategy:
         self.string_to_filename = string_to_filename
         self.index_filename = index_filename
 
+# Per-document customization
+class Customization:
+    @staticmethod
+    def needs_split(doc):
+        return False
+
 
 class Section:
     strategy = None
     split_level = None
     
     @classmethod
-    def set_strategy(cls, strategy, split_level):
+    def set_strategy(cls, strategy, customization, split_level):
         cls.strategy = strategy
+        cls.customization = customization
         cls.split_level = split_level
         
     def __init__(self, parent, header):
@@ -406,8 +416,8 @@ class TocMaker:
 
 
 class Document:
-    def __init__(self, destination: str, split_level: int, strategy: Strategy):
-        Section.set_strategy(strategy, split_level)
+    def __init__(self, destination: str, split_level: int, strategy: Strategy, customization: Customization):
+        Section.set_strategy(strategy, customization, split_level)
         self._destination = destination
         self._strategy = strategy
         self._root = Section(None, Header(DEFAULT_NAME))

@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from zipfile import ZipFile
 import os.path
 import functools
+import importlib
 
 import odt_tools
 import odt_parser
@@ -51,22 +52,22 @@ def tags_tree(content):
     for (k, v) in sorted(tags.items()):
         _print_dict_tree(k, v, 0)
 
-def extract_text(content, destination):
+def extract_text(content, dest_path):
     visitor = odt_tools.TextVisitor()
     visitor.traverse(content)
-    with open(os.path.expanduser(destination), "x") as output:
+    with open(dest_path, "x") as output:
         output.write(visitor.results())
         
 
 # Main methods        
 
-def _create_document(content, styles, dest_path, split_level, strategy, landing_name):
+def _create_document(content, styles, dest_path, split_level, strategy, customization, landing_name):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
     visitor.traverse(content)
     # Process the content
-    doc = document.Document(dest_path, split_level, strategy)
+    doc = document.Document(dest_path, split_level, strategy, customization)
     visitor.fill_document(doc)
     doc.finalize()
     # Add the landing page
@@ -101,15 +102,15 @@ def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
 def convert_to_github_markdown( archive,
                                 content, 
                                 styles, 
-                                destination, 
+                                dest_path, 
                                 collapse_level, 
                                 split_level, 
                                 images_folder, 
-                                remote_image_path):
+                                remote_image_path,
+                                customization):
     # Set up
-    dest_path = os.path.expanduser(destination)
     strategy = github_writer.github_strategy
-    doc, index = _create_document(content, styles, destination, split_level, strategy, "Home")
+    doc, index = _create_document(content, styles, dest_path, split_level, strategy, customization, "Home")
     side_toc = document.Section.create("_Sidebar", [index,], dest_path)
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
@@ -122,16 +123,16 @@ def convert_to_github_markdown( archive,
 def convert_to_hugo_markdown(   archive,
                                 content, 
                                 styles, 
-                                destination, 
+                                dest_path, 
                                 collapse_level, 
                                 split_level, 
                                 images_folder, 
-                                remote_image_path):
+                                remote_image_path,
+                                customization):
     assert not collapse_level, "Not implemented"
     # Set up
-    dest_path = os.path.expanduser(destination)
     strategy = hugo_writer.hugo_strategy
-    doc, _ = _create_document(content, styles, destination, split_level, strategy, "Table of Contents")
+    doc, _ = _create_document(content, styles, dest_path, split_level, strategy, customization, "Table of Contents")
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown
@@ -145,7 +146,7 @@ def main():
     usage = """
 odt2wiki.py <input.odt> --print={files|attrs|tags}
 odt2wiki.py <input.odt> <output.txt> --convert=text
-odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] """
+odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] [--customize=<python_module>]"""
     
     # Set up the CLI arguments
     parser = ArgumentParser(description=description, usage=usage)
@@ -163,6 +164,7 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
     group.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
     group.add_argument("-i", "--images-folder", action="store", help="local folder with images used throughout the document")
     group.add_argument("-r", "--remote-images", action="store", help="route image requests from wiki to this folder")
+    group.add_argument("-z", "--customize", action="store", help="custom rules for your document")
     
     args = parser.parse_args()
     
@@ -197,34 +199,43 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
                 case _:
                     assert False
         elif args.convert:
+            # Process parameters
             if not args.output:
                 parser.print_usage()
                 print("Output file or folder is required for --convert")
                 exit()
+            dest_path = os.path.expanduser(args.output)
+            if args.customize:
+                customization = importlib.import_module("custom." + args.customize).customization
+            else:
+                customization = document.Customization()
+            # Run
             match args.convert:
                 case "text":
                     print(f"Extracting text from {TEXT_XML_FILE_NAME} to {args.output}")
-                    extract_text(parsed_content, args.output)
+                    extract_text(parsed_content, dest_path)
                 case "github":
                     print(f"Converting to GitHub markdown in {args.output}")
                     convert_to_github_markdown( archive,
                                                 parsed_content, 
                                                 parsed_styles, 
-                                                args.output,
+                                                dest_path,
                                                 args.collapse_level, 
                                                 args.split_level,
                                                 args.images_folder,
-                                                args.remote_images)
+                                                args.remote_images,
+                                                customization)
                 case "hugo":
                     print(f"Converting to Hugo markdown in {args.output}")
                     convert_to_hugo_markdown(   archive,
                                                 parsed_content, 
                                                 parsed_styles, 
-                                                args.output,
+                                                dest_path,
                                                 args.collapse_level, 
                                                 args.split_level,
                                                 args.images_folder,
-                                                args.remote_images)
+                                                args.remote_images,
+                                                customization)
                 case _:
                     assert False
     print()

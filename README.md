@@ -64,7 +64,7 @@ odt2wiki generates markdown files which are the main content for wikis. Below is
 
    * If it is empty (e.g. because the document was exported from GoogleDocs), please follow the "Document structure" step of [this instruction](https://medium.com/@denyspoltorak/guide-on-converting-a-google-docs-text-into-an-ebook-5b1abc65f69d).
 
-2. Run the script, for example: `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc`
+2. Run the script, for example: `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc -z my_custom_code`
 
    * Positional arguments are the input ODT file (`~/Documents/MyDoc.odt`) and the output folder to be created (`~/Work/MyWiki`). The output folder should not already exist.
    
@@ -73,6 +73,8 @@ odt2wiki generates markdown files which are the main content for wikis. Below is
    * `-s` or `--split-level` is where you divide your wiki into pages. If your document is structured into parts (level 1), chapters (level 2) and sections (level 3) and you specify `-s 2` you will have a wiki folder per part and a wiki page per chapter.
    
    * Optionally, you can add `-l` or `--collapse-level` to collapse sections of that outline level (GitHub format only).
+   
+   * `-z` or `--customize` allows you to provide your own code for processing your document: split chapters below the `--split-level` and set up SEO strings. The value of the argument is the name of a Python module in the `custom` folder. See `custom/metapatterns.py`.
    
    * #### Matching images:
    
@@ -94,7 +96,7 @@ odt2wiki generates markdown files which are the main content for wikis. Below is
 
 ### Generating a GitHub wiki
 
-Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc`
+Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/MyWiki -c github -s 2 -i ~/Diagrams/MyDoc -r https://raw.githubusercontent.com/myname/myrepo/main/MyDoc -z my_code`
 
 Customize your wiki by editing:
 
@@ -116,7 +118,7 @@ Customize your wiki by editing:
 
 [Set up Hugo Book](https://github.com/alex-shpak/hugo-book/?tab=readme-ov-file#installation) from the latest release (v11.0.0) tag.
 
-Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r ""`
+Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r "" -z my_code`
 
 Copy the script's output from `~/Work/Hugo` to your newly created Hugo project's `content` folder.
 
@@ -199,6 +201,8 @@ If you decide to fix or extend the script, here are its components:
 * `hugo_writer.py` - Hugo-Book-specific code (index files, relrefs, [front matter](https://gohugo.io/content-management/front-matter/) (metadata)).
 
 * `image_matcher.py` - extracts matches images from the document and matches them to local files.
+
+* `custom` folder contains the code for per-document customization.
 
 ## Q&A
 

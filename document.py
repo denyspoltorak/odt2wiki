@@ -7,6 +7,11 @@ import os
 
 
 DEFAULT_NAME = "Introduction"
+LOCAL_TOC_NAME = "Contents:"
+
+
+def is_link_external(link):
+    return link.startswith("http") or link.startswith("mailto")
 
 
 class SectionType(IntEnum):
@@ -153,6 +158,32 @@ class Customization:
     @staticmethod
     def needs_split(section):
         return False
+    
+    # Does this folder-level section need a local ToC to provide links to its children?
+    @staticmethod
+    def needs_local_toc(section):
+        return False
+
+
+class TocMaker:
+    def __init__(self, strategy, level_offset = 0):
+        self._strategy = strategy
+        self._level_offset = level_offset
+        self._toc = ToC()
+    
+    def make(self, root):
+        for c in root.children:
+            c.traverse(self)
+        return self._toc
+    
+    def __call__(self, section):
+        assert section.header.outline_level
+        if section.type < SectionType.INTERNAL:
+            name = section.header.to_string()
+            level = section.header.outline_level
+            self._toc.items.append(TocItem(name, 
+                                           self._strategy.process_internal_link(section.rel_filename), 
+                                           level - self._level_offset))
 
 
 class Section:
@@ -303,6 +334,13 @@ class Section:
             writer.add(c)
         for child in self.children:
             child.dump(writer_factory, writer)
+        # Optionally add a ToC with links to our child sections
+        if self.header.outline_level and self.type == SectionType.FOLDER and self.customization.needs_local_toc(self):
+            print(f"Added a ToC to '{self.header.to_string()}'")
+            toc_header = Header(LOCAL_TOC_NAME)
+            toc_header.outline_level = max(self.header.outline_level, self.split_level) + 1
+            writer.add_header(toc_header)
+            writer.add(TocMaker(self.strategy, self.header.outline_level - 1).make(self))
         # Save it to the file
         if self.type < SectionType.INTERNAL:
             assert (not self.prev) == (not self.next)
@@ -383,7 +421,7 @@ class Section:
             else:
                 return self.strategy.process_internal_link(self._join_paths(self.path_to_root, new_link))
         else:
-            assert link.startswith("http") or link.startswith("mailto"), link
+            assert is_link_external(link), link
             return link
         
     def _make_navigation(self):
@@ -430,24 +468,6 @@ class Section:
             return r
         else:
             return ""
-
-
-class TocMaker:
-    def __init__(self, strategy):
-        self._strategy = strategy
-        self._toc = ToC()
-    
-    def make(self, root):
-        root.traverse(self)
-        return self._toc
-    
-    def __call__(self, section):
-        if section.header.outline_level and section.type < SectionType.INTERNAL:
-            name = section.header.to_string()
-            level = section.header.outline_level
-            self._toc.items.append(TocItem(name, 
-                                           self._strategy.process_internal_link(section.rel_filename), 
-                                           max(level, 1)))
 
 
 class Document:

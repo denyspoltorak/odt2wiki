@@ -24,6 +24,11 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         assert link.enswith('" >}}')
         return link[len('{{< relref "'):-len('" >}}')]
     
+    def _add_toc(self, toc):
+        self._output.append("<nav>\n\n")
+        super()._add_toc(toc)
+        self._output.append("\n</nav>\n\n")
+    
     def _add_nav_bar(self, navbar):
         self._output.append("<nav>\n\n")
         super()._add_nav_bar(navbar)

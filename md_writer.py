@@ -96,7 +96,6 @@ class MarkdownWriter:
         self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
     
     def _add_toc(self, toc):
-        assert toc.items[0].level == 1
         for i in toc.items:
             assert i.level > 0
             assert i.name

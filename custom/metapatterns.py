@@ -1,4 +1,33 @@
+import os.path
+
 import document
+
+
+class LinksCollector:
+    def __init__(self):
+        self.links = set()
+        
+    def __contains__(self, item):
+        return item in self.links
+    
+    def visit(self, section):
+        for s in section.header.spans:
+            self._process_span(s)
+        for c in section.content:
+            if isinstance(c, document.Paragraph):
+                for s in c.spans:
+                    self._process_span(s)
+        for child in section.children:
+            if child.type == document.SectionType.INTERNAL:
+                self.visit(child)
+    
+    def _process_span(self, span):
+        if span.link and not document.is_link_external(span.link) and not span.link.startswith("#"):
+            filename = os.path.basename(span.link.strip('<>{} "').split("#")[0])
+            if filename.endswith(".md"):
+                filename = filename[:-3]
+            self.links.add(filename)
+
 
 class MetapatternsCustomization(document.Customization):
     @staticmethod
@@ -16,5 +45,20 @@ class MetapatternsCustomization(document.Customization):
             return True
         # Otherwise use default rules
         return False
+    
+    @staticmethod
+    def needs_local_toc(section):
+        assert section.type == document.SectionType.FOLDER
+        # Add Table of Contents if this folder type section does not reference all of its children files
+        files = []
+        for c in section.children:
+            if c.type < document.SectionType.INTERNAL:
+                filename = os.path.basename(c.rel_filename)
+                assert filename.endswith(".md")
+                files.append(filename[:-3])
+        collector = LinksCollector()
+        collector.visit(section)
+        return not all(f in collector for f in files)
+
 
 customization = MetapatternsCustomization()

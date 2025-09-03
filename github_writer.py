@@ -58,7 +58,6 @@ class GithubMarkdownWriter(md_writer.MarkdownWriter):
     
     def _add_toc(self, toc):
         assert self._toc_collapse_level in (0, 1) # Cannot collapse inside a list
-        assert toc.items[0].level == 1
         for i in toc.items:
             assert i.level > 0
             assert i.name

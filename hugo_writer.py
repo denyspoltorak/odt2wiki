@@ -2,9 +2,6 @@ import document
 import md_writer
 
 
-METADATA_SEPARATOR = "+++"
-
-
 def _process_internal_link(link):
     return f'{{{{< relref "{link}" >}}}}' if link else "#"
 
@@ -16,8 +13,10 @@ def _index_filename(string):
 
 
 class HugoMarkdownWriter(md_writer.MarkdownWriter):
-    def __init__(self, creator, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    METADATA_SEPARATOR = "+++"
+    
+    def __init__(self, creator, split_level = 0):
+        super().__init__(split_level)
         self._make_metadata(creator)
         
     def _strip_link(self, link):
@@ -31,15 +30,15 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._output.append("\n</nav>\n\n")
     
     def _make_metadata(self, creator):
-        output = [METADATA_SEPARATOR,]
+        output = [self.METADATA_SEPARATOR,]
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
         output.append(f'title = "{creator.header.to_string()}"')
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
-        output.append(METADATA_SEPARATOR)
+        output.append(self.METADATA_SEPARATOR)
         self._output.append("\n".join(output))
-        self._output.append(md_writer.PARAGRAPH_SEPARATOR)
+        self._output.append(self.PARAGRAPH_SEPARATOR)
         
 
 hugo_strategy = document.Strategy(  ".md",

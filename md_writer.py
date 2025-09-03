@@ -3,172 +3,15 @@
 import document
 import os.path
 
-
-PARAGRAPH_SEPARATOR = "\n\n"
-
-
-def _escape(text):
-    output = []
-    for l in text:
-        if l in "\\`*_~(){}[]<>#+-.!|":
-            output.append("\\")
-        output.append(l)
-    return "".join(output)
-
-
-def _make_list_bullet(index):
-    return "- "
-
-
-def _make_list_number(index):
-    assert index < 100
-    return f"{str(index)+'.':<4}"
-
-
-def _make_table_row(row):
-    output = ["|",]
-    for cell in row:
-        output.append(_add_spans(cell.spans) if cell else "")
-        output.append("|")
-    return " ".join(output) + "\n"
     
-
-def _make_table_separator(num_columns):
-    output = ["|",]
-    for _ in range(num_columns):
-        output.append("---")
-        output.append("|")
-    return " ".join(output) + "\n"
-
-
-def _make_html_color_name(color):
-    if not color:
-        return ""
-    elif color.r > 2 * color.g and color.r > 2 * color.b:
-        return "red"
-    elif color.g > 2 * color.r and color.g > 2 * color.b:
-        return "green"
-    else:
-        return ""
-    
-    
-def _close_style(color, underline, bold, italic, strikethrough):
-    output = []
-    if color:
-        output.append("</span>")
-    if underline:
-        output.append("</ins>")
-    if bold:
-        output.append("**")
-    if italic:
-        output.append("*")
-    if strikethrough:
-        output.append("~")
-    return output
-
-
-def _open_style(color, underline, bold, italic, strikethrough):
-    output = []
-    if strikethrough:
-        output.append("~")
-    if italic:
-        output.append("*")
-    if bold:
-        output.append("**")
-    if underline:
-        output.append("<ins>")
-    if color:
-        output.append(f'<span style="color:{color}">')
-    return output
-    
-
-def _change_style(old, new, old_link, new_link, add_spaces):
-    output = []
-    old_color_name = _make_html_color_name(old.color)
-    new_color_name = _make_html_color_name(new.color)
-    old_underline = old.underline and not old_link
-    new_underline = new.underline and not new_link
-    # Close the old style
-    if old_link != new_link:
-        # A style cannot cross a link's border - reset
-        output.extend(_close_style(old_color_name, old_underline, old.bold, old.italic, old.strikethrough))
-    else:
-        # Apply the style diff
-        if old_color_name and old_color_name != new_color_name:
-            output.append("</span>")
-        if old_underline and not new_underline:
-            output.append("</ins>")
-        if old.bold and not new.bold:
-            output.append("**")
-        if old.italic and not new.italic:
-            output.append("*")
-        if old.strikethrough and not new.strikethrough:
-            output.append("~")
-    if old_link and old_link != new_link:
-        output.append(f"]({old_link})")
-    # Insert whitespaces which we move from inside the tags
-    output.append(" " * add_spaces)
-    # Open the new style
-    if new_link and new_link != old_link:
-        output.append("[")
-    if old_link != new_link:
-        # A style cannot cross a link's border - reload
-        output.extend(_open_style(new_color_name, new_underline, new.bold, new.italic, new.strikethrough))
-    else:
-        # Apply the style diff
-        if new.strikethrough and not old.strikethrough:
-            output.append("~")
-        if new.italic and not old.italic:
-            output.append("*")
-        if new.bold and not old.bold:
-            output.append("**")
-        if new_underline and not old_underline:
-            output.append("<ins>")
-        if new_color_name and new_color_name != old_color_name:
-            output.append(f'<span style="color:{new_color_name}">')
-    # Merge
-    return "".join(output)
-
-
-def _add_spans(spans):
-    output = []
-    move_spaces = 0
-    # Current style
-    style = document.Style()
-    link = ""
-    # Process the spans
-    for s in spans:
-        # Don't allow for spaces between markup tags and the text
-        left_stripped_text = s.text.lstrip()
-        move_spaces += len(s.text) - len(left_stripped_text)
-        if not left_stripped_text:
-            continue
-        output.append(_change_style(style, s.style, link, s.link, move_spaces))
-        style = s.style
-        link = s.link
-        fully_stripped_text = left_stripped_text.rstrip()
-        assert fully_stripped_text
-        move_spaces = len(left_stripped_text) - len(fully_stripped_text)
-        output.append(_escape(fully_stripped_text))
-    output.append(_change_style(style, document.Style(), link, "", move_spaces))
-    # Merge
-    result = "".join(output)
-    assert result
-    return result
-
-
 class MarkdownWriter:
-    def __init__(self, split_level = 0, *, collapse_level = 0, toc_collapse_level = 0):
+    PARAGRAPH_SEPARATOR = "\n\n"
+    
+    def __init__(self, split_level):
         self._output = []
         self._split_level = split_level
-        self._collapse_level = collapse_level
-        self._toc_collapse_level = toc_collapse_level
-        self._collapsing = False
      
     def get_output(self) -> str:
-        if self._collapsing:
-            self._output.append("</details>\n")
-            self._collapsing = False
         return "".join(self._output)
 
     def add(self, content: document.Content) -> None:
@@ -187,26 +30,18 @@ class MarkdownWriter:
                 self._add_nav_bar(content)
             case _:
                 assert False
-        self._output.append(PARAGRAPH_SEPARATOR)
+        self._output.append(self.PARAGRAPH_SEPARATOR)
     
     # Methods to add document parts
     def add_header(self, header: document.Header) -> None:
-        assert header.outline_level
-        # Close the previous section
-        if self._collapsing and header.outline_level <= self._collapse_level:
-            self._output.append("</details>\n\n")
-            self._collapsing = False
-        # Write the new section
-        if header.outline_level == self._collapse_level:
-            self._output.append("<details>\n<summary>\n\n")
-            self._collapsing = True
+        self._add_header(header)
+        self._output.append(self.PARAGRAPH_SEPARATOR)
+    
+    def _add_header(self, header):
         # Promote the file-level header
         promoted = max(header.outline_level - self._split_level + 1, 1)
         self._output.append("#" * promoted + " ")
         self._add_paragraph(header, False)
-        if self._collapsing:
-            self._output.append("\n</summary>")
-        self._output.append(PARAGRAPH_SEPARATOR)
       
     def _add_paragraph(self, paragraph, write_anchor):
         if write_anchor and paragraph.bookmarks:
@@ -215,7 +50,7 @@ class MarkdownWriter:
             self._output.append(f'<a name="{anchor_name}"></a>\n')
         if paragraph.grayed_out:
             self._output.append("> ")
-        self._output.append(_add_spans(paragraph.spans))
+        self._output.append(self._add_spans(paragraph.spans))
         
     def _add_list(self, l, offset = 0):
         prefix = " " * offset
@@ -223,10 +58,10 @@ class MarkdownWriter:
         # Differentiate between bulleted and numbered lists
         match l.kind:
             case document.ListStyle.BULLET:
-                method = _make_list_bullet
+                method = self._make_list_bullet
                 offset += 2
             case document.ListStyle.NUMBER:
-                method = _make_list_number
+                method = self._make_list_number
                 offset += 4
             case _:
                 assert False
@@ -246,12 +81,12 @@ class MarkdownWriter:
     def _add_table(self, table):
         # Add table header
         assert table.is_valid()
-        self._output.append(_make_table_row(table.rows[0]))
+        self._output.append(self._make_table_row(table.rows[0]))
         if len(table.rows) > 1:
-            self._output.append(_make_table_separator(table.num_columns))
+            self._output.append(self._make_table_separator(table.num_columns))
         # Add the content
         for r in range(1, len(table.rows)):
-            self._output.append(_make_table_row(table.rows[r]))
+            self._output.append(self._make_table_row(table.rows[r]))
 
     def _add_image(self, image):
         assert image.link
@@ -261,7 +96,6 @@ class MarkdownWriter:
         self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
     
     def _add_toc(self, toc):
-        assert self._toc_collapse_level in (0, 1) # Cannot collapse inside a list
         assert toc.items[0].level == 1
         for i in toc.items:
             assert i.level > 0
@@ -270,14 +104,7 @@ class MarkdownWriter:
             if i.level > 1:
                 self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({i.link})\n")
             else:        
-                if self._collapsing:
-                    self._output.append("\n</details>\n\n")
-                if self._toc_collapse_level:
-                    self._collapsing = True
-                    # Markdown does not work inside <summary>
-                    self._output.append(f'<details>\n<summary><a href="{self._strip_link(i.link)}">{i.name}</a></summary>\n\n')
-                else:
-                    self._output.append(f"\n### [{i.name}]({i.link})\n\n")
+                self._output.append(f"\n### [{i.name}]({i.link})\n\n")
     
     def _add_nav_bar(self, navbar):
         if navbar.prev or navbar.next or navbar.up:
@@ -305,13 +132,169 @@ class MarkdownWriter:
             else:
                 links.append(None)
             # Output
-            self._output.append(_make_table_row(links))
-            self._output.append(_make_table_separator(3))
+            self._output.append(self._make_table_row(links))
+            self._output.append(self._make_table_separator(3))
     
-    def _strip_link(self, link):
+    def _add_spans(self, spans):
+        output = []
+        move_spaces = 0
+        # Current style
+        style = document.Style()
+        link = ""
+        # Process the spans
+        for s in spans:
+            # Don't allow for spaces between markup tags and the text
+            left_stripped_text = s.text.lstrip()
+            move_spaces += len(s.text) - len(left_stripped_text)
+            if not left_stripped_text:
+                continue
+            output.append(self._change_style(style, s.style, link, s.link, move_spaces))
+            style = s.style
+            link = s.link
+            fully_stripped_text = left_stripped_text.rstrip()
+            assert fully_stripped_text
+            move_spaces = len(left_stripped_text) - len(fully_stripped_text)
+            output.append(self._escape(fully_stripped_text))
+        output.append(self._change_style(style, document.Style(), link, "", move_spaces))
+        # Merge
+        result = "".join(output)
+        assert result
+        return result
+    
+    def _make_table_row(self, row):
+        output = ["|",]
+        for cell in row:
+            output.append(self._add_spans(cell.spans) if cell else "")
+            output.append("|")
+        return " ".join(output) + "\n"
+    
+    @staticmethod
+    def _make_table_separator(num_columns):
+        output = ["|",]
+        for _ in range(num_columns):
+            output.append("---")
+            output.append("|")
+        return " ".join(output) + "\n"
+    
+    @staticmethod
+    def _make_list_bullet(index):
+        return "- "
+
+    @staticmethod
+    def _make_list_number(index):
+        assert index < 100
+        return f"{str(index)+'.':<4}"
+      
+    @staticmethod
+    def _make_html_color_name(color):
+        if not color:
+            return ""
+        elif color.r > 2 * color.g and color.r > 2 * color.b:
+            return "red"
+        elif color.g > 2 * color.r and color.g > 2 * color.b:
+            return "green"
+        else:
+            return ""
+    
+    def _change_style(self, old, new, old_link, new_link, add_spaces):
+        output = []
+        old_color_name = self._make_html_color_name(old.color)
+        new_color_name = self._make_html_color_name(new.color)
+        old_underline = old.underline and not old_link
+        new_underline = new.underline and not new_link
+        # Close the old style
+        if old_link != new_link:
+            # A style cannot cross a link's border - reset
+            output.extend(self._close_style(old_color_name, old_underline, old.bold, old.italic, old.strikethrough))
+        else:
+            # Apply the style diff
+            if old_color_name and old_color_name != new_color_name:
+                output.append("</span>")
+            if old_underline and not new_underline:
+                output.append("</ins>")
+            if old.bold and not new.bold:
+                output.append("**")
+            if old.italic and not new.italic:
+                output.append("*")
+            if old.strikethrough and not new.strikethrough:
+                output.append("~")
+        if old_link and old_link != new_link:
+            output.append(self._close_link(old_link))
+        # Insert whitespaces which we move from inside the tags
+        output.append(" " * add_spaces)
+        # Open the new style
+        if new_link and new_link != old_link:
+            output.append(self._open_link(new_link))
+        if old_link != new_link:
+            # A style cannot cross a link's border - reload
+            output.extend(self._open_style(new_color_name, new_underline, new.bold, new.italic, new.strikethrough))
+        else:
+            # Apply the style diff
+            if new.strikethrough and not old.strikethrough:
+                output.append("~")
+            if new.italic and not old.italic:
+                output.append("*")
+            if new.bold and not old.bold:
+                output.append("**")
+            if new_underline and not old_underline:
+                output.append("<ins>")
+            if new_color_name and new_color_name != old_color_name:
+                output.append(f'<span style="color:{new_color_name}">')
+        # Merge
+        return "".join(output)
+    
+    @staticmethod
+    def _close_style(color, underline, bold, italic, strikethrough):
+        output = []
+        if color:
+            output.append("</span>")
+        if underline:
+            output.append("</ins>")
+        if bold:
+            output.append("**")
+        if italic:
+            output.append("*")
+        if strikethrough:
+            output.append("~")
+        return output
+
+    @staticmethod
+    def _open_style(color, underline, bold, italic, strikethrough):
+        output = []
+        if strikethrough:
+            output.append("~")
+        if italic:
+            output.append("*")
+        if bold:
+            output.append("**")
+        if underline:
+            output.append("<ins>")
+        if color:
+            output.append(f'<span style="color:{color}">')
+        return output
+    
+    @staticmethod
+    def _open_link(link):
+        return "["
+    
+    @staticmethod
+    def _close_link(link):
+        return f"]({link})"
+    
+    @staticmethod
+    def _strip_link(link):
         assert link.startswith("<")
         assert link.endswith(">")
         return link.strip("<>")
+    
+    @staticmethod
+    def _escape(text):
+        output = []
+        for l in text:
+            if l in "\\`*_~(){}[]<>#+-.!|":
+                output.append("\\")
+            output.append(l)
+        return "".join(output)
 
 
 # Methods for strategies

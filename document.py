@@ -187,13 +187,14 @@ class Section:
             output.type = SectionType.FILE
         return output
         
-    def create_folders(self, abs_root, root_to_parent):
+    def create_folders(self, abs_root, root_to_parent, enforce_file = False):
         assert not self.rel_filename
         assert not self.abs_filename
         assert not self.path_to_root
         assert self.type == SectionType.NONE
         header_text = self.header.to_string()
         filename = self.strategy.string_to_filename(header_text)
+        children_should_be_files = False
         assert filename
         # Create the root folder
         if not self.header.outline_level:
@@ -203,26 +204,28 @@ class Section:
             self.type = SectionType.FOLDER if self.split_level else SectionType.FILE
         # Create top-level folders
         elif self.header.outline_level < self.split_level:
-            root_to_parent = self._join_paths(root_to_parent, filename)
-            os.mkdir(self._join_paths(abs_root, root_to_parent))
-            self.rel_filename = self._join_paths(root_to_parent, self.strategy.index_filename(filename) + self.strategy.file_extension)
-            self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
-            self.type = SectionType.FOLDER
+            root_to_parent = self._init_folder(abs_root, root_to_parent, filename)
         # Remember the file to create
         elif self.header.outline_level == self.split_level:
-            self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
-            self.path_to_root = self.parent.path_to_root
-            self.type = SectionType.FILE
-        # Inherit the file from parent
+            if self.customization.needs_split(self):
+                print(f"'{header_text}' was split by customization")
+                root_to_parent = self._init_folder(abs_root, root_to_parent, filename)
+                children_should_be_files = True
+            else:
+                self._init_file(root_to_parent, filename)
         else:
-            self.rel_filename = self.parent.rel_filename
-            self.path_to_root = self.parent.path_to_root
-            self.type = SectionType.INTERNAL
+            if enforce_file:
+                self._init_file(root_to_parent, filename)
+            else:
+                # Inherit the file from parent
+                self.rel_filename = self.parent.rel_filename
+                self.path_to_root = self.parent.path_to_root
+                self.type = SectionType.INTERNAL
         # Fill derived variables
         self.abs_filename = self._join_paths(abs_root, self.rel_filename)
         # Propagate to child sections in any case
         for child in self.children:
-            child.create_folders(abs_root, root_to_parent)
+            child.create_folders(abs_root, root_to_parent, children_should_be_files)
         assert self.type != SectionType.NONE
     
     def match_images(self, external_images, internal_images):
@@ -312,6 +315,19 @@ class Section:
         handler(self)
         for child in self.children:
             child.traverse(handler)
+            
+    def _init_folder(self, abs_root, root_to_parent, filename):
+        root_to_parent = self._join_paths(root_to_parent, filename)
+        os.mkdir(self._join_paths(abs_root, root_to_parent))
+        self.rel_filename = self._join_paths(root_to_parent, self.strategy.index_filename(filename) + self.strategy.file_extension)
+        self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
+        self.type = SectionType.FOLDER
+        return root_to_parent
+    
+    def _init_file(self, root_to_parent, filename):
+        self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
+        self.path_to_root = self.parent.path_to_root
+        self.type = SectionType.FILE
         
     def _process_bookmarks(self, bookmarks, text, direct, reverse, reverse_duplicates, make_ref, is_title = False):
         assert bookmarks

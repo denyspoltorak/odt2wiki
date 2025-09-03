@@ -72,6 +72,7 @@ def _create_document(content, styles, dest_path, split_level, strategy, customiz
     doc.finalize()
     # Add the landing page
     doc.push_root(document.Section.create(landing_name))
+    print("Creating folders:")
     doc.create_folders()
     # Create the table of contents
     index = document.TocMaker(strategy).make(doc.root())

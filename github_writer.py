@@ -27,14 +27,14 @@ def _process_internal_link(link):
 
 
 class GithubMarkdownWriter(md_writer.MarkdownWriter):
-    def __init__(self, creator, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, creator, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def add_header(self, header: document.Header, split_level: int) -> None:
+    def add_header(self, header: document.Header) -> None:
         assert header.outline_level
         # Skip chapter names as GitHub wiki shows file names anyway, and file names are the same as chapter names
-        if header.outline_level > split_level:
-            super().add_header(header, split_level)
+        if header.outline_level > self._split_level:
+            super().add_header(header)
 
 
 github_strategy = document.Strategy(".md",

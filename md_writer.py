@@ -158,8 +158,9 @@ def _add_spans(spans):
 
 
 class MarkdownWriter:
-    def __init__(self, *, collapse_level = 0, toc_collapse_level = 0):
+    def __init__(self, split_level = 0, *, collapse_level = 0, toc_collapse_level = 0):
         self._output = []
+        self._split_level = split_level
         self._collapse_level = collapse_level
         self._toc_collapse_level = toc_collapse_level
         self._collapsing = False
@@ -189,7 +190,7 @@ class MarkdownWriter:
         self._output.append(PARAGRAPH_SEPARATOR)
     
     # Methods to add document parts
-    def add_header(self, header: document.Header, split_level: int) -> None:
+    def add_header(self, header: document.Header) -> None:
         assert header.outline_level
         # Close the previous section
         if self._collapsing and header.outline_level <= self._collapse_level:
@@ -200,7 +201,7 @@ class MarkdownWriter:
             self._output.append("<details>\n<summary>\n\n")
             self._collapsing = True
         # Promote the file-level header
-        promoted = max(header.outline_level - split_level + 1, 1)
+        promoted = max(header.outline_level - self._split_level + 1, 1)
         self._output.append("#" * promoted + " ")
         self._add_paragraph(header, False)
         if self._collapsing:

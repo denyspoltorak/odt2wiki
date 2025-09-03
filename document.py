@@ -1,12 +1,19 @@
 "Internal representation of a book as a tree of sections (parts, chapters, etc.)"
 
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 from typing import Optional
 import os
 
 
 DEFAULT_NAME = "Introduction"
+
+
+class SectionType(IntEnum):
+    NONE = auto()
+    FOLDER = auto()
+    FILE = auto()
+    INTERNAL = auto()
 
 
 class ListStyle(Enum):
@@ -142,8 +149,9 @@ class Strategy:
 
 # Per-document customization
 class Customization:
+    # Does this split_level section need to be split even further into subsections?
     @staticmethod
-    def needs_split(doc):
+    def needs_split(section):
         return False
 
 
@@ -167,6 +175,7 @@ class Section:
         self.rel_filename = None
         self.abs_filename = None
         self.path_to_root = ""
+        self.type = SectionType.NONE
         
     @staticmethod
     def create(name, content = [], abs_path = None):
@@ -175,12 +184,14 @@ class Section:
         if abs_path:
             output.rel_filename = name + output.strategy.file_extension
             output.abs_filename = output._join_paths(abs_path, output.rel_filename)
+            output.type = SectionType.FILE
         return output
         
     def create_folders(self, abs_root, root_to_parent):
         assert not self.rel_filename
         assert not self.abs_filename
         assert not self.path_to_root
+        assert self.type == SectionType.NONE
         header_text = self.header.to_string()
         filename = self.strategy.string_to_filename(header_text)
         assert filename
@@ -189,25 +200,30 @@ class Section:
             assert not root_to_parent
             os.mkdir(abs_root)
             self.rel_filename = self.strategy.index_filename(filename) + self.strategy.file_extension
+            self.type = SectionType.FOLDER if self.split_level else SectionType.FILE
         # Create top-level folders
         elif self.header.outline_level < self.split_level:
             root_to_parent = self._join_paths(root_to_parent, filename)
             os.mkdir(self._join_paths(abs_root, root_to_parent))
             self.rel_filename = self._join_paths(root_to_parent, self.strategy.index_filename(filename) + self.strategy.file_extension)
             self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
+            self.type = SectionType.FOLDER
         # Remember the file to create
         elif self.header.outline_level == self.split_level:
             self.rel_filename = self._join_paths(root_to_parent, filename + self.strategy.file_extension)
             self.path_to_root = self.parent.path_to_root
+            self.type = SectionType.FILE
         # Inherit the file from parent
         else:
             self.rel_filename = self.parent.rel_filename
             self.path_to_root = self.parent.path_to_root
+            self.type = SectionType.INTERNAL
         # Fill derived variables
         self.abs_filename = self._join_paths(abs_root, self.rel_filename)
         # Propagate to child sections in any case
         for child in self.children:
             child.create_folders(abs_root, root_to_parent)
+        assert self.type != SectionType.NONE
     
     def match_images(self, external_images, internal_images):
         # Update paths in all our images
@@ -226,6 +242,7 @@ class Section:
             child.match_images(external_images, internal_images)
     
     def collect_bookmarks(self, direct, reverse, reverse_duplicates, remap):
+        assert self.type != SectionType.NONE
         # Extract bookmark from the header
         if self.header.bookmarks:
             self._process_bookmarks(self.header.bookmarks, 
@@ -234,7 +251,7 @@ class Section:
                                     reverse, 
                                     reverse_duplicates, 
                                     self.strategy.make_ref_for_header,
-                                    self.header.outline_level <= self.split_level)
+                                    self.type < SectionType.INTERNAL)
         else:
             assert not self.parent or self.header.spans[0].text == DEFAULT_NAME, self.header.to_string()
         # Extract bookmarks from the section's text
@@ -272,18 +289,19 @@ class Section:
         
     def dump(self, writer_factory, writer = None):
         assert self.abs_filename
+        assert self.type != SectionType.NONE
         # Start a new file if this is a book chapter or part
-        if self.header.outline_level <= self.split_level:
-            writer = writer_factory(self)
+        if self.type < SectionType.INTERNAL:
+            writer = writer_factory(self, max(self.header.outline_level, self.split_level))
         # Write our content
-        if self.header.outline_level:
-            writer.add_header(self.header, self.split_level)
+        if self.header.outline_level:   # don't write title for the landing page
+            writer.add_header(self.header)
         for c in self.content:
             writer.add(c)
         for child in self.children:
             child.dump(writer_factory, writer)
         # Save it to the file
-        if self.header.outline_level <= self.split_level:
+        if self.type < SectionType.INTERNAL:
             assert (not self.prev) == (not self.next)
             if self.next and self.split_level and self.strategy.needs_navigation:   # No navbar for stand-alone ToC or a single-file project
                 writer.add(self._make_navigation())
@@ -354,16 +372,17 @@ class Section:
         
     def _make_navigation(self):
         assert self.prev and self.next
+        assert self.type != SectionType.NONE
         navigation = NavBar()
         # Find the next chapter
         other = self
-        while other.next.header.outline_level > self.split_level:
+        while other.next.type == SectionType.INTERNAL:
             other = other.next
             assert other != self
         navigation.next = self._make_nav_item(other.next)
         # Find the prev chapter
         other = self
-        while other.prev.header.outline_level > self.split_level:
+        while other.prev.type == SectionType.INTERNAL:
             other = other.prev
             assert other != self
         navigation.prev = self._make_nav_item(other.prev)
@@ -407,7 +426,7 @@ class TocMaker:
         return self._toc
     
     def __call__(self, section):
-        if section.header.outline_level and section.header.outline_level <= section.split_level:
+        if section.header.outline_level and section.type < SectionType.INTERNAL:
             name = section.header.to_string()
             level = section.header.outline_level
             self._toc.items.append(TocItem(name, 
@@ -462,6 +481,8 @@ class Document:
         assert isinstance(new_root, Section)
         assert new_root.header.outline_level == 0
         assert self._root.header.outline_level == 0
+        assert new_root.type == SectionType.NONE
+        assert self._root.type == SectionType.NONE
         assert not self._current_section
         assert self._root.prev.next == self._root
         # Update the navigation list

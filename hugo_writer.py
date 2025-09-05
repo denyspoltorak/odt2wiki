@@ -1,15 +1,6 @@
 import document
+import plugins
 import md_writer
-
-
-def _process_internal_link(link):
-    return f'{{{{< relref "{link}" >}}}}' if link else "#"
-
-def _string_to_filename(string):
-    return "".join([l.lower() if l.isalnum() else "-" for l in string.rstrip(". ")])
-
-def _index_filename(string):
-    return "_index"
 
 
 class HugoMarkdownWriter(md_writer.MarkdownWriter):
@@ -46,11 +37,15 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._output.append(self.PARAGRAPH_SEPARATOR)
         
 
-hugo_strategy = document.Strategy(  ".md",
-                                    True, #False,    # Hugo Book will release its navbar in v12 in May 2026.
-                                    md_writer.make_ref_for_header, 
-                                    md_writer.make_ref_for_text, 
-                                    md_writer.resolve_refs_conflict,
-                                    _process_internal_link,
-                                    _string_to_filename,
-                                    _index_filename)
+class HugoStrategy(plugins.Strategy):
+    @staticmethod
+    def process_internal_link(link):
+        return f'{{{{< relref "{link}" >}}}}' if link else "#"
+
+    @staticmethod
+    def string_to_filename(string):
+        return "".join([l.lower() if l.isalnum() else "-" for l in string.rstrip(". ")])
+    
+    @staticmethod
+    def index_filename(string):
+        return "_index"

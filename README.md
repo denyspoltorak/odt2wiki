@@ -28,6 +28,8 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 
 * Image size is preserved. You won't see a small diagram from your document take a whole page of wiki.
 
+* The output is target-specific and production-ready - you can deploy it to the [GitHub wiki](https://docs.github.com/en/communities/documenting-your-project-with-wikis) or use it with [Hugo Book](https://github.com/alex-shpak/hugo-book/) to make a website.
+
 * Grayed-out sections are converted to quotes, retaining their distinct style.
 
 ### Ordinary features
@@ -39,6 +41,8 @@ odt2wiki aims at remaining simple to use and to extend while producing [best in 
 * Tables.
 
 * An option to collapse sections (only with GitHub wiki for now, can be implemented for Hugo Book).
+
+* [Debug modes](#troubleshooting) and customizable [analytics](#analytics).
 
 ### Unsupported features
 
@@ -189,10 +193,10 @@ If you decide to fix or extend the script, here are its components:
   * `Section` - A header with associated content. `Section`s make a DOM tree.
   
   * `Document` - A tree of sections.
-  
+
 * `odt_parser.py` - my simplistic parser for the ODT format. It creates a `Document`
 
-* `odt_tool.py` - even simpler ODT parsers for troubleshooting modes.
+* `odt_tools.py` - even simpler ODT parsers for troubleshooting modes.
 
 * `md_writer.py` - Conversion of `Content` to generic markdown. Is used by `Section`s to output wiki pages.
 
@@ -202,7 +206,19 @@ If you decide to fix or extend the script, here are its components:
 
 * `image_matcher.py` - extracts matches images from the document and matches them to local files.
 
-* `custom` folder contains the code for per-document customization.
+* `plugins.py` - parent classes for output customizations and analytics.
+
+* <a name="analytics"></a>`analytics` is a folder with plugins that iterate over the DOM tree (all document sections) to collect information:
+
+  * `duplicates.py` - find chapters with duplicate names (GitHub wiki cannot discern them).
+  
+  * `print_chapters.py` - print all the chapters (files or web pages). This is a good start for writing SEO descriptions.
+  
+  * `print_full_toc.py` - pring the detailed table of contents.
+
+* `custom` folder contains the code for per-document customization:
+
+  * `metapatterns.py` - the customization for the [rchitectural Metapatterns book](https://metapatterns.io/). Includes SEO and some analytics.
 
 ## Q&A
 

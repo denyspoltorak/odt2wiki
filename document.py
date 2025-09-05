@@ -5,6 +5,8 @@ from enum import Enum, IntEnum, auto
 from typing import Optional
 import os
 
+import plugins
+
 
 DEFAULT_NAME = "Introduction"
 LOCAL_TOC_NAME = "Contents:"
@@ -132,58 +134,22 @@ class NavBar(Content):
 
 # Customization
 
-# Customization by the output dialect
-class Strategy:
-    def __init__(self, 
-                 file_extension, 
-                 needs_navigation,
-                 make_ref_for_header, 
-                 make_ref_for_text, 
-                 resolve_refs_conflict, 
-                 process_internal_link, 
-                 string_to_filename,
-                 index_filename):
-        self.file_extension = file_extension
-        self.needs_navigation = needs_navigation
-        self.make_ref_for_header = make_ref_for_header
-        self.make_ref_for_text = make_ref_for_text
-        self.resolve_refs_conflict = resolve_refs_conflict
-        self.process_internal_link = process_internal_link
-        self.string_to_filename = string_to_filename
-        self.index_filename = index_filename
-
-# Per-document customization
-class Customization:
-    # Does this split_level section need to be split even further into subsections?
-    @staticmethod
-    def needs_split(section):
-        return False
-    
-    # Does this folder-level section need a local ToC to provide links to its children?
-    @staticmethod
-    def needs_local_toc(section):
-        return False
-
-
-class TocMaker:
+class TocMaker(plugins.Analytics):
     def __init__(self, strategy, level_offset = 0):
         self._strategy = strategy
         self._level_offset = level_offset
         self._toc = ToC()
+        
+    def _process_chapter(self, section):
+        name = section.header.to_string()
+        level = section.header.outline_level
+        self._toc.items.append(TocItem(name, 
+                                       self._strategy.process_internal_link(section.rel_filename), 
+                                       level - self._level_offset))
+        return True
     
-    def make(self, root):
-        for c in root.children:
-            c.traverse(self)
+    def _finalize(self):
         return self._toc
-    
-    def __call__(self, section):
-        assert section.header.outline_level
-        if section.type < SectionType.INTERNAL:
-            name = section.header.to_string()
-            level = section.header.outline_level
-            self._toc.items.append(TocItem(name, 
-                                           self._strategy.process_internal_link(section.rel_filename), 
-                                           level - self._level_offset))
 
 
 class Section:
@@ -217,6 +183,9 @@ class Section:
             output.abs_filename = output._join_paths(abs_path, output.rel_filename)
             output.type = SectionType.FILE
         return output
+    
+    def has_file(self):   # Has a dedicated file
+        return self.type < SectionType.INTERNAL
         
     def create_folders(self, abs_root, root_to_parent, enforce_file = False):
         assert not self.rel_filename
@@ -230,7 +199,8 @@ class Section:
         # Create the root folder
         if not self.header.outline_level:
             assert not root_to_parent
-            os.mkdir(abs_root)
+            if abs_root:
+                os.mkdir(abs_root)
             self.rel_filename = self.strategy.index_filename(filename) + self.strategy.file_extension
             self.type = SectionType.FOLDER if self.split_level else SectionType.FILE
         # Create top-level folders
@@ -253,7 +223,8 @@ class Section:
                 self.path_to_root = self.parent.path_to_root
                 self.type = SectionType.INTERNAL
         # Fill derived variables
-        self.abs_filename = self._join_paths(abs_root, self.rel_filename)
+        if abs_root:
+            self.abs_filename = self._join_paths(abs_root, self.rel_filename)
         # Propagate to child sections in any case
         for child in self.children:
             child.create_folders(abs_root, root_to_parent, children_should_be_files)
@@ -285,7 +256,7 @@ class Section:
                                     reverse, 
                                     reverse_duplicates, 
                                     self.strategy.make_ref_for_header,
-                                    self.type < SectionType.INTERNAL)
+                                    self.has_file())
         else:
             assert not self.parent or self.header.spans[0].text == DEFAULT_NAME, self.header.to_string()
         # Extract bookmarks from the section's text
@@ -325,7 +296,7 @@ class Section:
         assert self.abs_filename
         assert self.type != SectionType.NONE
         # Start a new file if this is a book chapter or part
-        if self.type < SectionType.INTERNAL:
+        if self.has_file():
             writer = writer_factory(self, max(self.header.outline_level, self.split_level))
         # Write our content
         if self.header.outline_level:   # don't write title for the landing page
@@ -342,7 +313,7 @@ class Section:
             writer.add_header(toc_header)
             writer.add(TocMaker(self.strategy, self.header.outline_level - 1).make(self))
         # Save it to the file
-        if self.type < SectionType.INTERNAL:
+        if self.has_file():
             assert (not self.prev) == (not self.next)
             if self.next and self.split_level and self.strategy.needs_navigation:   # No navbar for stand-alone ToC or a single-file project
                 writer.add(self._make_navigation())
@@ -350,13 +321,14 @@ class Section:
                 output.write(writer.get_output())
     
     def traverse(self, handler):
-        handler(self)
-        for child in self.children:
-            child.traverse(handler)
+        if handler(self):
+            for child in self.children:
+                child.traverse(handler)
             
     def _init_folder(self, abs_root, root_to_parent, filename):
         root_to_parent = self._join_paths(root_to_parent, filename)
-        os.mkdir(self._join_paths(abs_root, root_to_parent))
+        if abs_root:
+            os.mkdir(self._join_paths(abs_root, root_to_parent))
         self.rel_filename = self._join_paths(root_to_parent, self.strategy.index_filename(filename) + self.strategy.file_extension)
         self.path_to_root = self._join_paths(self.parent.path_to_root, "..")
         self.type = SectionType.FOLDER
@@ -430,13 +402,13 @@ class Section:
         navigation = NavBar()
         # Find the next chapter
         other = self
-        while other.next.type == SectionType.INTERNAL:
+        while not other.next.has_file():
             other = other.next
             assert other != self
         navigation.next = self._make_nav_item(other.next)
         # Find the prev chapter
         other = self
-        while other.prev.type == SectionType.INTERNAL:
+        while not other.prev.has_file():
             other = other.prev
             assert other != self
         navigation.prev = self._make_nav_item(other.prev)
@@ -471,7 +443,7 @@ class Section:
 
 
 class Document:
-    def __init__(self, destination: str, split_level: int, strategy: Strategy, customization: Customization):
+    def __init__(self, destination: str, split_level: int, strategy: plugins.Strategy, customization: plugins.Customization):
         Section.set_strategy(strategy, customization, split_level)
         self._destination = destination
         self._strategy = strategy

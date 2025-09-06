@@ -7,6 +7,10 @@ import os.path
 class MarkdownWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
     
+    @classmethod
+    def set_customization(cls, customization):
+        cls._customization = customization
+    
     def __init__(self, split_level):
         self._output = []
         self._split_level = split_level

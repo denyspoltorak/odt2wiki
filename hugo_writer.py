@@ -47,12 +47,19 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._output.append("\n</nav>\n\n")
     
     def _make_metadata(self, creator):
+        # Open a front matter
         output = [self.METADATA_SEPARATOR,]
+        # Set up front matter fields
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
         output.append(f'title = "{creator.header.to_string()}"')
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
+        if self._customization.is_hidden(creator):
+            output.append("bookSearchExclude = true")
+            output.append("[sitemap]")
+            output.append("  disable = true")
+        # Write the front matter
         output.append(self.METADATA_SEPARATOR)
         self._output.append("\n".join(output))
         self._output.append(self.PARAGRAPH_SEPARATOR)

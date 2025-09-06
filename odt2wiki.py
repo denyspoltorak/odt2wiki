@@ -160,6 +160,7 @@ def convert_to_hugo_markdown(   archive,
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown
     doc.crosslink()
+    hugo_writer.HugoMarkdownWriter.set_customization(customization)
     doc.dump(hugo_writer.HugoMarkdownWriter)
     print(f"Hugo markdown created in {dest_path}")
 

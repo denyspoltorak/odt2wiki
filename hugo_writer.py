@@ -30,6 +30,11 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._in_list += 1
         super()._add_list(l, offset)
         self._in_list -= 1
+        
+    def _add_image(self, image):
+        self._output.append("<figure>\n\n")
+        super()._add_image(image)
+        self._output.append("\n\n</figure>")
     
     def _add_toc(self, toc):
         self._output.append("<nav>\n\n")

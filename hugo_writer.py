@@ -8,12 +8,28 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
     
     def __init__(self, creator, split_level = 0):
         super().__init__(split_level)
+        self._in_list = 0
         self._make_metadata(creator)
         
     def _strip_link(self, link):
         assert link.startswith('{{< relref "')
         assert link.enswith('" >}}')
         return link[len('{{< relref "'):-len('" >}}')]
+    
+    def _add_paragraph(self, paragraph, write_anchor):
+        assert self._in_list >= 0
+        aside = False
+        if paragraph.grayed_out and not self._in_list:
+            aside = True
+            self._output.append("<aside>\n\n")
+        super()._add_paragraph(paragraph, write_anchor)
+        if aside:
+            self._output.append("\n\n</aside>")
+            
+    def _add_list(self, l, offset = 0):
+        self._in_list += 1
+        super()._add_list(l, offset)
+        self._in_list -= 1
     
     def _add_toc(self, toc):
         self._output.append("<nav>\n\n")

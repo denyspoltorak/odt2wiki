@@ -208,7 +208,7 @@ If you decide to fix or extend the script, here are its components:
 
 * `plugins.py` - parent classes for output customizations and analytics.
 
-* <a name="analytics"></a>`analytics` is a folder with plugins that iterate over the DOM tree (all document sections) to collect information:
+* <a name="analytics"></a>`analytics` is a folder with plugins (you can run one with `-y` or `--analyze`) that iterate over the DOM tree (all document sections) to collect information:
 
   * `duplicates.py` - find chapters with duplicate names (GitHub wiki cannot discern them).
   

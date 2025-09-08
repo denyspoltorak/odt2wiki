@@ -19,7 +19,6 @@ class GithubMarkdownWriter(md_writer.MarkdownWriter):
         return super().get_output()
 
     def add_header(self, header: document.Header) -> None:
-        assert header.outline_level
         # Skip chapter names as GitHub wiki shows file names anyway, and file names are the same as chapter names
         if header.outline_level > self._split_level:
             # Close the previous section

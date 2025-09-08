@@ -299,8 +299,7 @@ class Section:
         if self.has_file():
             writer = writer_factory(self, max(self.header.outline_level, self.split_level))
         # Write our content
-        if self.header.outline_level:   # don't write title for the landing page
-            writer.add_header(self.header)
+        writer.add_header(self.header)
         for c in self.content:
             writer.add(c)
         for child in self.children:

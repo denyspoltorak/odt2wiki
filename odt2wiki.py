@@ -155,7 +155,8 @@ def convert_to_hugo_markdown(   archive,
     assert not collapse_level, "Not implemented"
     # Set up
     strategy = hugo_writer.HugoStrategy()
-    doc, _ = _create_document(content, styles, dest_path, split_level, strategy, customization, "Table of Contents")
+    doc, _ = _create_document(content, styles, dest_path, split_level, strategy, customization, 
+            customization.subtitle if customization.subtitle else "Table of Contents")
     # Map pictires inside the ODT to picture files in the destination folder
     _process_images(doc, archive, dest_path, images_folder, remote_image_path)
     # Convert to markdown

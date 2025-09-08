@@ -51,6 +51,8 @@ class Strategy:
 
 # Per-document customization
 class Customization:
+    subtitle = None
+    
     # Does this split_level section need to be split even further into subsections?
     @staticmethod
     def needs_split(section):

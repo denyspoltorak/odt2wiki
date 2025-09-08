@@ -119,6 +119,8 @@ class LinksCollector:
 
 
 class MetapatternsCustomization(plugins.Customization):
+    subtitle = "The Pattern Language of Software Architecture"
+    
     @staticmethod
     def needs_split(section):
         # Split a chapter if it contains subchapters

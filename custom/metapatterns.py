@@ -82,46 +82,85 @@ meta_descriptions = {
     "Part 6. Analytics":
         "This part compares different aspects of patterns which were covered in the previous chapters and outlines a few general topics of software architecture.",
     "Comparison of architectural patterns":
-        "",
-    "Sharing functionality or data among services",
-    "Pipelines in architectural patterns",
-    "Dependency inversion in architectural patterns",
-    "Indirection in commands and queries",
-    "Ambiguous patterns",
-    "Architecture and product life cycle",
-    "Real-world inspirations for architectural patterns",
-    "The heart of software architecture",
-    "Cohesers and decouplers",
-    "Deconstructing patterns",
-    "Choose your own architecture",
-    "Part 7. Appendices",
-    "Appendix A. Acknowledgements.",
-    "Appendix B. Books referenced.",
-    "Appendix C. Copyright.",
-    "Appendix D. Disclaimer.",
-    "Appendix E. Evolutions.",
-    "Monolith: to Shards",
-    "Monolith: to Layers",
-    "Monolith: to Services",
-    "Monolith: to Plugins",
-    "Shards: share data",
-    "Shards: share logic",
-    "Layers: make more layers",
-    "Layers: help large projects",
-    "Layers: improve performance",
-    "Layers: gain flexibility",
-    "Services: add or remove services",
-    "Services: add layers",
-    "Pipeline:",
-    "Middleware:",
-    "Shared Repository:",
-    "Proxy:",
-    "Orchestrator:",
-    "Combined Component:",
-    "Appendix F. Format of a metapattern.",
-    "Appendix G. Glossary.",
-    "Appendix H. History of changes.",
-    "Appendix I. Index of patterns."
+        "Patterns vary in ways to share functionality or data among system components, build pipelines, and in their use of dependency inversion or indirection.",
+    "Sharing functionality or data among services":
+        "Functionality or data may be shared among componets through: direct access, building a dedicated service, delegation, and replication.",
+    "Pipelines in architectural patterns":
+        "Pipeline is a unidirectional data flow. Depending on pattern, it may or may not preserve: data type, data identity and temporal order of the data stream.",
+    "Dependency inversion in architectural patterns":
+        "Plugins, Hexagonal Architecture, Microkernel and Hierarchy rely on dependency inversion. Other patterns, such as Layers and Services, occasionally use it.",
+    "Indirection in commands and queries":
+        "Indirection is implemented with Anticorruption Layer or Open Host Service in OLTP and with CQRS View or Reporting Database in OLAP systems.",
+    "Ambiguous patterns":
+        "There are patterns whose meaning varies from source to source. They include Monolith, Reactor, Microkernel, Domain Services, Cells, and Nanoservices.",
+    "Architecture and product life cycle":
+        "Architecture of a software project evolves over its lifetime. It starts monolithic, transforms into Layers and Services, then merges back to a Monolith.",
+    "Real-world inspirations for architectural patterns":
+        "Styles and patterns of software architecture have real-world inspirations and parallels. Learning about them may help us to invent new patterns when needed.",
+    "The heart of software architecture":
+        "The closing chapter shows how cohesion and decoupling make the entirety of software architecture: its principles, patterns and guidelines.",
+    "Cohesers and decouplers":
+        "Some architectural constraints or forces cause the code to be kept together, others pull it apart, still others prefer components of a definite size.",
+    "Deconstructing patterns":
+        "Both SOLID principles, Gang of Four design patterns, and architectural metapatterns emerge from the interplay of coupling and cohesion.",
+    "Choose your own architecture":
+        "This is a guide to choosing an architectural style based on project size, domain features, target performance and flexibility requirements.",
+    "Part 7. Appendices":
+        "This part contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revisions history.",
+    "Appendix A. Acknowledgements.":
+        "Thanks to the people who made Architectural Metapatterns possible.",
+    "Appendix B. Books referenced.":
+        "The list of books which Architectural Metapatterns references.",
+    "Appendix C. Copyright.":
+        "Creative Commons Attribution 4.0 International Public License.",
+    "Appendix D. Disclaimer.":
+        "IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.",
+    "Appendix E. Evolutions.":
+        "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits and drawbacks.",
+    "Monolith: to Shards":
+        "Multiple stateful or stateless instances of a Monolith can be deployed to improve performance. The systems may need a Sharding Proxy or Load Balancer.",
+    "Monolith: to Layers":
+        "A Monolith can be split into Layers, or a specialized layer, such as a Proxy or an Orchestrator, may be added between an existing Monolith and its clients.",
+    "Monolith: to Services":
+        "A Monolith can be divided into modules, Services or a Pipeline to support development by multiple teams, improve its codebase, and employ more hardware.",
+    "Monolith: to Plugins":
+        "Plugins or Interpreter make a monolithic component customizable. Hexagonal Architecture protects its business logic from unstable external dependencies. ",
+    "Shards: share data":
+        "The main issue with Shards is coordination between the instances. It is solved by deploying a Shared Repository or wrapping the shared data with a service.",
+    "Shards: share logic":
+        "Intershard communication is helped by a Middleware or is made unnecessary by employing a Sharding Proxy or an Orchestrator.",
+    "Layers: make more layers":
+        "It is often possible to split the business logic layer in two, namely, integration or application logic (scenarios) and domain logic (business rules).",
+    "Layers: help large projects":
+        "When a layered software grows large, its business logic should be subdivided into Services, Pipeline or Hierarchy.",
+    "Layers: improve performance":
+        "There are a few ways to improve performance of a layered system: merge the layers, scale them, or use specialized databases (Polyglot Persistence).",
+    "Layers: gain flexibility":
+        "The upper Proxy or Orchestrator layer can be split into a service per client, making Backends for Frontends. This allows for per-client customization.",
+    "Services: add or remove services":
+        "A new service can be added, an existing one can be split in two, or multiple services can be merged if they become tightly coupled.",
+    "Services: add layers":
+        "A system of services can be extended with a Middleware, Service Mesh, Proxies, Shared Database or an Orchestrator which implement cross-cutting concerns.",
+    "Pipeline:":
+        "A Front Controller may be used to track states of running requests. Alternatively, adding an Orchestrator benefits complex scenarios.",
+    "Middleware:":
+        "It is possible to add a second specialized Middleware or integrate several systems through a hierarchy of Middlewares.",
+    "Shared Repository:":
+        "A shared database can be sharded or divided into private databases. Space-Based Architecture or Polyglot Persistence help to improve performance.",
+    "Proxy:":
+        "A new system-wide proxy may be stacked with the existing one or you can deploy a proxy per client type.",
+    "Orchestrator:":
+        "An Orchestrator can be subdivided into Backends for Frontends or Layered Services. Alternatively, you can use a layered or hierarchical Orchestrator.",
+    "Combined Component:":
+        "A stack of single-purpose layers can replace a Combined Component, buying you flexibility at the cost of development effort and, often, performance.",
+    "Appendix F. Format of a metapattern.":
+        "This section formalized the format of each of the metapattern chapters.",
+    "Appendix G. Glossary.":
+        "The glossary of terms used throughout the Architectural Metapatterns book.",
+    "Appendix H. History of changes.":
+        "The list of versions of Architectural Metapatterns and its predecessors.",
+    "Appendix I. Index of patterns.":
+        "The index of patterns described in the Architectural Metapatterns book."
 }
 
 hidden_chapters = {

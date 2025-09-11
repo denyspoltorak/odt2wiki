@@ -96,8 +96,7 @@ class MarkdownWriter:
         assert image.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        #self._output.append(f"![{presentation}]({image.link})")
-        self._output.append(f'<p align="center">\n<img src="{image.link}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
+        self._output.append(f'<p align="center">\n<img src="{self._escape_link(image.link)}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
     
     def _add_toc(self, toc):
         for i in toc.items:
@@ -157,7 +156,7 @@ class MarkdownWriter:
             fully_stripped_text = left_stripped_text.rstrip()
             assert fully_stripped_text
             move_spaces = len(left_stripped_text) - len(fully_stripped_text)
-            output.append(self._escape(fully_stripped_text))
+            output.append(self._escape_text(fully_stripped_text))
         output.append(self._change_style(style, document.Style(), link, "", move_spaces))
         # Merge
         result = "".join(output)
@@ -291,10 +290,14 @@ class MarkdownWriter:
         return link.strip("<>")
     
     @staticmethod
-    def _escape(text):
+    def _escape_text(text):
         output = []
         for l in text:
             if l in "\\`*_~(){}[]<>#+-.!|":
                 output.append("\\")
             output.append(l)
         return "".join(output)
+    
+    @staticmethod
+    def _escape_link(link):
+        return link.replace(" ", "%20")

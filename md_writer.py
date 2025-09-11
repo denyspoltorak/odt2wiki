@@ -56,6 +56,7 @@ class MarkdownWriter:
             self._output.append("> ")
         self._output.append(self._add_spans(paragraph.spans))
         
+    # List
     def _add_list(self, l, offset = 0):
         prefix = " " * offset
         index = 1
@@ -82,6 +83,16 @@ class MarkdownWriter:
                     assert False
             index += 1
     
+    @staticmethod
+    def _make_list_bullet(index):
+        return "- "
+
+    @staticmethod
+    def _make_list_number(index):
+        assert index < 100
+        return f"{str(index)+'.':<4}"
+    
+    # Table
     def _add_table(self, table):
         # Add table header
         assert table.is_valid()
@@ -91,13 +102,41 @@ class MarkdownWriter:
         # Add the content
         for r in range(1, len(table.rows)):
             self._output.append(self._make_table_row(table.rows[r]))
+    
+    def _make_table_row(self, row):
+        output = ["|",]
+        for cell in row:
+            output.append(self._add_spans(cell.spans) if cell else "")
+            output.append("|")
+        return " ".join(output) + "\n"
+    
+    @staticmethod
+    def _make_table_separator(num_columns):
+        output = ["|",]
+        for _ in range(num_columns):
+            output.append("---")
+            output.append("|")
+        return " ".join(output) + "\n"
 
+    # Image
     def _add_image(self, image):
         assert image.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        self._output.append(self._make_image_html(self._escape_link(image.link), presentation, image.scale))
+        lines = self._make_image_html(self._escape_link(image.link), presentation, image.scale)
+        self._output.append("\n".join(lines))
+        
+    @staticmethod
+    def _make_image_html(link, presentation, scale):
+        output = []
+        output.append('<div align="center">')
+        output.append(f'<a href="{link}">')
+        output.append(f'<img src="{link}" alt="{presentation}" width={scale:.0%}/>')
+        output.append('</a>')
+        output.append('</div>')
+        return output
     
+    # Table of Contents
     def _add_toc(self, toc):
         for i in toc.items:
             assert i.level > 0
@@ -162,30 +201,6 @@ class MarkdownWriter:
         result = "".join(output)
         assert result
         return result
-    
-    def _make_table_row(self, row):
-        output = ["|",]
-        for cell in row:
-            output.append(self._add_spans(cell.spans) if cell else "")
-            output.append("|")
-        return " ".join(output) + "\n"
-    
-    @staticmethod
-    def _make_table_separator(num_columns):
-        output = ["|",]
-        for _ in range(num_columns):
-            output.append("---")
-            output.append("|")
-        return " ".join(output) + "\n"
-    
-    @staticmethod
-    def _make_list_bullet(index):
-        return "- "
-
-    @staticmethod
-    def _make_list_number(index):
-        assert index < 100
-        return f"{str(index)+'.':<4}"
       
     @staticmethod
     def _make_html_color_name(color):
@@ -197,10 +212,6 @@ class MarkdownWriter:
             return "green"
         else:
             return ""
-        
-    @staticmethod
-    def _make_image_html(link, presentation, scale):
-        return f'<div align="center">\n<img src="{link}" alt="{presentation}" width={scale:.0%}/>\n</div>'
     
     def _change_style(self, old, new, old_link, new_link, add_spaces):
         output = []

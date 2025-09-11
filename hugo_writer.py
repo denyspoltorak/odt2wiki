@@ -30,11 +30,18 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._in_list += 1
         super()._add_list(l, offset)
         self._in_list -= 1
-        
-    def _add_image(self, image):
-        self._output.append("<figure>\n\n")
-        super()._add_image(image)
-        self._output.append("\n\n</figure>")
+           
+    @staticmethod
+    def _make_image_html(link, presentation, scale):
+        output = []
+        output.append('<figure style="text-align:center">')
+        #self._output.append('<div align="center">')
+        output.append(f'<a href="{link}" style="outline:none">')
+        output.append(f'<img src="{link}" alt="{presentation}" width={scale:.0%}/>')
+        output.append('</a>')
+        #self._output.append('</div>')
+        output.append('</figure>')
+        return output
     
     def _add_toc(self, toc):
         self._output.append("<nav>\n\n")
@@ -45,11 +52,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._output.append("<nav>\n\n")
         super()._add_nav_bar(navbar)
         self._output.append("\n</nav>\n\n")
-        
-    @staticmethod
-    def _make_image_html(link, presentation, scale):
-        return f'<div style="text-align:center">\n<img src="{link}" alt="{presentation}" style="width:{scale:.0%}"/>\n</div>'
-    
+           
     def _make_metadata(self, creator):
         # Open a front matter
         output = [self.METADATA_SEPARATOR,]
@@ -60,6 +63,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
         if self._customization.is_hidden(creator):
+            print(f"Hiding '{creator.header.to_string()}' from search engines")
             output.append("bookSearchExclude = true")
             output.append("[sitemap]")
             output.append("  disable = true")

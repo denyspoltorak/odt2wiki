@@ -45,6 +45,10 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._output.append("<nav>\n\n")
         super()._add_nav_bar(navbar)
         self._output.append("\n</nav>\n\n")
+        
+    @staticmethod
+    def _make_image_html(link, presentation, scale):
+        return f'<div style="text-align:center">\n<img src="{link}" alt="{presentation}" style="width:{scale:.0%}"/>\n</div>'
     
     def _make_metadata(self, creator):
         # Open a front matter

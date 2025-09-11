@@ -96,7 +96,7 @@ class MarkdownWriter:
         assert image.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        self._output.append(f'<p align="center">\n<img src="{self._escape_link(image.link)}" alt="{presentation}" width={image.scale:.0%}/>\n</p>')
+        self._output.append(self._make_image_html(self._escape_link(image.link), presentation, image.scale))
     
     def _add_toc(self, toc):
         for i in toc.items:
@@ -197,6 +197,10 @@ class MarkdownWriter:
             return "green"
         else:
             return ""
+        
+    @staticmethod
+    def _make_image_html(link, presentation, scale):
+        return f'<div align="center">\n<img src="{link}" alt="{presentation}" width={scale:.0%}/>\n</div>'
     
     def _change_style(self, old, new, old_link, new_link, add_spaces):
         output = []

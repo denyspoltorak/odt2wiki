@@ -170,6 +170,15 @@ hidden_chapters = {
     "Appendix H. History of changes.", 
 }
 
+extra_split = {
+    "The heart of software architecture", 
+    "Appendix E. Evolutions."
+}
+
+
+assert hidden_chapters.issubset(meta_descriptions.keys())
+assert extra_split.issubset(meta_descriptions.keys())
+
 
 class LinksCollector:
     def __init__(self):
@@ -211,7 +220,7 @@ class MetapatternsCustomization(plugins.Customization):
         if num_summaries > 1:
             return True
         # Split select long chapters
-        if section.header.to_string() in ("The heart of software architecture", "Appendix E. Evolutions."):
+        if section.header.to_string() in extra_split:
             return True
         # Otherwise use default rules
         return False

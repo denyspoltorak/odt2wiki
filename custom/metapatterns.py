@@ -18,7 +18,7 @@ meta_descriptions = {
     "Modules and complexity":
         "Complexity is the number of concepts which one must keep in mind to understand a system. Breaking a system into components may lower its complexity.",
     "Forces, asynchronicity, and distribution":
-        "Forces are non-functional requirement for a system. Conflicting forces are satisfied by splitting a system into asynchronous or distributed components.",
+        "Forces are non-functional requirements for a system. Conflicting forces are satisfied by splitting a system into asynchronous or distributed components.",
     "Four kinds of software":
         "Control, interactive, streaming and computational software differ in their architectures and design patterns. Complex systems mix these four approaches.",
     "Arranging communication":
@@ -64,7 +64,7 @@ meta_descriptions = {
     "Polyglot Persistence":
         "Polyglot Persistence is the pattern for using multiple databases, which may be mutually independent or derived. The specialization improves performance.",
     "Backends for Frontends (BFF)":
-        "Backends for Frontends dedicates a component to each kind of a system's client. That grants flexibility in workflows and technologies.",
+        "Backends for Frontends dedicate a component to each kind of a system's client. That grants flexibility in workflows and technologies.",
     "Service-Oriented Architecture (SOA)":
         "Service-Oriented Architecture is an application of object-oriented design at the system level. It builds a system from small reusable components.",
     "Hierarchy":
@@ -78,13 +78,13 @@ meta_descriptions = {
     "Microkernel":
         "A microkernel mediates between resource providers and resource consumers. It both makes the providers expendable and sandboxes the consumers.",
     "Mesh":
-        "A Mesh or Grid is a virtual layer of interconnected components which makes a distributed Middleware. It features supreme fault tolerance ande scalability.",
+        "A Mesh or Grid is a virtual layer of interconnected components which makes a distributed Middleware. It features supreme fault tolerance and scalability.",
     "Analytics":
         "This part compares different aspects of patterns which were covered in the previous chapters and outlines a few general topics of software architecture.",
     "Comparison of architectural patterns":
         "Patterns vary in ways to share functionality or data among system components, build pipelines, and in their use of dependency inversion or indirection.",
     "Sharing functionality or data among services":
-        "Functionality or data may be shared among componets through: direct access, building a dedicated service, delegation, and replication.",
+        "Functionality or data may be shared among components through: direct access, building a dedicated service, delegation, and replication.",
     "Pipelines in architectural patterns":
         "Pipeline is a unidirectional data flow. Depending on pattern, it may or may not preserve: data type, data identity and temporal order of the data stream.",
     "Dependency inversion in architectural patterns":

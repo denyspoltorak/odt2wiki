@@ -57,11 +57,18 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         # Set up front matter fields
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
-        output.append(f'title = "{creator.header.to_string()}"')
+        title = creator.header.to_string()
+        if len(title) > 60:
+            print(f"'The title of {title}' is longler than the SEO-recommended 60 symbols")
+        output.append(f'title = "{title}"')
+        description = self._customization.get_description(creator)
+        if description:
+            assert len(description) <= 160
+            output.append(f"description = {description}")
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
         if self._customization.is_hidden(creator):
-            print(f"Hiding '{creator.header.to_string()}' from search engines")
+            print(f"Hiding '{title}' from search engines")
             output.append("bookSearchExclude = true")
             output.append("[sitemap]")
             output.append("  disable = true")

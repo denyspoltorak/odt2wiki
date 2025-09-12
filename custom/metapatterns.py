@@ -242,6 +242,12 @@ class MetapatternsCustomization(plugins.Customization):
     @staticmethod
     def is_hidden(section):
         return section.header.to_string() in hidden_chapters
+    
+    @staticmethod
+    def get_description(section):
+        title = section.header.to_string()
+        assert title in meta_descriptions, title
+        return meta_descriptions[title]
 
 
 export = MetapatternsCustomization

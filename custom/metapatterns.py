@@ -13,7 +13,7 @@ meta_descriptions = {
         "The story behind Architectural Metapatterns, the kinds of diagrams and notation used throughout the book, and why we need a classification of patterns.",
     "Metapatterns":
         "A metapattern is a cluster of patterns with related structure and function. We draw designs along the abstractness, subdomain and sharding axes.",
-    "Part 1. Foundations":
+    "Part 1. Foundations of software architecture":
         "This part reviews the basics of software architecture: forces, complexity, distribution, and the ways to connect multiple components in a system.",
     "Modules and complexity":
         "Complexity is the number of concepts which one must keep in mind to understand a system. Breaking a system into components may lower its complexity.",
@@ -31,9 +31,9 @@ meta_descriptions = {
         "In choreography user requests or input events pass through a chain of components that handle individual steps of the scenario which the system implements.",
     "Shared data":
         "Communication through shared data benefits data-centric domains where multiple services need to operate on a common dataset.",
-    "Comparison of the options":
+    "Comparison of communication styles":
         "Orchestration is good when there are many complex scenarios, choreography - for simple highly loaded systems, shared data - for data-centric domains.",
-    "Part 2. Basic Metapatterns":
+    "Part 2. Basic metapatterns":
         "Basic architectures include: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for more complex designs.",
     "Monolith":
         "A Monolith is a cohesive system which keeps all of its business logic, generic code and data together. This architecture fits short-lived tiny projects.",
@@ -45,7 +45,7 @@ meta_descriptions = {
         "Services are components dedicated to subdomains. They may vary in size, internal structure and technologies. A service can be further subdivided into a Cell.",
     "Pipeline":
         "A pipeline is a chain of components that implement individual steps of data or event processing. Its parts tend to be highly independent and scalable.",
-    "Part 3. Extension Metapatterns":
+    "Part 3. Extension metapatterns":
         "A system of services can be extended with one or more specialized layers such as a Proxy, a Middleware, an Orchestrator, or a Shared Repository.",
     "Middleware":
         "A Middleware provides system components with means of communication. It may also manage their deployment, scaling and failure recovery.",
@@ -57,7 +57,7 @@ meta_descriptions = {
         "An Orchestrator integrates lower-level components. It runs a client request as a series of calls to other components while keeping their states consistent.",
     "Combined Component":
         "A Combined Component implements two or more of the following extension patterns: Middleware, Shared Repository, Proxy, and Orchestrator.",
-    "Part 4. Fragmented Metapatterns":
+    "Part 4. Fragmented metapatterns":
         "Fragmented architectures make use of small specialized components. Examples include Layered Services, BFF, SOA, Polyglot Persistence, and Hierarchy.",
     "Layered Services":
         "Layered Services may orchestrate each other, rely on choreography, or make a CQRS system. The communication between services happens at different layers.",
@@ -69,7 +69,7 @@ meta_descriptions = {
         "Service-Oriented Architecture is an application of object-oriented design at the system level. It builds a system from small reusable components.",
     "Hierarchy":
         "A Hierarchy distributes responsibilities throughout a tree of components. It is fault tolerant, and the components remain simple and are easy to replace.",
-    "Part 5. Implementation Metapatterns":
+    "Part 5. Implementation metapatterns":
         "Implementation patterns study internals of a component. Plugins, Microkernel and Hexagonal Architecture grant flexibility while Mesh provides fault tolerance.",
     "Plugins":
         "Plugins let a client customize select aspects of a system's behavior. Addons build their application logic on top of whatever the modified system provides.",
@@ -117,41 +117,41 @@ meta_descriptions = {
         "IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.",
     "Appendix E. Evolutions.":
         "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits and drawbacks.",
-    "Monolith: to Shards":
+    "Evolutions of a Monolith that lead to Shards":
         "Multiple stateful or stateless instances of a Monolith can be deployed to improve performance. The systems may need a Sharding Proxy or Load Balancer.",
-    "Monolith: to Layers":
+    "Evolutions of a Monolith that result in Layers":
         "A Monolith can be split into Layers, or a specialized layer, such as a Proxy or an Orchestrator, may be added between an existing Monolith and its clients.",
-    "Monolith: to Services":
+    "Evolutions of a Monolith that make Services":
         "A Monolith can be divided into modules, Services or a Pipeline to support development by multiple teams, improve its codebase, and employ more hardware.",
-    "Monolith: to Plugins":
+    "Evolutions of a Monolith that rely on Plugins":
         "Plugins or Interpreter make a monolithic component customizable. Hexagonal Architecture protects its business logic from unstable external dependencies. ",
-    "Shards: share data":
+    "Evolutions of Shards that share data":
         "The main issue with Shards is coordination between the instances. It is solved by deploying a Shared Repository or wrapping the shared data with a service.",
-    "Shards: share logic":
+    "Evolutions of Shards that share logic":
         "Intershard communication is helped by a Middleware or is made unnecessary by employing a Sharding Proxy or an Orchestrator.",
-    "Layers: make more layers":
+    "Evolutions of Layers that make more layers":
         "It is often possible to split the business logic layer in two, namely, integration or application logic (scenarios) and domain logic (business rules).",
-    "Layers: help large projects":
+    "Evolutions of Layers that help large projects":
         "When a layered software grows large, its business logic should be subdivided into Services, Pipeline or Hierarchy.",
-    "Layers: improve performance":
+    "Evolutions of Layers to improve performance":
         "There are a few ways to improve performance of a layered system: merge the layers, scale them, or use specialized databases (Polyglot Persistence).",
-    "Layers: gain flexibility":
+    "Evolutions of Layers to gain flexibility":
         "The upper Proxy or Orchestrator layer can be split into a service per client, making Backends for Frontends. This allows for per-client customization.",
-    "Services: add or remove services":
+    "Evolutions of Services that add or remove services":
         "A new service can be added, an existing one can be split in two, or multiple services can be merged if they become tightly coupled.",
-    "Services: add layers":
+    "Evolutions of Services that add layers":
         "A system of services can be extended with a Middleware, Service Mesh, Proxies, Shared Database or an Orchestrator which implement cross-cutting concerns.",
-    "Pipeline:":
+    "Evolutions of a Pipeline":
         "A Front Controller may be used to track states of running requests. Alternatively, adding an Orchestrator benefits complex scenarios.",
-    "Middleware:":
+    "Evolutions of a Middleware":
         "It is possible to add a second specialized Middleware or integrate several systems through a hierarchy of Middlewares.",
-    "Shared Repository:":
+    "Evolutions of a Shared Repository":
         "A shared database can be sharded or divided into private databases. Space-Based Architecture or Polyglot Persistence help to improve performance.",
-    "Proxy:":
+    "Evolutions of a Proxy":
         "A new system-wide proxy may be stacked with the existing one or you can deploy a proxy per client type.",
-    "Orchestrator:":
+    "Evolutions of an Orchestrator":
         "An Orchestrator can be subdivided into Backends for Frontends or Layered Services. Alternatively, you can use a layered or hierarchical Orchestrator.",
-    "Combined Component:":
+    "Evolutions of a Combined Component":
         "A stack of single-purpose layers can replace a Combined Component, buying you flexibility at the cost of development effort and, often, performance.",
     "Appendix F. Format of a metapattern.":
         "This section formalized the format of each of the metapattern chapters.",

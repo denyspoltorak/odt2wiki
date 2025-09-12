@@ -64,7 +64,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         description = self._customization.get_description(creator)
         if description:
             assert len(description) <= 160
-            output.append(f"description = {description}")
+            output.append(f'description = "{description}"')
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
         if self._customization.is_hidden(creator):

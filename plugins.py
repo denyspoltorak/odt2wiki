@@ -53,6 +53,11 @@ class Strategy:
 class Customization:
     subtitle = None
     
+    # Here you can edit a section after it has been loaded from the parser
+    @staticmethod
+    def preprocess(section):
+        pass
+    
     # Does this split_level section need to be split even further into subsections?
     @staticmethod
     def needs_split(section):
@@ -63,10 +68,12 @@ class Customization:
     def needs_local_toc(section):
         return False
     
+    # Hides the section from local (Hugo Book) search and sitemap.xml
     @staticmethod
     def is_hidden(section):
         return False
     
+    # Return SEO description (up to 160 chars)
     @staticmethod
     def get_description(section):
         return None

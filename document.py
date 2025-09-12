@@ -192,6 +192,7 @@ class Section:
         assert not self.abs_filename
         assert not self.path_to_root
         assert self.type == SectionType.NONE
+        self.customization.preprocess(self)
         header_text = self.header.to_string()
         filename = self.strategy.string_to_filename(header_text)
         children_should_be_files = False

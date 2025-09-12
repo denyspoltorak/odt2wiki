@@ -124,7 +124,8 @@ class FullVisitor():
             for c in self._content:
                 if isinstance(c, document.Image):
                     assert c.scale
-                    c.scale /= self._max_image_width
+                    scale = c.scale / self._max_image_width
+                    c.scale = 1.0 if scale > 0.95 else scale
 
     def _process_h(self, header):
         output = document.Header()

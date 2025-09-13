@@ -120,7 +120,7 @@ Customize your wiki by editing:
 
 [Create a project](https://cloudcannon.com/tutorials/hugo-beginner-tutorial/): `hugo new site my-wiki`.
 
-[Set up Hugo Book](https://github.com/alex-shpak/hugo-book/?tab=readme-ov-file#installation) from the latest release (v11.0.0) tag.
+[Set up Hugo Book](https://github.com/alex-shpak/hugo-book/?tab=readme-ov-file#installation) from the latest release (v11.0.0) or get [my fork with a few CSS customizations](https://github.com/denyspoltorak/hugo-book) - see its `metapatterns` branch.
 
 Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r "" -z my_code`
 

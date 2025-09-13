@@ -34,7 +34,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
     @staticmethod
     def _make_image_html(link, presentation, scale):
         output = []
-        output.append('<figure style="text-align:center">')
+        output.append('<figure>')
         output.append(f'<a href="{link}" style="outline:none">')
         output.append(f'<img src="{link}" alt="{presentation}" style="width:{scale:.0%}"/>')
         output.append('</a>')

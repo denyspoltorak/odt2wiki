@@ -230,7 +230,7 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
         else:
             # Process more parameters
             if args.customize:
-                customization = importlib.import_module("custom." + args.customize).export()
+                customization = importlib.import_module("custom." + args.customize).export(args.convert)
             else:
                 customization = plugins.Customization()
             # Run the command

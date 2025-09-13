@@ -24,6 +24,8 @@ class MarkdownWriter:
                 self._add_paragraph(content, True)
             case document.List():
                 self._add_list(content)
+            case document.DefinitionList():
+                self._add_definition_list(content)
             case document.Table():
                 self._add_table(content)
             case document.Image():
@@ -92,6 +94,11 @@ class MarkdownWriter:
         assert index < 100
         return f"{str(index)+'.':<4}"
     
+    # Definition List
+    def _add_definition_list(self, dl):
+        output = [f'{self._add_spans(i[0].spans)}\n: {self._add_spans(i[1].spans)}' for i in dl.items]
+        self._output.append(self.PARAGRAPH_SEPARATOR.join(output))
+
     # Table
     def _add_table(self, table):
         # Add table header

@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
 from typing import Optional
+import copy
 import os
 
 import plugins
@@ -89,6 +90,43 @@ class Paragraph(Content):
         
     def to_string(self):
         return "".join([s.text for s in self.spans])
+    
+    def split(self, separator):
+        assert not self.bookmarks
+        text = self.to_string()
+        sep_length = len(separator)
+        assert sep_length
+        chunks = text.split(separator)
+        output = []
+        index = 0
+        for c in chunks:
+            length = len(c)
+            if length:
+                par = Paragraph()
+                par.spans = self._slice(index, index + length)
+                par.grayed_out = self.grayed_out
+                output.append(par)
+            index += (length + sep_length)
+        assert index == len(text) + sep_length
+        return output
+        
+    def _slice(self, start, end):
+        assert start < end
+        first = 0
+        output = []
+        for s in self.spans:
+            span_length = len(s.text)
+            last = first + span_length
+            if last > start:
+                new_span = copy.copy(s)
+                new_span.text = new_span.text[max(start - first, 0) : min(end - first, span_length)]
+                assert len(new_span.text)
+                output.append(new_span)
+            first = last
+            if first >= end:
+                break
+        assert len(output)
+        return output
 
   
 class Header(Paragraph):
@@ -102,6 +140,11 @@ class Header(Paragraph):
 class List(Content):
     def __init__(self):
         self.kind = None
+        self.items = []
+
+
+class DefinitionList(Content):
+    def __init__(self):
         self.items = []
         
 

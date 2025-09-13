@@ -175,9 +175,14 @@ extra_split = {
     "Evolutions"
 }
 
+definition_lists = {
+    "Glossary"
+}
+
 
 assert hidden_chapters.issubset(meta_descriptions.keys())
 assert extra_split.issubset(meta_descriptions.keys())
+assert definition_lists.issubset(meta_descriptions.keys())
 
 
 class LinksCollector:
@@ -209,9 +214,12 @@ class LinksCollector:
 class MetapatternsCustomization(plugins.Customization):
     subtitle = "The pattern language of software architecture"
     
-    @staticmethod
-    def preprocess(section):
+    def __init__(self, mode):
+        self._hugo = (mode == "hugo")
+    
+    def preprocess(self, section):
         title = section.header.to_string()
+        # Strip technical terms
         new_title = None
         if title.startswith("Part "):
             new_title = title[len("Part X. "):]
@@ -220,7 +228,17 @@ class MetapatternsCustomization(plugins.Customization):
             new_title = title[len("Appendix X. "):-1]
         if new_title:
             assert len(section.header.spans) == 1
-            section.header.spans[0].text = new_title
+            title = section.header.spans[0].text = new_title
+        # Convert to definition list
+        if self._hugo:
+            if title in definition_lists:
+                dl = document.DefinitionList()
+                for c in section.content:
+                    assert isinstance(c, document.Paragraph)
+                    item = c.split(" – ")
+                    assert len(item) == 2
+                    dl.items.append(item)
+                section.content = [dl,]
     
     @staticmethod
     def needs_split(section):

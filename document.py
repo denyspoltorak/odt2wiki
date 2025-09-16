@@ -416,6 +416,9 @@ class Section:
                 for r in c.rows:
                     for col in r:
                         self._replace_links_in_content(col, mapping)
+            case DefinitionList():
+                for i in c.items:
+                    self._replace_links_in_content(i[1], mapping)
     
     def _replace_single_bookmark(self, bookmarks, mapping):
         assert bookmarks

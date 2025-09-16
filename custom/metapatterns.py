@@ -163,6 +163,25 @@ meta_descriptions = {
         "The index of patterns described in the Architectural Metapatterns book."
 }
 
+previews = {
+    "About this book": "/Misc/Diagrams.png",
+    "Metapatterns": "Intro/Example-Defined.png",
+    "Modules and complexity": "/Intro/Modules-2.png",
+    "Forces, asynchronicity, and distribution": "/Intro/3-Tier.png",
+    "Four kinds of software": "/4Kinds/4 Kinds.png",
+    "Programming and architectural paradigms": "/Communication/Paradigms - Object-oriented.png",
+    "Combined Component": "Variants/2/Multifunctional - API Gateway.png",
+    "Sharing functionality or data among services": "Conclusion/Sharing-DirectCall.png",
+    "Pipelines in architectural patterns": "/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
+    "Dependency inversion in architectural patterns": "/Conclusion/DI-1.png",
+    "Indirection in commands and queries": "/Conclusion/Indirection-Command.png",
+    "Ambiguous patterns": "/Conclusion/Ambiguous-Monolith.png",
+    "Architecture and product life cycle": "/Conclusion/Lifecycle-4.png",
+    "Cohesers and decouplers": "/Heart/Pain.png",
+    "Deconstructing patterns": "/Heart/Basic.png",
+    "Choose your own architecture": "/Heart/Features-1.png"
+}
+
 hidden_chapters = {
     "Acknowledgements",
     "Copyright",
@@ -180,6 +199,7 @@ definition_lists = {
 }
 
 
+assert set(previews.keys()).issubset(meta_descriptions.keys())
 assert hidden_chapters.issubset(meta_descriptions.keys())
 assert extra_split.issubset(meta_descriptions.keys())
 assert definition_lists.issubset(meta_descriptions.keys())
@@ -229,6 +249,18 @@ class MetapatternsCustomization(plugins.Customization):
         if new_title:
             assert len(section.header.spans) == 1
             title = section.header.spans[0].text = new_title
+        # Find figure captions
+        elements = []
+        for c in section.content:
+            if isinstance(c, document.Paragraph) \
+                    and c.centered \
+                    and len(c.spans) == 1 \
+                    and elements \
+                    and isinstance(elements[-1], document.Image):
+                elements[-1].caption = c.spans[0].text
+            else:
+                elements.append(c)
+        section.content = elements
         # Convert to definition list
         if self._hugo:
             if title in definition_lists:
@@ -279,6 +311,18 @@ class MetapatternsCustomization(plugins.Customization):
         title = section.header.to_string()
         assert title in meta_descriptions, title
         return meta_descriptions[title]
+    
+    @staticmethod
+    def get_preview_image(section):
+        title = section.header.to_string()
+        # Check for a predefined image
+        if title in previews:
+            return previews[title]
+        # Return the first image after the chapter's title
+        for c in section.content:
+            if isinstance(c, document.Image):
+                return c.link
+        return None
 
 
 export = MetapatternsCustomization

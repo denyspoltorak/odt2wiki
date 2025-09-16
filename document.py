@@ -69,7 +69,7 @@ class NavItem:
         self.link = link
     
     def to_paragraph(self):
-        return Paragraph.from_link(self.name, self.link)
+        return Paragraph(self.name, self.link)
 
 
 class Content:
@@ -77,16 +77,13 @@ class Content:
 
 
 class Paragraph(Content):
-    def __init__(self):
+    def __init__(self, text = None, link = None):
         self.spans = []
         self.bookmarks = []
         self.grayed_out = False
-    
-    @staticmethod
-    def from_link(text, link):
-        output = Paragraph()
-        output.spans.append(Span(text, link=link))
-        return output
+        self.centered = False
+        if text:
+            self.spans.append(Span(text, link=link))
         
     def to_string(self):
         return "".join([s.text for s in self.spans])
@@ -161,6 +158,7 @@ class Image(Content):
     def __init__(self, link, scale):
         self.link = link
         self.scale = scale
+        self.caption = None
         
 
 class ToC(Content):
@@ -305,14 +303,13 @@ class Section:
             assert not self.parent or self.header.spans[0].text == DEFAULT_NAME, self.header.to_string()
         # Extract bookmarks from the section's text
         for c in self.content:
-            if isinstance(c, Paragraph):
-                if c.bookmarks:
-                    self._process_bookmarks(c.bookmarks, 
-                                            c.to_string(), 
-                                            remap, 
-                                            reverse, 
-                                            reverse_duplicates, 
-                                            self.strategy.make_ref_for_text)
+            if isinstance(c, Paragraph) and c.bookmarks:
+                self._process_bookmarks(c.bookmarks, 
+                                        c.to_string(), 
+                                        remap, 
+                                        reverse, 
+                                        reverse_duplicates, 
+                                        self.strategy.make_ref_for_text)
         # Traverse children
         for child in self.children:
             child.collect_bookmarks(direct, reverse, reverse_duplicates, remap)
@@ -404,7 +401,7 @@ class Section:
                     c.bookmarks = [self._replace_single_bookmark(c.bookmarks, mapping),]
             case List():
                 for i in c.items:
-                    self._replace_bookmarks_in_content(i, mapping)
+                    self._replace_bookmarks_in_content(i, mapping)                    
     
     def _replace_links_in_content(self, c, mapping):
         match c:

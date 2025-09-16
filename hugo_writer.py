@@ -19,37 +19,37 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
     def _add_paragraph(self, paragraph, write_anchor):
         assert self._in_list >= 0
         aside = False
+        result = ""
         if paragraph.grayed_out and not self._in_list:
             aside = True
-            self._output.append("<aside>\n\n")
-        super()._add_paragraph(paragraph, write_anchor)
+            result += ("<aside>" + self.PARAGRAPH_SEPARATOR)
+        result += super()._add_paragraph(paragraph, write_anchor)
         if aside:
-            self._output.append("\n\n</aside>")
+            result += self.PARAGRAPH_SEPARATOR + "</aside>"
+        return result
             
     def _add_list(self, l, offset = 0):
         self._in_list += 1
-        super()._add_list(l, offset)
+        result = super()._add_list(l, offset)
         self._in_list -= 1
+        return result
            
-    @staticmethod
-    def _make_image_html(link, presentation, scale):
+    def _make_image_html(self, link, presentation, scale, caption):
         output = []
         output.append('<figure>')
         output.append(f'<a href="{link}" style="outline:none">')
         output.append(f'<img src="{link}" alt="{presentation}" style="width:{scale:.0%}"/>')
         output.append('</a>')
+        if caption:
+            output.append("<figcaption>" + caption + "</figcaption>")
         output.append('</figure>')
-        return output
+        return "\n".join(output)
     
     def _add_toc(self, toc):
-        self._output.append("<nav>\n\n")
-        super()._add_toc(toc)
-        self._output.append("\n</nav>\n\n")
+        return "<nav>" + self.PARAGRAPH_SEPARATOR + super()._add_toc(toc) + self.PARAGRAPH_SEPARATOR + "</nav>"
     
     def _add_nav_bar(self, navbar):
-        self._output.append("<nav>\n\n")
-        super()._add_nav_bar(navbar)
-        self._output.append("\n</nav>\n\n")
+        return "<nav>" + self.PARAGRAPH_SEPARATOR + super()._add_nav_bar(navbar) + self.PARAGRAPH_SEPARATOR + "</nav>"
            
     def _make_metadata(self, creator):
         # Open a front matter
@@ -65,6 +65,9 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         if description:
             assert len(description) <= 160
             output.append(f'description = "{description}"')
+        image = self._customization.get_preview_image(creator)
+        if image:
+            output.append(f'images = ["{self._escape_link(image)}"]')
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
         if self._customization.is_hidden(creator):
@@ -75,7 +78,6 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         # Write the front matter
         output.append(self.METADATA_SEPARATOR)
         self._output.append("\n".join(output))
-        self._output.append(self.PARAGRAPH_SEPARATOR)
         
 
 class HugoStrategy(plugins.Strategy):

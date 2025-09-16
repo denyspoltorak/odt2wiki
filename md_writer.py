@@ -16,52 +16,53 @@ class MarkdownWriter:
         self._split_level = split_level
      
     def get_output(self) -> str:
-        return "".join(self._output)
+        return self.PARAGRAPH_SEPARATOR.join(self._output)
 
     def add(self, content: document.Content) -> None:
         match content:
             case document.Paragraph():
-                self._add_paragraph(content, True)
+                result = self._add_paragraph(content, True)
             case document.List():
-                self._add_list(content)
+                result = self._add_list(content)
             case document.DefinitionList():
-                self._add_definition_list(content)
+                result = self._add_definition_list(content)
             case document.Table():
-                self._add_table(content)
+                result = self._add_table(content)
             case document.Image():
-                self._add_image(content)
+                result = self._add_image(content)
             case document.ToC():
-                self._add_toc(content)
+                result = self._add_toc(content)
             case document.NavBar():
-                self._add_nav_bar(content)
+                result = self._add_nav_bar(content)
             case _:
                 assert False
-        self._output.append(self.PARAGRAPH_SEPARATOR)
+        assert result, content
+        self._output.append(result)
     
     # Methods to add document parts
     def add_header(self, header: document.Header) -> None:
-        self._add_header(header)
-        self._output.append(self.PARAGRAPH_SEPARATOR)
+        self._output.append(self._add_header(header))
     
     def _add_header(self, header):
         # Promote the file-level header
         promoted = max(header.outline_level - self._split_level + 1, 1)
-        self._output.append("#" * promoted + " ")
-        self._add_paragraph(header, False)
+        return "#" * promoted + " " + self._add_paragraph(header, False)
       
     def _add_paragraph(self, paragraph, write_anchor):
+        result = ""
         if write_anchor and paragraph.bookmarks:
             assert len(paragraph.bookmarks) == 1
             anchor_name = paragraph.bookmarks[0].split("#")[1]
-            self._output.append(f'<a name="{anchor_name}"></a>\n')
+            result += f'<a name="{anchor_name}"></a>\n'
         if paragraph.grayed_out:
-            self._output.append("> ")
-        self._output.append(self._add_spans(paragraph.spans))
+            result += "> "
+        return result + self._add_spans(paragraph.spans)
         
     # List
     def _add_list(self, l, offset = 0):
         prefix = " " * offset
         index = 1
+        result = ""
         # Differentiate between bulleted and numbered lists
         match l.kind:
             case document.ListStyle.BULLET:
@@ -76,14 +77,15 @@ class MarkdownWriter:
         for i in l.items:
             match i:
                 case document.Paragraph():
-                    self._output.append(prefix + method(index))
-                    self._add_paragraph(i, True)
-                    self._output.append("\n")
+                    result += (prefix + method(index))
+                    result += self._add_paragraph(i, True)
+                    result += "\n"
                 case document.List():
-                    self._add_list(i, offset)
+                    result += self._add_list(i, offset)
                 case _:
                     assert False
             index += 1
+        return result
     
     @staticmethod
     def _make_list_bullet(index):
@@ -97,25 +99,27 @@ class MarkdownWriter:
     # Definition List
     def _add_definition_list(self, dl):
         output = [f'{self._add_spans(i[0].spans)}\n: {self._add_spans(i[1].spans)}' for i in dl.items]
-        self._output.append(self.PARAGRAPH_SEPARATOR.join(output))
+        return self.PARAGRAPH_SEPARATOR.join(output)
 
     # Table
     def _add_table(self, table):
         # Add table header
         assert table.is_valid()
-        self._output.append(self._make_table_row(table.rows[0]))
+        output = []
+        output.append(self._make_table_row(table.rows[0]))
         if len(table.rows) > 1:
-            self._output.append(self._make_table_separator(table.num_columns))
+            output.append(self._make_table_separator(table.num_columns))
         # Add the content
         for r in range(1, len(table.rows)):
-            self._output.append(self._make_table_row(table.rows[r]))
+            output.append(self._make_table_row(table.rows[r]))
+        return "\n".join(output)
     
     def _make_table_row(self, row):
         output = ["|",]
         for cell in row:
             output.append(self._add_spans(cell.spans) if cell else "")
             output.append("|")
-        return " ".join(output) + "\n"
+        return " ".join(output)
     
     @staticmethod
     def _make_table_separator(num_columns):
@@ -123,36 +127,38 @@ class MarkdownWriter:
         for _ in range(num_columns):
             output.append("---")
             output.append("|")
-        return " ".join(output) + "\n"
+        return " ".join(output)
 
     # Image
     def _add_image(self, image):
         assert image.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        lines = self._make_image_html(self._escape_link(image.link), presentation, image.scale)
-        self._output.append("\n".join(lines))
+        return self._make_image_html(self._escape_link(image.link), presentation, image.scale, image.caption)
         
-    @staticmethod
-    def _make_image_html(link, presentation, scale):
+    def _make_image_html(self, link, presentation, scale, caption):
         output = []
         output.append('<div align="center">')
         output.append(f'<a href="{link}">')
         output.append(f'<img src="{link}" alt="{presentation}" width={scale:.0%}/>')
         output.append('</a>')
+        if caption:
+            output.append("\n" + self._add_paragraph(document.Paragraph(caption), True) + "\n")
         output.append('</div>')
-        return output
+        return "\n".join(output)
     
     # Table of Contents
     def _add_toc(self, toc):
+        output = []
         for i in toc.items:
             assert i.level > 0
             assert i.name
             assert i.link
             if i.level > 1:
-                self._output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({i.link})\n")
+                output.append("  " * (i.level - 2) + "- " + f"[{i.name}]({i.link})")
             else:        
-                self._output.append(f"\n### [{i.name}]({i.link})\n\n")
+                output.append(f"\n### [{i.name}]({i.link})\n")
+        return "\n".join(output)
     
     def _add_nav_bar(self, navbar):
         if navbar.prev or navbar.next or navbar.up:
@@ -180,8 +186,9 @@ class MarkdownWriter:
             else:
                 links.append(None)
             # Output
-            self._output.append(self._make_table_row(links))
-            self._output.append(self._make_table_separator(3))
+            return self._make_table_row(links) + "\n" + self._make_table_separator(3)
+        else:
+            return ""
     
     def _add_spans(self, spans):
         output = []

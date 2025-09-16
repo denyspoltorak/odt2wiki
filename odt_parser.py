@@ -15,6 +15,7 @@ class _Style:
         self.strikethrough = None
         self.colored_background = None
         self.color = None
+        self.centered = None
     
     def __ior__(self, other):
         if self.bold is None:
@@ -29,6 +30,8 @@ class _Style:
             self.colored_background = other.colored_background
         if self.color is None:
             self.color = other.color
+        if self.centered is None:
+            self.centered = other.centered
         return self
     
     def normalize(self):
@@ -176,6 +179,7 @@ class FullVisitor():
             style = self._styles.get(v, _Style())
         assert style
         output.grayed_out = style.colored_background
+        output.centered = style.centered
         # Parse text
         if paragraph.text:
             output.spans.append(_Span(paragraph.text, style))
@@ -259,7 +263,7 @@ class FullVisitor():
     # Low-level methods
     def _process_style(self, style):
         name = None
-        output = None
+        output = _Style()
         # _Style's metadata
         for (k, v) in style.attrib.items():
             attr_name = extract(k)
@@ -275,8 +279,9 @@ class FullVisitor():
             child_tag = extract(child.tag)
             match child_tag:
                 case "text-properties":
-                    assert output is None
-                    output = self._process_text_properties(child)
+                    output |= self._process_text_properties(child)
+                case "paragraph-properties":
+                    output |= self._process_paragraph_properties(child)
                 case _:
                     self._unhandled_tags.add(child_tag)
         return name, output
@@ -333,6 +338,18 @@ class FullVisitor():
                     output.color = v
                 case _:
                     self._unhandled_attrs["text-properties"].add(attr_name)
+        return output
+    
+    def _process_paragraph_properties(self, props):               
+        output = _Style()
+        for (k, v) in props.attrib.items():
+            attr_name = extract(k)
+            match attr_name:
+                case "text-align":
+                    assert output.centered is None
+                    output.centered = (v == "center")
+                case _:
+                    self._unhandled_attrs["paragraph-properties"].add(attr_name)
         return output
 
     def _process_a(self, a):

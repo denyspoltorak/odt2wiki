@@ -23,19 +23,19 @@ class GithubMarkdownWriter(md_writer.MarkdownWriter):
         if header.outline_level > self._split_level:
             # Close the previous section
             if self._collapsing and header.outline_level <= self._collapse_level:
-                self._output.append("</details>\n\n")
+                self._output.append("</details>")
                 self._collapsing = False
             # Write the new section
             if header.outline_level == self._collapse_level:
-                self._output.append("<details>\n<summary>\n\n")
+                self._output.append("<details>\n<summary>")
                 self._collapsing = True
-            super()._add_header(header)
+            super().add_header(header)
             if self._collapsing:
                 self._output.append("\n</summary>")
-            self._output.append(self.PARAGRAPH_SEPARATOR)
     
     def _add_toc(self, toc):
         assert self._toc_collapse_level in (0, 1) # Cannot collapse inside a list
+        output = []
         for i in toc.items:
             assert i.level > 0
             assert i.name
@@ -47,16 +47,17 @@ class GithubMarkdownWriter(md_writer.MarkdownWriter):
                     link_text = f"[[{i.name}|{i.link[1:-1]}]]"
                 else:
                     link_text = f"[{i.name}]({i.link})"
-                self._output.append("  " * (i.level - 2) + "- " + link_text + "\n")
+                output.append("  " * (i.level - 2) + "- " + link_text)
             else:        
                 if self._collapsing:
-                    self._output.append("\n</details>\n\n")
+                    output.append("\n</details>\n")
                 if self._toc_collapse_level:
                     self._collapsing = True
                     # Markdown does not work inside <summary>
-                    self._output.append(f'<details>\n<summary><a href="{self._strip_link(i.link)}">{i.name}</a></summary>\n\n')
+                    output.append(f'<details>\n<summary><a href="{self._strip_link(i.link)}">{i.name}</a></summary>\n')
                 else:
-                    self._output.append(f"\n### [{i.name}]({i.link})\n\n")
+                    output.append(f"\n### [{i.name}]({i.link})\n")
+        return "\n".join(output)
     
     @staticmethod
     def _open_link(link):

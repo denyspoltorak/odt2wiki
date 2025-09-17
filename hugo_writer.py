@@ -58,6 +58,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
         title = creator.header.to_string()
+        # SEO and OpenGraph
         if len(title) > 60:
             print(f"'The title of {title}' is longler than the SEO-recommended 60 symbols")
         output.append(f'title = "{title}"')
@@ -68,13 +69,17 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         image = self._customization.get_preview_image(creator)
         if image:
             output.append(f'images = ["{self._escape_link(image)}"]')
+        # ToC
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")
+        # Sitemap and search disable
+        output.append("[sitemap]")
         if self._customization.is_hidden(creator):
             print(f"Hiding '{title}' from search engines")
-            output.append("bookSearchExclude = true")
-            output.append("[sitemap]")
             output.append("  disable = true")
+            output.append("bookSearchExclude = true")
+        else:
+            output.append(f"  priority = {self._customization.get_sitemap_priority(creator)}")
         # Write the front matter
         output.append(self.METADATA_SEPARATOR)
         self._output.append("\n".join(output))

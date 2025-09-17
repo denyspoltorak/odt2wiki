@@ -73,6 +73,11 @@ class Customization:
     def is_hidden(section):
         return False
     
+    # Priority for sitemap.xml, from 0 to 1
+    @staticmethod
+    def get_sitemap_priority(section):
+        return 0.5
+    
     # Return SEO description (up to 160 chars)
     @staticmethod
     def get_description(section):

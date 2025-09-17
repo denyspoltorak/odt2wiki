@@ -306,6 +306,19 @@ class MetapatternsCustomization(plugins.Customization):
     def is_hidden(section):
         return section.header.to_string() in hidden_chapters
     
+    def get_sitemap_priority(self, section):
+        title = section.header.to_string()
+        parent_title = section.parent.header.to_string() if section.parent else ""
+        if title == "Metapatterns" or "metapatterns" in parent_title:
+            return 0.8  # Patterns and theory
+        if title.startswith("Evolutions") and title != "Evolutions":
+            return 0.3  # Pattern evolutions
+        if "metapatterns" in title or self.needs_split(section):
+            return 0.2  # Part and split chapter intros
+        if parent_title in {"Appendices", "The pattern language of software architecture"}:
+            return 0.1  # Appendices and book part summaries
+        return 0.5      # Analytical and overbiew articles
+    
     @staticmethod
     def get_description(section):
         title = section.header.to_string()

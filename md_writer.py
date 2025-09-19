@@ -134,9 +134,9 @@ class MarkdownWriter:
         assert image.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        return self._make_image_html(self._escape_link(image.link), presentation, image.scale, image.caption)
+        return self._make_image_html(self._escape_link(image.link), presentation, image.scale, image.caption, image.width, image.height)
         
-    def _make_image_html(self, link, presentation, scale, caption):
+    def _make_image_html(self, link, presentation, scale, caption, width, height):
         output = []
         output.append('<div align="center">')
         output.append(f'<a href="{link}">')

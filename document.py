@@ -27,6 +27,13 @@ class SectionType(IntEnum):
 class ListStyle(Enum):
     BULLET = auto()
     NUMBER = auto()
+    
+
+@dataclass
+class ImageData:
+    link:   str
+    width:  int = 0
+    height: int = 0
 
 
 @dataclass(frozen=True)
@@ -159,6 +166,14 @@ class Image(Content):
         self.link = link
         self.scale = scale
         self.caption = None
+        self.width = 0
+        self.height = 0
+    
+    def update(self, data: ImageData):
+        assert not (self.width or self.height)
+        self.link = data.link
+        self.width = data.width
+        self.height = data.height
         
 
 class ToC(Content):
@@ -277,13 +292,14 @@ class Section:
         for c in self.content:
             if isinstance(c, Image):
                 assert(c.link)
-                link = external_images.get(c.link, None)
-                if link:
-                    c.link = link
+                data = external_images.get(c.link, None)
+                if data:
+                    c.update(data)
                 else:
-                    link = internal_images.get(c.link, None)
-                    assert link
-                    c.link = os.path.join(self.path_to_root, link)
+                    data = internal_images.get(c.link, None)
+                    assert data
+                    data.link = os.path.join(self.path_to_root, data.link)
+                    c.update(data)
         # Update child sections
         for child in self.children:
             child.match_images(external_images, internal_images)
@@ -496,7 +512,7 @@ class Document:
     def create_folders(self) -> None:
         self._root.create_folders(self._destination, "")
         
-    def link_images(self, external_images: dict[str, str], internal_images: dict[str, str]) -> None:
+    def link_images(self, external_images: dict[str, ImageData], internal_images: dict[str, ImageData]) -> None:
         self._root.match_images(external_images, internal_images)
         
     def crosslink(self):

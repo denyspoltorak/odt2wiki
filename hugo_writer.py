@@ -40,10 +40,10 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         output.append(f'<a href="{link}" style="outline:none">')
         if width:
             assert height
-            output.append(f'<img src="{link}" alt="{presentation}" width="{width}" height="{height}" style="width:{scale:.0%}"/>')
+            output.append(f'<img src="{link}" alt="{presentation}" loading="lazy" width="{width}" height="{height}" style="width:{scale:.0%}"/>')
         else:
             assert not height
-            output.append(f'<img src="{link}" alt="{presentation}" style="width:{scale:.0%}"/>')
+            output.append(f'<img src="{link}" alt="{presentation}" loading="lazy" style="width:{scale:.0%}"/>')
         output.append('</a>')
         if caption:
             output.append("<figcaption>" + caption + "</figcaption>")

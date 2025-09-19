@@ -140,7 +140,7 @@ class MarkdownWriter:
         output = []
         output.append('<div align="center">')
         output.append(f'<a href="{link}">')
-        output.append(f'<img src="{link}" alt="{presentation}" width={scale:.0%}/>')
+        output.append(f'<img src="{link}" alt="{presentation}" loading="lazy" width={scale:.0%}/>')
         output.append('</a>')
         if caption:
             output.append("\n" + self._add_paragraph(document.Paragraph(caption), True) + "\n")

@@ -10,11 +10,11 @@ meta_descriptions = {
     "Introduction":
         "This part defines metapatterns, explains the notation for NoSQL diagrams used throughout the book, and provides a theory for pattern classification.",
     "About this book":
-        "The story behind Architectural Metapatterns, the kinds of diagrams and notation used throughout the book, and why we need a classification of patterns.",
+        "The story behind Architectural Metapatterns, the kinds of diagrams and notation used throughout the book, and why we need a taxonomy for patterns.",
     "Metapatterns":
-        "A metapattern is a cluster of patterns with related structure and function. We draw designs along the abstractness, subdomain and sharding axes.",
+        "A metapattern is a cluster of patterns with related structure and function. We sketch designs along the abstractness, subdomain, and sharding axes.",
     "Foundations of software architecture":
-        "This part reviews the basics of software architecture: forces, complexity, distribution, and the ways to connect multiple components in a system.",
+        "This part reviews the basics of software architecture: forces, complexity, distribution, and ways to connect multiple components in a system.",
     "Modules and complexity":
         "Complexity is the number of concepts which one must keep in mind to understand a system. Breaking a system into components may lower its complexity.",
     "Forces, asynchronicity, and distribution":
@@ -22,9 +22,9 @@ meta_descriptions = {
     "Four kinds of software":
         "Control, interactive, streaming and computational software differ in their architectures and design patterns. Complex systems mix these four approaches.",
     "Arranging communication":
-        "Components can be integrated through orchestration, choreography or shared data. These approaches emerge at every level: from code to system design.",
+        "Components can be integrated through orchestration, choreography, or shared data. These approaches emerge at every level, from code to system design.",
     "Programming and architectural paradigms":
-        "The object-oriented, functional, and procedural paradigms are the code-level manifestations of orchestration, choreography, and shared data, correspondingly.",
+        "The object-oriented, functional, and procedural paradigms are the code-level manifestations of orchestration, choreography, and shared data, respectively.",
     "Orchestration":
         "In orchestration there is a high-level component, called orchestrator, which uses (orchestrates) other components in order to implement application logic.",
     "Choreography":
@@ -34,7 +34,7 @@ meta_descriptions = {
     "Comparison of communication styles":
         "Orchestration is good when there are many complex scenarios, choreography - for simple highly loaded systems, shared data - for data-centric domains.",
     "Basic metapatterns":
-        "Basic architectures include: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for more complex designs.",
+        "Basic architectures include: Monolith, Shards, Layers, Services, and Pipeline. They are the building blocks for more complex designs.",
     "Monolith":
         "A Monolith is a cohesive system which keeps all of its business logic, generic code and data together. This architecture fits short-lived tiny projects.",
     "Shards":
@@ -48,7 +48,7 @@ meta_descriptions = {
     "Extension metapatterns":
         "A system of services can be extended with one or more specialized layers such as a Proxy, a Middleware, an Orchestrator, or a Shared Repository.",
     "Middleware":
-        "A Middleware provides system components with means of communication. It may also manage their deployment, scaling and failure recovery.",
+        "A Middleware provides system components with a means of communication. It may also manage their deployment, scaling, and failure recovery.",
     "Shared Repository":
         "A Shared Repository stores all or a part of the system's data. It may provide notifications on data change and atomic transactions.",
     "Proxy":
@@ -70,11 +70,11 @@ meta_descriptions = {
     "Hierarchy":
         "A Hierarchy distributes responsibilities throughout a tree of components. It is fault tolerant, and the components remain simple and are easy to replace.",
     "Implementation metapatterns":
-        "Implementation patterns study internals of a component. Plugins, Microkernel and Hexagonal Architecture grant flexibility while Mesh provides fault tolerance.",
+        "Implementation patterns study the internals of a component. Plugins, Microkernel and Hexagonal Architecture grant flexibility while Mesh provides resilience.",
     "Plugins":
         "Plugins let a client customize select aspects of a system's behavior. Addons build their application logic on top of whatever the modified system provides.",
     "Hexagonal Architecture":
-        "Hexagonal Architecture isolates a component's business logic from its environment through hiding all the component's dependencies behind Adapters.",
+        "Hexagonal Architecture isolates a component's business logic from its environment by hiding all the component's dependencies behind Adapters.",
     "Microkernel":
         "A microkernel mediates between resource providers and resource consumers. It both makes the providers expendable and sandboxes the consumers.",
     "Mesh":
@@ -82,29 +82,29 @@ meta_descriptions = {
     "Analytics":
         "This part compares different aspects of patterns which were covered in the previous chapters and outlines a few general topics of software architecture.",
     "Comparison of architectural patterns":
-        "Patterns vary in ways to share functionality or data among system components, build pipelines, and in their use of dependency inversion or indirection.",
+        "Patterns vary in the ways they share functionality or data among system components, build pipelines, and in their use of dependency inversion or indirection.",
     "Sharing functionality or data among services":
-        "Functionality or data may be shared among components through: direct access, building a dedicated service, delegation, and replication.",
+        "Functionality or data may be shared among components through direct access, building a dedicated service, delegation, and replication.",
     "Pipelines in architectural patterns":
-        "Pipeline is a unidirectional data flow. Depending on pattern, it may or may not preserve: data type, data identity and temporal order of the data stream.",
+        "Pipeline is a unidirectional data flow. Depending on the pattern, it may preserve the data type, data identity, or temporal order of the data stream.",
     "Dependency inversion in architectural patterns":
-        "Plugins, Hexagonal Architecture, Microkernel and Hierarchy rely on dependency inversion. Other patterns, such as Layers and Services, occasionally use it.",
+        "Plugins, Hexagonal Architecture, Microkernel, and Hierarchy rely on dependency inversion. Other patterns, such as Layers and Services, occasionally use it.",
     "Indirection in commands and queries":
         "Indirection is implemented with Anticorruption Layer or Open Host Service in OLTP and with CQRS View or Reporting Database in OLAP systems.",
     "Ambiguous patterns":
-        "There are patterns whose meaning varies from source to source. They include Monolith, Reactor, Microkernel, Domain Services, Cells, and Nanoservices.",
+        "There are patterns with meanings which vary from source to source. They include Monolith, Reactor, Microkernel, Domain Services, Cells, and Nanoservices.",
     "Architecture and product life cycle":
-        "Architecture of a software project evolves over its lifetime. It starts monolithic, transforms into Layers and Services, then merges back to a Monolith.",
+        "The architecture of a software project evolves over its lifetime. It starts monolithic, transforms into Layers and Services, then merges back to a Monolith.",
     "Real-world inspirations for architectural patterns":
         "Styles and patterns of software architecture have real-world inspirations and parallels. Learning about them may help us to invent new patterns when needed.",
     "The heart of software architecture":
-        "The closing chapter shows how cohesion and decoupling make the entirety of software architecture: its principles, patterns and guidelines.",
+        "The closing chapter shows how cohesion and decoupling make the entirety of software architecture: its principles, patterns, and guidelines.",
     "Cohesers and decouplers":
-        "Some architectural constraints or forces cause the code to be kept together, others pull it apart, still others prefer components of a definite size.",
+        "Some architectural constraints or forces cause the code to be kept together, others pull it apart, and still others prefer components of a definite size.",
     "Deconstructing patterns":
         "Both SOLID principles, Gang of Four design patterns, and architectural metapatterns emerge from the interplay of coupling and cohesion.",
     "Choose your own architecture":
-        "This is a guide to choosing an architectural style based on project size, domain features, target performance and flexibility requirements.",
+        "This is a guide to choosing an architectural style based on project size, domain features, target performance, and flexibility requirements.",
     "Appendices":
         "This part contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revisions history.",
     "Acknowledgements":
@@ -116,13 +116,13 @@ meta_descriptions = {
     "Disclaimer":
         "IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.",
     "Evolutions":
-        "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits and drawbacks.",
+        "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits, and drawbacks.",
     "Evolutions of a Monolith that lead to Shards":
         "Multiple stateful or stateless instances of a Monolith can be deployed to improve performance. The systems may need a Sharding Proxy or Load Balancer.",
     "Evolutions of a Monolith that result in Layers":
         "A Monolith can be split into Layers, or a specialized layer, such as a Proxy or an Orchestrator, may be added between an existing Monolith and its clients.",
     "Evolutions of a Monolith that make Services":
-        "A Monolith can be divided into modules, Services or a Pipeline to support development by multiple teams, improve its codebase, and employ more hardware.",
+        "A Monolith can be divided into modules, Services, or a Pipeline to support development by multiple teams, improve its codebase, and employ more hardware.",
     "Evolutions of a Monolith that rely on Plugins":
         "Plugins or Interpreter make a monolithic component customizable. Hexagonal Architecture protects its business logic from unstable external dependencies. ",
     "Evolutions of Shards that share data":
@@ -132,15 +132,15 @@ meta_descriptions = {
     "Evolutions of Layers that make more layers":
         "It is often possible to split the business logic layer in two, namely, integration or application logic (scenarios) and domain logic (business rules).",
     "Evolutions of Layers that help large projects":
-        "When a layered software grows large, its business logic should be subdivided into Services, Pipeline or Hierarchy.",
+        "When layered software grows large, its business logic should be subdivided into Services, Pipeline, or Hierarchy.",
     "Evolutions of Layers to improve performance":
-        "There are a few ways to improve performance of a layered system: merge the layers, scale them, or use specialized databases (Polyglot Persistence).",
+        "There are a few ways to improve the performance of a layered system: merge the layers, scale them, or use specialized databases (Polyglot Persistence).",
     "Evolutions of Layers to gain flexibility":
         "The upper Proxy or Orchestrator layer can be split into a service per client, making Backends for Frontends. This allows for per-client customization.",
     "Evolutions of Services that add or remove services":
         "A new service can be added, an existing one can be split in two, or multiple services can be merged if they become tightly coupled.",
     "Evolutions of Services that add layers":
-        "A system of services can be extended with a Middleware, Service Mesh, Proxies, Shared Database or an Orchestrator which implement cross-cutting concerns.",
+        "A system of services can be extended with a Middleware, Service Mesh, Proxies, Shared Database, or an Orchestrator which implement cross-cutting concerns.",
     "Evolutions of a Pipeline":
         "A Front Controller may be used to track states of running requests. Alternatively, adding an Orchestrator benefits complex scenarios.",
     "Evolutions of a Middleware":
@@ -154,7 +154,7 @@ meta_descriptions = {
     "Evolutions of a Combined Component":
         "A stack of single-purpose layers can replace a Combined Component, buying you flexibility at the cost of development effort and, often, performance.",
     "Format of a metapattern":
-        "This section formalized the format of each of the metapattern chapters.",
+        "This section formalizes the format of each of the metapattern chapters.",
     "Glossary":
         "The glossary of terms used throughout the Architectural Metapatterns book.",
     "History of changes":
@@ -164,22 +164,22 @@ meta_descriptions = {
 }
 
 previews = {
-    "About this book": "/Misc/Diagrams.png",
-    "Metapatterns": "Intro/Example-Defined.png",
-    "Modules and complexity": "/Intro/Modules-2.png",
-    "Forces, asynchronicity, and distribution": "/Intro/3-Tier.png",
-    "Four kinds of software": "/4Kinds/4 Kinds.png",
-    "Programming and architectural paradigms": "/Communication/Paradigms - Object-oriented.png",
-    "Combined Component": "Variants/2/Multifunctional - API Gateway.png",
-    "Sharing functionality or data among services": "Conclusion/Sharing-DirectCall.png",
-    "Pipelines in architectural patterns": "/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
-    "Dependency inversion in architectural patterns": "/Conclusion/DI-1.png",
-    "Indirection in commands and queries": "/Conclusion/Indirection-Command.png",
-    "Ambiguous patterns": "/Conclusion/Ambiguous-Monolith.png",
-    "Architecture and product life cycle": "/Conclusion/Lifecycle-4.png",
-    "Cohesers and decouplers": "/Heart/Pain.png",
-    "Deconstructing patterns": "/Heart/Basic.png",
-    "Choose your own architecture": "/Heart/Features-1.png"
+    "About this book": "/diagrams/Misc/Diagrams.png",
+    "Metapatterns": "/diagrams/Intro/Example-Defined.png",
+    "Modules and complexity": "/diagrams/Intro/Modules-2.png",
+    "Forces, asynchronicity, and distribution": "/diagrams/Intro/3-Tier.png",
+    "Four kinds of software": "/diagrams/4Kinds/4 Kinds.png",
+    "Programming and architectural paradigms": "/diagrams/Communication/Paradigms - Object-oriented.png",
+    "Combined Component": "/diagrams/Variants/2/Multifunctional - API Gateway.png",
+    "Sharing functionality or data among services": "/diagrams/Conclusion/Sharing-DirectCall.png",
+    "Pipelines in architectural patterns": "/diagrams/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
+    "Dependency inversion in architectural patterns": "/diagrams/Conclusion/DI-1.png",
+    "Indirection in commands and queries": "/diagrams/Conclusion/Indirection-Command.png",
+    "Ambiguous patterns": "/diagrams/Conclusion/Ambiguous-Monolith.png",
+    "Architecture and product life cycle": "/diagrams/Conclusion/Lifecycle-4.png",
+    "Cohesers and decouplers": "/diagrams/Heart/Pain.png",
+    "Deconstructing patterns": "/diagrams/Heart/Basic.png",
+    "Choose your own architecture": "/diagrams/Heart/Features-1.png"
 }
 
 hidden_chapters = {

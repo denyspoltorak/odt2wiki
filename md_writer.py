@@ -221,7 +221,7 @@ class MarkdownWriter:
         if not color:
             return ""
         elif color.r > 2 * color.g and color.r > 2 * color.b:
-            return "red"
+            return "crimson"
         elif color.g > 2 * color.r and color.g > 2 * color.b:
             return "green"
         else:

@@ -6,6 +6,11 @@ import md_writer
 class HugoMarkdownWriter(md_writer.MarkdownWriter):
     METADATA_SEPARATOR = "+++"
     
+    _color_styles = {
+        md_writer.ColorId.RED:      "book-red",
+        md_writer.ColorId.GREEN:    "book-green"
+    }
+    
     def __init__(self, creator, split_level = 0):
         super().__init__(split_level)
         self._in_list = 0
@@ -55,6 +60,9 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
     
     def _add_nav_bar(self, navbar):
         return "<nav>" + self.PARAGRAPH_SEPARATOR + super()._add_nav_bar(navbar) + self.PARAGRAPH_SEPARATOR + "</nav>"
+    
+    def _make_color_style(self, color):
+        return f'class="{self._color_styles[color]}"'
            
     def _make_metadata(self, creator):
         # Open a front matter

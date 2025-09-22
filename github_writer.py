@@ -74,6 +74,10 @@ class GithubMarkdownWriter(md_writer.MarkdownWriter):
             if ":" in link:
                 return f"|{link[1:-1]}]]"
         return f"]({link})"
+    
+    @staticmethod
+    def _get_color_id(color):
+        return md_writer.ColorId.DEFAULT    # GitHub Wiki strips color info
 
 
 class GithubStrategy(plugins.Strategy):

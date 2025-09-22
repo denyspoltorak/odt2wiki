@@ -2,10 +2,26 @@
 
 import document
 import os.path
+from enum import Enum, auto, unique
+
+
+@unique
+class ColorId(Enum):
+    DEFAULT = auto()
+    RED = auto()
+    GREEN = auto()
+    
+    def __bool__(self):
+        return self is not ColorId.DEFAULT
 
     
 class MarkdownWriter:
     PARAGRAPH_SEPARATOR = "\n\n"
+    
+    _color_names = {
+        ColorId.RED:      "crimson",
+        ColorId.GREEN:    "green"
+    }
     
     @classmethod
     def set_customization(cls, customization):
@@ -215,31 +231,34 @@ class MarkdownWriter:
         result = "".join(output)
         assert result
         return result
-      
+    
     @staticmethod
-    def _make_html_color_name(color):
+    def _get_color_id(color):
         if not color:
-            return ""
+            return ColorId.DEFAULT
         elif color.r > 2 * color.g and color.r > 2 * color.b:
-            return "crimson"
+            return ColorId.RED
         elif color.g > 2 * color.r and color.g > 2 * color.b:
-            return "green"
+            return ColorId.GREEN
         else:
-            return ""
+            return ColorId.DEFAULT
+    
+    def _make_color_style(self, color):
+        return f'<span style="color:{self._color_names[color]}">'
     
     def _change_style(self, old, new, old_link, new_link, add_spaces):
         output = []
-        old_color_name = self._make_html_color_name(old.color)
-        new_color_name = self._make_html_color_name(new.color)
+        old_color = self._get_color_id(old.color)
+        new_color = self._get_color_id(new.color)
         old_underline = old.underline and not old_link
         new_underline = new.underline and not new_link
         # Close the old style
         if old_link != new_link:
             # A style cannot cross a link's border - reset
-            output.extend(self._close_style(old_color_name, old_underline, old.bold, old.italic, old.strikethrough))
+            output.extend(self._close_style(old_color, old_underline, old.bold, old.italic, old.strikethrough))
         else:
             # Apply the style diff
-            if old_color_name and old_color_name != new_color_name:
+            if old_color and old_color != new_color:
                 output.append("</span>")
             if old_underline and not new_underline:
                 output.append("</ins>")
@@ -258,7 +277,7 @@ class MarkdownWriter:
             output.append(self._open_link(new_link))
         if old_link != new_link:
             # A style cannot cross a link's border - reload
-            output.extend(self._open_style(new_color_name, new_underline, new.bold, new.italic, new.strikethrough))
+            output.extend(self._open_style(new_color, new_underline, new.bold, new.italic, new.strikethrough))
         else:
             # Apply the style diff
             if new.strikethrough and not old.strikethrough:
@@ -269,8 +288,8 @@ class MarkdownWriter:
                 output.append("**")
             if new_underline and not old_underline:
                 output.append("<ins>")
-            if new_color_name and new_color_name != old_color_name:
-                output.append(f'<span style="color:{new_color_name}">')
+            if new_color and new_color != old_color:
+                output.append(f'<span {self._make_color_style(new_color)}>')
         # Merge
         return "".join(output)
     
@@ -289,8 +308,7 @@ class MarkdownWriter:
             output.append("~")
         return output
 
-    @staticmethod
-    def _open_style(color, underline, bold, italic, strikethrough):
+    def _open_style(self, color, underline, bold, italic, strikethrough):
         output = []
         if strikethrough:
             output.append("~")
@@ -301,7 +319,7 @@ class MarkdownWriter:
         if underline:
             output.append("<ins>")
         if color:
-            output.append(f'<span style="color:{color}">')
+            output.append(f'<span {self._make_color_style(color)}>')
         return output
     
     @staticmethod

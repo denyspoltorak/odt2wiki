@@ -95,6 +95,8 @@ odt2wiki generates markdown files which are the main content for wikis. Below is
      * Any image matched in the local folder (as given via `-i` argument) will be linked to a corresponding image at the remote `-r` path.
     
      * In our example, any chapter that uses `~/Diagrams/MyDoc/ColorDrawings/Foo/Bar.png` will translate into a wiki page that references `https://raw.githubusercontent.com/myname/myrepo/main/MyDoc/ColorDrawings/Foo/Bar.png` with "Bar" for alt text.
+     
+     * `-v` or `--use-svg` replaces any raster images with SVG files from the same folder. SVG files are better compressed thus you should use them if you have them.
 
 3. Customize the generated content.
 
@@ -124,7 +126,7 @@ Customize your wiki by editing:
 
 [Set up Hugo Book](https://github.com/alex-shpak/hugo-book/?tab=readme-ov-file#installation) from the latest release (v11.0.0) or get [my fork with a few CSS customizations](https://github.com/denyspoltorak/hugo-book) - see its `metapatterns` branch.
 
-Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r "" -z my_code`
+Run `./odt2wiki.py ~/Documents/MyDoc.odt ~/Work/Hugo -c hugo -s 2 -i ~/Diagrams/MyDoc -r "diagrams" -v -z my_code`
 
 Copy the script's output from `~/Work/Hugo` to your newly created Hugo project's `content` folder.
 

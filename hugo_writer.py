@@ -39,10 +39,10 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._in_list -= 1
         return result
            
-    def _make_image_html(self, link, presentation, scale, caption, width, height):
+    def _make_image_html(self, link, original_link, presentation, scale, caption, width, height):
         output = []
         output.append('<figure>')
-        output.append(f'<a href="{link}">')
+        output.append(f'<a href="{original_link}">')
         if width:
             assert height
             output.append(f'<img src="{link}" alt="{presentation}" loading="lazy" width="{width}" height="{height}" style="width:{scale:.0%}"/>')

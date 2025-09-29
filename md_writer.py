@@ -147,15 +147,21 @@ class MarkdownWriter:
 
     # Image
     def _add_image(self, image):
-        assert image.link
+        assert image.data.link
         assert image.scale <= 1
-        presentation = os.path.splitext(os.path.basename(image.link))[0].replace("_", ":")
-        return self._make_image_html(self._escape_link(image.link), presentation, image.scale, image.caption, image.width, image.height)
+        presentation = os.path.splitext(os.path.basename(image.data.link))[0].replace("_", ":")
+        return self._make_image_html(self._escape_link(image.data.link),
+                                     self._escape_link(image.data.original), 
+                                     presentation, 
+                                     image.scale, 
+                                     image.caption, 
+                                     image.data.width, 
+                                     image.data.height)
         
-    def _make_image_html(self, link, presentation, scale, caption, width, height):
+    def _make_image_html(self, link, original_link, presentation, scale, caption, width, height):
         output = []
         output.append('<div align="center">')
-        output.append(f'<a href="{link}">')
+        output.append(f'<a href="{original_link}">')
         output.append(f'<img src="{link}" alt="{presentation}" loading="lazy" width={scale:.0%}/>')
         output.append('</a>')
         if caption:

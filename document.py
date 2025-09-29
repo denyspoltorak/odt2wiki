@@ -29,11 +29,23 @@ class ListStyle(Enum):
     NUMBER = auto()
     
 
-@dataclass
 class ImageData:
-    link:   str
-    width:  int = 0
-    height: int = 0
+    def __init__(self, link, width=0, height=0):
+        assert link
+        self.original = self.link = link
+        self.width = width
+        self.height = height
+        
+    def set_link(self, link):
+        self.original = self.link = link
+    
+    def set_path(self, path):
+        self.link = os.path.join(path, self.link)
+        self.original = os.path.join(path, self.original)
+    
+    def replace_path(self, old_path, new_path):
+        self.link = self.link.replace(old_path, new_path)
+        self.original = self.original.replace(old_path, new_path)
 
 
 @dataclass(frozen=True)
@@ -163,17 +175,13 @@ class Table(Content):
 
 class Image(Content):
     def __init__(self, link, scale):
-        self.link = link
+        self.data = ImageData(link)
         self.scale = scale
         self.caption = None
-        self.width = 0
-        self.height = 0
     
     def update(self, data: ImageData):
-        assert not (self.width or self.height)
-        self.link = data.link
-        self.width = data.width
-        self.height = data.height
+        assert not (self.data.width or self.data.height)
+        self.data = data
         
 
 class ToC(Content):
@@ -291,14 +299,14 @@ class Section:
         # Update paths in all our images
         for c in self.content:
             if isinstance(c, Image):
-                assert(c.link)
-                data = external_images.get(c.link, None)
+                assert(c.data.link)
+                data = external_images.get(c.data.link, None)
                 if data:
                     c.update(data)
                 else:
-                    data = internal_images.get(c.link, None)
+                    data = internal_images.get(c.data.link, None)
                     assert data
-                    data.link = os.path.join(self.path_to_root, data.link)
+                    data.set_path(self.path_to_root)
                     c.update(data)
         # Update child sections
         for child in self.children:

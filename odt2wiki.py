@@ -14,6 +14,7 @@ import document
 import plugins
 import github_writer, hugo_writer
 import image_matcher
+import svg_tools
 from analytics import duplicates
 
 
@@ -99,7 +100,7 @@ def _create_document(content, styles, dest_path, split_level, strategy, customiz
     # The index may be reused
     return doc, index
 
-def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
+def _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg):
     external_images = {}
     internal_images = {}
     if images_folder:
@@ -108,13 +109,25 @@ def _process_images(doc, archive, dest_path, images_folder, remote_image_path):
             exit(1)
         full_local_path = os.path.expanduser(images_folder)
         matched, unmatched = image_matcher.match_images(archive, full_local_path)
+        if use_svg:
+            for v in matched.values():
+                try:
+                    v.link = os.path.splitext(v.link)[0] + ".svg"
+                    with open(v.link) as file:
+                        width, height = svg_tools.get_dimensions(file.read(svg_tools.PREFETCH_LENGTH))
+                        assert width > 1 and height > 1
+                        v.width = width
+                        v.height = height
+                except Exception as e:
+                    print(f"Exception {e} while processing {v.link}")
+                    raise  
         if remote_image_path is not None:
             for v in matched.values():
-                v.link = v.link.replace(full_local_path, remote_image_path)
+                v.replace_path(full_local_path, remote_image_path)
         external_images = matched
         if unmatched:
             image_matcher.extract_images(archive, dest_path, unmatched)
-            internal_images = unmatched
+            internal_images = unmatched                      
     else:
         internal_images = image_matcher.extract_all_images(archive, dest_path)
     doc.link_images(external_images, internal_images)
@@ -128,6 +141,7 @@ def convert_to_github_markdown( archive,
                                 split_level, 
                                 images_folder, 
                                 remote_image_path,
+                                use_svg,
                                 customization):
     # Set up
     strategy = github_writer.GithubStrategy()
@@ -137,7 +151,7 @@ def convert_to_github_markdown( archive,
     dups = duplicates.HasDuplicateChapters().make(doc.root())
     assert not dups, dups
     # Map pictires inside the ODT to picture files in the destination folder
-    _process_images(doc, archive, dest_path, images_folder, remote_image_path)
+    _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg)
     # Convert to markdown
     doc.crosslink()
     doc.dump(functools.partial(github_writer.GithubMarkdownWriter, collapse_level=collapse_level))
@@ -152,6 +166,7 @@ def convert_to_hugo_markdown(   archive,
                                 split_level, 
                                 images_folder, 
                                 remote_image_path,
+                                use_svg,
                                 customization):
     assert not collapse_level, "Not implemented"
     # Set up
@@ -159,7 +174,7 @@ def convert_to_hugo_markdown(   archive,
     doc, _ = _create_document(content, styles, dest_path, split_level, strategy, customization, 
             customization.subtitle if customization.subtitle else "Table of Contents")
     # Map pictires inside the ODT to picture files in the destination folder
-    _process_images(doc, archive, dest_path, images_folder, remote_image_path)
+    _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg)
     # Convert to markdown
     doc.crosslink()
     hugo_writer.HugoMarkdownWriter.set_customization(customization)
@@ -192,6 +207,7 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
     group.add_argument("-s", "--split-level", action="store", type=int, default=0, help="split sections into files at this outline level")
     group.add_argument("-i", "--images-folder", action="store", help="local folder with images used throughout the document")
     group.add_argument("-r", "--remote-images", action="store", help="route image requests from wiki to this folder")
+    group.add_argument("-v", "--use-svg", action="store_true", help="replace images with SVG from the local folder")
     group.add_argument("-z", "--customize", action="store", help="custom rules for your document from the 'custom' folder")
     
     args = parser.parse_args()
@@ -261,6 +277,7 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
                                                     args.split_level,
                                                     args.images_folder,
                                                     args.remote_images,
+                                                    args.use_svg,
                                                     customization)
                     case "hugo":
                         print(f"Converting to Hugo markdown in {args.output}")
@@ -272,6 +289,7 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
                                                     args.split_level,
                                                     args.images_folder,
                                                     args.remote_images,
+                                                    args.use_svg,
                                                     customization)
                     case _:
                         assert False

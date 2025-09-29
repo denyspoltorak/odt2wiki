@@ -108,7 +108,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, ImageDa
             except UnidentifiedImageError:
                 pass
     assert not has_ambiguous
-    print("Local images were processed sucessfully")
+    print(f"{len(local_data)} local images were processed sucessfully")
     # Match images from the ODT to the local images
     matched = {}
     unmatched = {}
@@ -170,7 +170,7 @@ def extract_images(archive: ZipFile, destination: str, names: dict[str, ImageDat
         assert suffix
         new_rel_name = os.path.join(pictures_rel_path, f"{IMAGE_DEST_PREFIX}{index:03d}{suffix}")
         os.rename(os.path.join(pictures_abs_path, n[pictures_folder_name_len:]), os.path.join(destination, new_rel_name))
-        d.link = new_rel_name
+        d.set_link(new_rel_name)
         index += 1
     print(f"Extracted {index} images to {pictures_abs_path}")
 

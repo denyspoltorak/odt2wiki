@@ -212,6 +212,8 @@ If you decide to fix or extend the script, here are its components:
 
 * `plugins.py` - parent classes for output customizations and analytics.
 
+* `svg_tools.py` - access SVG images, relies on regexp.
+
 * <a name="analytics"></a>`analytics` is a folder with plugins (you can run one with `-y` or `--analyze`) that iterate over the DOM tree (all document sections) to collect information:
 
   * `duplicates.py` - find chapters with duplicate names (GitHub wiki cannot discern them).
@@ -225,6 +227,8 @@ If you decide to fix or extend the script, here are its components:
 * `custom` folder contains the code for per-document customization:
 
   * `metapatterns.py` - the customization for the [rchitectural Metapatterns book](https://metapatterns.io/). Includes SEO and some analytics.
+  
+* `svgcolor.py` - a tool to recolor SVG images, used for making a dark theme from light images, or vice versa.
 
 ## Q&A
 

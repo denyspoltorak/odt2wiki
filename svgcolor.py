@@ -36,8 +36,10 @@ class Traverser:
         pass
     
     def _process_file(self, path, filename):
+        assert path.startswith(self._path)
+        rel_path = path[len(self._path):]
         with open(os.path.join(path, filename)) as file:
-            self._process_content(file.read(), filename)
+            self._process_content(file.read(), rel_path + "/" + filename)
     
     def _process_content(self, content, filename):
         pass
@@ -123,22 +125,37 @@ class FindImagesTraverser(Traverser):
         for f in self._files:
             print(f)
 
-"""
-class ReplaceTraverser(Traverser):
-    def __init__(self, path, color):
-        super().__init__(path)
-        self._color = color
-        self._files = []
+
+class RemapTraverser(Traverser):
+    def __init__(self, input_path, output_path, config_file):
+        super().__init__(input_path)
+        self._color_map, self._multiplier = self._read_config(os.path.expanduser(config_file))
+        self._output_path = os.path.expanduser(output_path)
+        os.mkdir(self._output_path)
+    
+    def _process_dir(self, path, directory):
+        assert path.startswith(self._path)
+        new_path = self._output_path + "/" + path[len(self._path):] + "/" + directory
+        os.mkdir(new_path)
     
     def _process_content(self, content, filename):
-        if svg_tools.contains_color(content, self._color):
-            self._files.append(filename)
-    
-    def done(self):
-        print(f"{len(self._files)} FILES WITH COLOR {self._color}:")
-        for f in self._files:
-            print(f)
-"""
+        processed = svg_tools.replace(content, self._color_map, self._multiplier)
+        with open(self._output_path + "/" + filename, "x") as file:
+            file.write(processed)
+
+    def _read_config(self, config_file):
+        color_map = {}
+        multiplier = None
+        with open(config_file) as file:
+            for l in file.readlines():
+                original, replacement = l.split()
+                if original == "*":
+                    assert not multiplier
+                    multiplier = float(replacement)
+                else:
+                    color_map[original] = replacement
+        return svg_tools.prepare_color_map(color_map), multiplier
+
 
 def main():
     description = "Change colors in SVG files."
@@ -146,7 +163,7 @@ def main():
 svgcolor.py <input_folder> --{list|find-images}
 svgcolor.py <input_folder> --explore <file_name>
 svgcolor.py <input_folder> --[no-]find <color_code>
-svgcolor.py <input_folder> <output_folder> --replace <color_map>"""
+svgcolor.py <input_folder> <output_folder> --remap <color_map>"""
     
     # Set up the CLI arguments
     parser = ArgumentParser(description=description, usage=usage)
@@ -160,15 +177,16 @@ svgcolor.py <input_folder> <output_folder> --replace <color_map>"""
     group.add_argument("-f", "--find", action="store", help="find which SVG files use a given color")
     group.add_argument("-n", "--no-find", action="store", help="find which SVG files don't use a given color")
     group.add_argument("-i", "--find-images", action="store_true", help="find SVG files with embedded raster images")
-    group.add_argument("-r", "--replace", action="store", help="transform the input images with this color map file")
+    group.add_argument("-r", "--remap", action="store", help="transform the input images with this color map file")
     
     args = parser.parse_args()
     assert args.input
-    if args.replace:
+    if args.remap:
         if not args.output:
             parser.print_usage()
             print("Output folder is required for --replace")
             exit()
+        traverser = RemapTraverser(args.input, args.output, args.remap)
     else:
         if args.output:
             parser.print_usage()

@@ -127,11 +127,12 @@ class FindImagesTraverser(Traverser):
 
 
 class RemapTraverser(Traverser):
-    def __init__(self, input_path, output_path, config_file):
+    def __init__(self, input_path, output_path, config_file, infix):
         super().__init__(input_path)
         self._color_map, self._multiplier = self._read_config(os.path.expanduser(config_file))
         self._output_path = os.path.expanduser(output_path)
         os.mkdir(self._output_path)
+        self._infix = infix
     
     def _process_dir(self, path, directory):
         assert path.startswith(self._path)
@@ -139,6 +140,9 @@ class RemapTraverser(Traverser):
         os.mkdir(new_path)
     
     def _process_content(self, content, filename):
+        assert filename.endswith(".svg")
+        if self._infix:
+            filename = filename[:-3] + self._infix + ".svg"
         processed = svg_tools.replace(content, self._color_map, self._multiplier)
         with open(self._output_path + "/" + filename, "x") as file:
             file.write(processed)
@@ -163,7 +167,7 @@ def main():
 svgcolor.py <input_folder> --{list|find-images}
 svgcolor.py <input_folder> --explore <file_name>
 svgcolor.py <input_folder> --[no-]find <color_code>
-svgcolor.py <input_folder> <output_folder> --remap <color_map>"""
+svgcolor.py <input_folder> <output_folder> --remap <color_map> [--infix <string>]"""
     
     # Set up the CLI arguments
     parser = ArgumentParser(description=description, usage=usage)
@@ -179,6 +183,8 @@ svgcolor.py <input_folder> <output_folder> --remap <color_map>"""
     group.add_argument("-i", "--find-images", action="store_true", help="find SVG files with embedded raster images")
     group.add_argument("-r", "--remap", action="store", help="transform the input images with this color map file")
     
+    parser.add_argument("-x", "--infix", action="store", help="extra file extension for remapped colors")
+    
     args = parser.parse_args()
     assert args.input
     if args.remap:
@@ -186,11 +192,15 @@ svgcolor.py <input_folder> <output_folder> --remap <color_map>"""
             parser.print_usage()
             print("Output folder is required for --replace")
             exit()
-        traverser = RemapTraverser(args.input, args.output, args.remap)
+        traverser = RemapTraverser(args.input, args.output, args.remap, args.infix)
     else:
         if args.output:
             parser.print_usage()
             print("Output folder is supported only with --replace")
+            exit()
+        if args.infix:
+            parser.print_usage()
+            print("Infix is supported only with --replace")
             exit()
         if args.list:
             traverser = ListTraverser(args.input)

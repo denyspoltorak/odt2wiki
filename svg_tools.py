@@ -3,6 +3,7 @@ import re
 
 PREFETCH_LENGTH = 200
 COLOR_REGEXP = r'"#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})"'
+PATH_REGEXP = r'<(path .*?)/>'
 FLAGS = re.ASCII|re.IGNORECASE
 
 def _expand(color):
@@ -96,5 +97,17 @@ def replace(content, color_map, default_multiplier):
         else:
             result = p
         output.append(result)
-    return "".join(output)
-    
+    result = "".join(output)
+    new_default = color_map.get("000000")
+    if new_default:
+        output = []
+        pieces = re.split(PATH_REGEXP, result, flags=FLAGS)
+        for p in pieces:
+            if p.startswith("path"):
+                if "fill=" not in p:
+                    p += f' fill="#{new_default}"'
+                output.append(f"<{p}/>")
+            else:
+                output.append(p)
+        result = "".join(output)
+    return result

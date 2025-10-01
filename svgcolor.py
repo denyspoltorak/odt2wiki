@@ -108,6 +108,21 @@ class NoFindTraverser(FindTraverser):
         for f in self._files:
             print(f)
 
+
+class FindImagesTraverser(Traverser):
+    def __init__(self, path):
+        super().__init__(path)
+        self._files = []
+    
+    def _process_content(self, content, filename):
+        if svg_tools.contains_image(content):
+            self._files.append(filename)
+    
+    def done(self):
+        print(f"{len(self._files)} FILES WITH EMBEDDED IMAGES:")
+        for f in self._files:
+            print(f)
+
 """
 class ReplaceTraverser(Traverser):
     def __init__(self, path, color):
@@ -128,10 +143,9 @@ class ReplaceTraverser(Traverser):
 def main():
     description = "Change colors in SVG files."
     usage = """
-svgcolor.py <input_folder> --list
+svgcolor.py <input_folder> --{list|find-images}
 svgcolor.py <input_folder> --explore <file_name>
-svgcolor.py <input_folder> --find <color_code>
-svgcolor.py <input_folder> --no-find <color_code>
+svgcolor.py <input_folder> --[no-]find <color_code>
 svgcolor.py <input_folder> <output_folder> --replace <color_map>"""
     
     # Set up the CLI arguments
@@ -145,6 +159,7 @@ svgcolor.py <input_folder> <output_folder> --replace <color_map>"""
     group.add_argument("-o", "--list-one", action="store", help="see which colors a given SVG file uses")
     group.add_argument("-f", "--find", action="store", help="find which SVG files use a given color")
     group.add_argument("-n", "--no-find", action="store", help="find which SVG files don't use a given color")
+    group.add_argument("-i", "--find-images", action="store_true", help="find SVG files with embedded raster images")
     group.add_argument("-r", "--replace", action="store", help="transform the input images with this color map file")
     
     args = parser.parse_args()
@@ -167,6 +182,8 @@ svgcolor.py <input_folder> <output_folder> --replace <color_map>"""
             traverser = FindTraverser(args.input, args.find)
         elif args.no_find:
             traverser = NoFindTraverser(args.input, args.no_find)
+        elif args.find_images:
+            traverser = FindImagesTraverser(args.input)
         else:
             assert False
     

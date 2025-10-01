@@ -62,3 +62,6 @@ def list_colors(content):
 
 def contains_regexp(content, regexp):
     return re.search(regexp, content, FLAGS)
+
+def contains_image(content):
+    return "<image " in content

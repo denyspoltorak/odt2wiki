@@ -1,7 +1,16 @@
-000000	ffd700
+000000	ffff88  # Lines and text
 
-c3f7c8	32cd32	# Green
-cfe4ff	00bfff	# Blue
-ffffff	ffe4e1	# White
-ced4db	a9a9a9	# Gray
+c3f7c8	448844	# Integration
+cfe4ff	4466aa	# Business logic
+ffffff	999999	# Generic code
+ced4db	666666	# Data
+e8e2c8  606000  # Client
+979ea8  334455  # Hardware
 
+edf5ff  224466  # Pale blue background
+f7f4e4  555511  # Pale yellow background
+dedeff  858599  # Lilac background
+fe7070  cc0000  # Red fill
+6f7681  444444  # Gray arrows on white background
+6db1ff  55aacc  # Cyan arrows
+*       ~

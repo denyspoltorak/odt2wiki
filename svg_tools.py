@@ -48,7 +48,9 @@ def make_regexp(color):
 def prepare_color_map(color_map):
     normalized = {}
     for k, v in color_map.items():
-        normalized[normalize(k)] = try_contract(normalize(v))
+        new_key = normalize(k)
+        assert new_key not in normalized, new_key
+        normalized[new_key] = try_contract(normalize(v))
     return normalized
 
 def get_dimensions(content):
@@ -73,7 +75,7 @@ def contains_regexp(content, regexp):
 def contains_image(content):
     return "<image " in content
 
-def replace(content, color_map, default_multiplier):
+def replace(content, color_map, default_action):
     output = []
     pieces = re.split(COLOR_REGEXP, content, flags=FLAGS)
     for p in pieces:
@@ -81,16 +83,8 @@ def replace(content, color_map, default_multiplier):
         if (len(p) == 3 or len(p) == 6) and p.isalnum():    # seems to be a color
             normalized = normalize(p)
             result = color_map.get(normalized)
-            if not result:
-                if default_multiplier:
-                    result = ""
-                    assert len(normalized) == 6
-                    for i in range(3):
-                        value = int(normalized[2*i: 2*(i+1)], 16)
-                        value *= default_multiplier
-                        assert value < 256
-                        result += f"{int(value):02x}"
-                    result = try_contract(result)
+            if not result and default_action:
+                result = try_contract(default_action(normalized))
             if not result:
                 result = p
             result = f'"#{result}"'

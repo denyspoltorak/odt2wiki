@@ -3,6 +3,8 @@
 from argparse import ArgumentParser
 from collections import defaultdict
 import os
+import functools
+import colorsys
 
 import svg_tools
 
@@ -129,10 +131,11 @@ class FindImagesTraverser(Traverser):
 class RemapTraverser(Traverser):
     def __init__(self, input_path, output_path, config_file, infix):
         super().__init__(input_path)
-        self._color_map, self._multiplier = self._read_config(os.path.expanduser(config_file))
+        self._color_map, self._default_action = self._read_config(os.path.expanduser(config_file))
         self._output_path = os.path.expanduser(output_path)
         os.mkdir(self._output_path)
         self._infix = infix
+        self._overflows = set()
     
     def _process_dir(self, path, directory):
         assert path.startswith(self._path)
@@ -143,13 +146,13 @@ class RemapTraverser(Traverser):
         assert filename.endswith(".svg")
         if self._infix:
             filename = filename[:-3] + self._infix + ".svg"
-        processed = svg_tools.replace(content, self._color_map, self._multiplier)
+        processed = svg_tools.replace(content, self._color_map, self._default_action)
         with open(self._output_path + "/" + filename, "x") as file:
             file.write(processed)
 
     def _read_config(self, config_file):
         color_map = {}
-        multiplier = None
+        default_action = None
         with open(config_file) as file:
             for l in file.readlines():
                 l = l.split("#")[0] # strip comments
@@ -157,12 +160,50 @@ class RemapTraverser(Traverser):
                 if not words:       # empty line
                     continue
                 assert len(words) == 2
-                if words[0] == "*":
-                    assert not multiplier
-                    multiplier = float(words[1])
+                if words[0] == "*": # operation for colors not listed in the config
+                    assert not default_action
+                    if words[1] == "~":
+                        default_action = self._invert_lightness
+                    else:
+                        default_action = functools.partial(self._multiply_rgb, multiplier=float(words[1]))
                 else:
+                    assert words[0] not in color_map
                     color_map[words[0]] = words[1]
-        return svg_tools.prepare_color_map(color_map), multiplier
+        return svg_tools.prepare_color_map(color_map), default_action
+
+    def done(self):
+        if self._overflows:
+            print("COLOR MULTIPLICATION OVERFLOWS:")
+            for c in sorted(self._overflows):
+                print(c)
+    
+    # Operations
+    def _multiply_rgb(self, color, multiplier):
+        result = ""
+        assert len(color) == 6
+        for i in range(3):
+            value = int(color[2*i: 2*(i+1)], 16)
+            value *= multiplier
+            if value > 255:
+                self._overflows.add(color)
+                value = 255
+            result += f"{int(value):02x}"
+        return result
+    
+    @staticmethod
+    def _invert_lightness(color):
+        # Parse the hex input
+        assert len(color) == 6
+        rgb = [int(color[2*i: 2*(i+1)], 16) / 255.0 for i in range(3)]
+        # Transfor the color: invert Lightness
+        h, l, s = colorsys.rgb_to_hls(*rgb)
+        l = 1.0 - l
+        rgb = colorsys.hls_to_rgb(h, l, s)
+        # Print the color back to hex
+        result = ""
+        for i in range(3):
+            result += f"{int(rgb[i] * 255.0):02x}"
+        return result
 
 
 def main():

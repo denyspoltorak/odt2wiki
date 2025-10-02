@@ -182,6 +182,11 @@ previews = {
     "Choose your own architecture": "/diagrams/Heart/Features-1.png"
 }
 
+override_images = {
+    "Performance/Hierarchy - speed.svg":            "Performance/Hierarchy - speed.negated.svg",
+    "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.svg"
+}
+
 hidden_chapters = {
     "Acknowledgements",
     "Copyright",
@@ -336,6 +341,18 @@ class MetapatternsCustomization(plugins.Customization):
             if isinstance(c, document.Image):
                 return c.data.link
         return None
+
+    @staticmethod
+    def get_dark_image(light_image):
+        # Special cases
+        for k, v in override_images.items():
+            if light_image.endswith(k):
+                return light_image.replace(k, v)
+        # The default dark file name
+        if light_image.endswith(".svg"):
+            return light_image[:-4] + ".dark.svg"
+        else:
+            return None
 
 
 export = MetapatternsCustomization

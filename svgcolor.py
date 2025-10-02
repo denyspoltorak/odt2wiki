@@ -152,12 +152,16 @@ class RemapTraverser(Traverser):
         multiplier = None
         with open(config_file) as file:
             for l in file.readlines():
-                original, replacement = l.split()
-                if original == "*":
+                l = l.split("#")[0] # strip comments
+                words = l.split()
+                if not words:       # empty line
+                    continue
+                assert len(words) == 2
+                if words[0] == "*":
                     assert not multiplier
-                    multiplier = float(replacement)
+                    multiplier = float(words[1])
                 else:
-                    color_map[original] = replacement
+                    color_map[words[0]] = words[1]
         return svg_tools.prepare_color_map(color_map), multiplier
 
 

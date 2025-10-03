@@ -75,7 +75,7 @@ def contains_regexp(content, regexp):
 def contains_image(content):
     return "<image " in content
 
-def replace(content, color_map, default_action):
+def replace(content, color_map, default_actions):
     output = []
     pieces = re.split(COLOR_REGEXP, content, flags=FLAGS)
     for p in pieces:
@@ -83,8 +83,10 @@ def replace(content, color_map, default_action):
         if (len(p) == 3 or len(p) == 6) and p.isalnum():    # seems to be a color
             normalized = normalize(p)
             result = color_map.get(normalized)
-            if not result and default_action:
-                result = try_contract(default_action(normalized))
+            if not result and default_actions:
+                for a in default_actions:
+                    normalized = a(normalized)
+                result = try_contract(normalized)
             if not result:
                 result = p
             result = f'"#{result}"'

@@ -4,13 +4,22 @@ c3f7c8	448844	# Integration
 cfe4ff	4466aa	# Business logic
 ffffff	999999	# Generic code
 ced4db	666666	# Data
-e8e2c8  606000  # Client
+e8e2c8  666600  # Client
 979ea8  334455  # Hardware
 
 edf5ff  224466  # Pale blue background
 f7f4e4  555511  # Pale yellow background
-dedeff  858599  # Lilac background
+ffdda6  884422  # Light orange background
+e3fae3  336633  # Light green background
+dedeff  776699  # Lilac background
+ffd9d9  aa5577  # Pink background
 fe7070  cc0000  # Red fill
 6f7681  444444  # Gray arrows on white background
-6db1ff  55aacc  # Cyan arrows
-*       ~
+008a0e  33ee44  # Green arrows for integration logic and good performance
+fc9432  ffaa00  # Orange arrows for suboptimal performance
+e81313  ee1111  # Red arrows for poor performance
+ba23f6  ff66ff  # Magenta arrows for highlighted flows
+635dff  88eeff  # Violet arrows - used with magenta
+1071e5  55ccff  # Blue arrows and shapes - mostly shards
+~       0.7     # Make bright colors moderately dark and vice versa
+/       2       # Saturate everything

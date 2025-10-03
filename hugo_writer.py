@@ -46,20 +46,20 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         # Generate the HTML code      
         output = []
         output.append('<figure>')
-        output.append(f'<a href="{original_link}">')
+        output.append(f'<a href="{self._escape_link(original_link)}">')
         # Add light and dark themes
         if dark_link:
             assert dark_link != link
             output.append('<picture>')
-            output.append(f'<source srcset="{link}" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"/>')
-            output.append(f'<source srcset="{dark_link}" media="(prefers-color-scheme: dark)"/>')
+            output.append(f'<source srcset="{self._escape_link(link)}" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"/>')
+            output.append(f'<source srcset="{self._escape_link(dark_link)}" media="(prefers-color-scheme: dark)"/>')
         # Add the fallback image and image dimensions
         if width:
             assert height
-            output.append(f'<img src="{img_link}" alt="{presentation}" loading="lazy" width="{width}" height="{height}" style="width:{scale:.0%}"/>')
+            output.append(f'<img src="{self._escape_link(img_link)}" alt="{presentation}" loading="lazy" width="{width}" height="{height}" style="width:{scale:.0%}"/>')
         else:
             assert not height
-            output.append(f'<img src="{img_link}" alt="{presentation}" loading="lazy" style="width:{scale:.0%}"/>')
+            output.append(f'<img src="{self._escape_link(img_link)}" alt="{presentation}" loading="lazy" style="width:{scale:.0%}"/>')
         # Close the created elements
         if dark_link:
             output.append('</picture>')

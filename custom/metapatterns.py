@@ -183,8 +183,8 @@ previews = {
 }
 
 override_images = {
-    "Performance/Hierarchy - speed.svg":            "Performance/Hierarchy - speed.negated.svg",
-    "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.svg"
+    "Performance/Hierarchy - speed.svg":            "Performance/Hierarchy - speed.negated.dark.svg",
+    "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.dark.svg"
 }
 
 hidden_chapters = {

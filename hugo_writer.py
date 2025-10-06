@@ -51,7 +51,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         if dark_link:
             assert dark_link != link
             output.append('<picture>')
-            output.append(f'<source srcset="{self._escape_link(link)}" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"/>')
+            output.append(f'<source srcset="{self._escape_link(link)}" media="(prefers-color-scheme: light)"/>')
             output.append(f'<source srcset="{self._escape_link(dark_link)}" media="(prefers-color-scheme: dark)"/>')
         # Add the fallback image and image dimensions
         if width:

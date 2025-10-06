@@ -113,6 +113,8 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         
 
 class HugoStrategy(plugins.Strategy):
+    needs_navigation = False
+    
     @staticmethod
     def process_internal_link(link):
         return f'{{{{< relref "{link}" >}}}}' if link else "#"

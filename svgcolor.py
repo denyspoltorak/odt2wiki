@@ -230,7 +230,7 @@ def main():
     description = "Change colors in SVG files."
     usage = """
 svgcolor.py <input_folder> --{list|find-images}
-svgcolor.py <input_folder> --explore <file_name>
+svgcolor.py <input_folder> --list-one <file_name>
 svgcolor.py <input_folder> --[no-]find <color_code>
 svgcolor.py <input_folder> <output_folder> --remap <color_map> [--infix <string>]"""
     

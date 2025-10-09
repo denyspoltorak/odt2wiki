@@ -14,7 +14,15 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
     def __init__(self, creator, split_level = 0):
         super().__init__(split_level)
         self._in_list = 0
+        self._first_header = True
         self._make_metadata(creator)
+        
+    def add_header(self, header: document.Header) -> None:
+        header = self._add_header(header)
+        if self._first_header:
+            header += " {anchor=false}"
+            self._first_header = False
+        self._output.append(header)
         
     def _strip_link(self, link):
         assert link.startswith('{{< relref "')
@@ -82,16 +90,16 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                 assert i.link
                 if i.level < max_level:
                     # A grid-wide header
-                    output.append(f'<div class="{self._customization.grid_wide_class}">')
-                    output.append(f'### [{i.name}]({i.link})')
-                    output.append("</div>")
+                    output.append(f'<a class="{self._customization.grid_wide_class}" href="{i.link}">')
+                    output.append("<h3>" + i.name + "</h3>")
+                    output.append('</a>')
                 elif i.level == max_level:
                     picture = self._customization.get_toc_image(i.name)
                     if isinstance(picture, plugins.Wide):
                         # A grid-wide normal text
-                        output.append(f'<div class="{self._customization.grid_wide_class}">')
-                        output.append(f'[{i.name}]({i.link})')
-                        output.append('</div>')
+                        output.append(f'<a class="{self._customization.grid_wide_class}" href="{i.link}">')
+                        output.append(i.name)
+                        output.append('</a>')
                     elif picture:
                         # A single-cell image and text
                         dark = self._customization.get_dark_image(picture)
@@ -107,7 +115,9 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                         output.append('</a>')
                     else:
                         # A single-cell normal text
-                        output.append(f'[{i.name}]({i.link})')
+                        output.append(f'<a href="{i.link}">')
+                        output.append(i.name)
+                        output.append('</a>')
                 # Else skip the item as it is too deep in the ToC tree
         else:
             # Add a list-based ToC
@@ -130,6 +140,8 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         weight = 1 + creator.parent.children.index(creator) if creator.parent else 1
         output.append(f"weight = {weight}")
         title = creator.header.to_string()
+        if not creator.parent:
+            output.append('layout = "landing"')
         # SEO and OpenGraph
         if len(title) > 60:
             print(f"'The title of {title}' is longler than the SEO-recommended 60 symbols")

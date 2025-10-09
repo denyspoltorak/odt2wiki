@@ -95,6 +95,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
             output.append(f'description = "{description}"')
         image = self._customization.get_preview_image(creator)
         if image:
+            assert not image.endswith(".svg")
             output.append(f'images = ["{self._escape_link(image)}"]')
         # ToC
         if creator.type == document.SectionType.FOLDER:

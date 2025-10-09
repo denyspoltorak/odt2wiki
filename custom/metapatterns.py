@@ -339,7 +339,7 @@ class MetapatternsCustomization(plugins.Customization):
         # Return the first image after the chapter's title
         for c in section.content:
             if isinstance(c, document.Image):
-                return c.data.link
+                return c.data.original
         return None
 
     @staticmethod

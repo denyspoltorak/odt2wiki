@@ -187,6 +187,7 @@ class Image(Content):
 class ToC(Content):
     def __init__(self):
         self.items = []
+        self.root = None
         
 
 class NavBar(Content):
@@ -211,6 +212,9 @@ class TocMaker(plugins.Analytics):
                                        self._strategy.process_internal_link(section.rel_filename), 
                                        level - self._level_offset))
         return True
+        
+    def _set_root(self, root):
+        self._toc.root = root
     
     def _finalize(self):
         return self._toc

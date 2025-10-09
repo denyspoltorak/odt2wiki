@@ -164,22 +164,46 @@ meta_descriptions = {
 }
 
 previews = {
-    "About this book": "/diagrams/Misc/Diagrams.png",
-    "Metapatterns": "/diagrams/Intro/Example-Defined.png",
-    "Modules and complexity": "/diagrams/Intro/Modules-2.png",
-    "Forces, asynchronicity, and distribution": "/diagrams/Intro/3-Tier.png",
-    "Four kinds of software": "/diagrams/4Kinds/4 Kinds.png",
-    "Programming and architectural paradigms": "/diagrams/Communication/Paradigms - Object-oriented.png",
-    "Combined Component": "/diagrams/Variants/2/Multifunctional - API Gateway.png",
-    "Sharing functionality or data among services": "/diagrams/Conclusion/Sharing-DirectCall.png",
-    "Pipelines in architectural patterns": "/diagrams/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
-    "Dependency inversion in architectural patterns": "/diagrams/Conclusion/DI-1.png",
-    "Indirection in commands and queries": "/diagrams/Conclusion/Indirection-Command.png",
-    "Ambiguous patterns": "/diagrams/Conclusion/Ambiguous-Monolith.png",
-    "Architecture and product life cycle": "/diagrams/Conclusion/Lifecycle-4.png",
-    "Cohesers and decouplers": "/diagrams/Heart/Pain.png",
-    "Deconstructing patterns": "/diagrams/Heart/Basic.png",
-    "Choose your own architecture": "/diagrams/Heart/Features-1.png"
+    "About this book":                                  "/diagrams/Misc/Diagrams.png",
+    "Metapatterns":                                     "/diagrams/Intro/Example-Defined.png",
+    "Modules and complexity":                           "/diagrams/Intro/Modules-2.png",
+    "Forces, asynchronicity, and distribution":         "/diagrams/Intro/3-Tier.png",
+    "Four kinds of software":                           "/diagrams/4Kinds/4 Kinds.png",
+    "Programming and architectural paradigms":          "/diagrams/Communication/Paradigms - Object-oriented.png",
+    "Combined Component":                               "/diagrams/Variants/2/Multifunctional - API Gateway.png",
+    "Sharing functionality or data among services":     "/diagrams/Conclusion/Sharing-DirectCall.png",
+    "Pipelines in architectural patterns":              "/diagrams/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
+    "Dependency inversion in architectural patterns":   "/diagrams/Conclusion/DI-1.png",
+    "Indirection in commands and queries":              "/diagrams/Conclusion/Indirection-Command.png",
+    "Ambiguous patterns":                               "/diagrams/Conclusion/Ambiguous-Monolith.png",
+    "Architecture and product life cycle":              "/diagrams/Conclusion/Lifecycle-4.png",
+    "Cohesers and decouplers":                          "/diagrams/Heart/Pain.png",
+    "Deconstructing patterns":                          "/diagrams/Heart/Basic.png",
+    "Choose your own architecture":                     "/diagrams/Heart/Features-1.png"
+}
+
+toc_images = {
+    "Programming and architectural paradigms":  plugins.Wide(),
+    "Comparison of communication styles":       plugins.Wide(),
+    "Monolith":                                 "/diagrams/Web/Monolith.svg",
+    "Shards":                                   "/diagrams/Web/Shards.svg",
+    "Layers":                                   "/diagrams/Web/Layers.svg",
+    "Services":                                 "/diagrams/Web/Services.svg",
+    "Pipeline":                                 "/diagrams/Web/Pipeline.svg",
+    "Middleware":                               "/diagrams/Web/Middleware.svg",
+    "Shared Repository":                        "/diagrams/Web/Shared Repository.svg",
+    "Proxy":                                    "/diagrams/Web/Proxy.svg",
+    "Orchestrator":                             "/diagrams/Web/Orchestrator.svg",
+    "Combined Component":                       "/diagrams/Web/Combined Component.svg",
+    "Layered Services":                         "/diagrams/Web/Layered Services.svg",
+    "Polyglot Persistence":                     "/diagrams/Web/Polyglot Persistence.svg",
+    "Backends for Frontends (BFF)":             "/diagrams/Web/Backends for Frontends.svg",
+    "Service-Oriented Architecture (SOA)":      "/diagrams/Web/Service-Oriented Architecture.svg",
+    "Hierarchy":                                "/diagrams/Web/Hierarchy.svg",
+    "Plugins":                                  "/diagrams/Web/Plugins.svg",
+    "Hexagonal Architecture":                   "/diagrams/Web/Hexagonal Architecture.svg",
+    "Microkernel":                              "/diagrams/Web/Microkernel.svg",
+    "Mesh":                                     "/diagrams/Web/Mesh.svg"
 }
 
 override_images = {
@@ -203,11 +227,18 @@ definition_lists = {
     "Glossary"
 }
 
+grid_tocs = {
+    "The pattern language of software architecture":    (2, "grid5"),
+    "Arranging communication":                          (1, "grid3")
+}
+
 
 assert set(previews.keys()).issubset(meta_descriptions.keys())
 assert hidden_chapters.issubset(meta_descriptions.keys())
 assert extra_split.issubset(meta_descriptions.keys())
 assert definition_lists.issubset(meta_descriptions.keys())
+assert set(grid_tocs.keys()).issubset(meta_descriptions.keys())
+assert set(toc_images.keys()).issubset(meta_descriptions.keys())
 
 
 class LinksCollector:
@@ -238,6 +269,7 @@ class LinksCollector:
 
 class MetapatternsCustomization(plugins.Customization):
     subtitle = "The pattern language of software architecture"
+    grid_wide_class = "grid-row"
     
     def __init__(self, mode):
         self._hugo = (mode == "hugo")
@@ -308,6 +340,10 @@ class MetapatternsCustomization(plugins.Customization):
         return not all(f in collector for f in files)
     
     @staticmethod
+    def toc_grid_depth_and_style(section):
+        return grid_tocs.get(section.header.to_string())
+    
+    @staticmethod
     def is_hidden(section):
         return section.header.to_string() in hidden_chapters
     
@@ -341,6 +377,10 @@ class MetapatternsCustomization(plugins.Customization):
             if isinstance(c, document.Image):
                 return c.data.original
         return None
+
+    @staticmethod
+    def get_toc_image(section_name):
+        return toc_images.get(section_name)
 
     @staticmethod
     def get_dark_image(light_image):

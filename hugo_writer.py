@@ -70,7 +70,52 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         return "\n".join(output)
     
     def _add_toc(self, toc):
-        return "<nav>" + self.PARAGRAPH_SEPARATOR + super()._add_toc(toc) + self.PARAGRAPH_SEPARATOR + "</nav>"
+        output = []
+        grid = self._customization.toc_grid_depth_and_style(toc.root)
+        if grid:
+            # Add a CSS grid ToC
+            max_level, css_class = grid
+            output.append(f'<nav class="{css_class}">')
+            for i in toc.items:
+                assert i.level > 0
+                assert i.name
+                assert i.link
+                if i.level < max_level:
+                    # A grid-wide header
+                    output.append(f'<div class="{self._customization.grid_wide_class}">')
+                    output.append(f'### [{i.name}]({i.link})')
+                    output.append("</div>")
+                elif i.level == max_level:
+                    picture = self._customization.get_toc_image(i.name)
+                    if isinstance(picture, plugins.Wide):
+                        # A grid-wide normal text
+                        output.append(f'<div class="{self._customization.grid_wide_class}">')
+                        output.append(f'[{i.name}]({i.link})')
+                        output.append('</div>')
+                    elif picture:
+                        # A single-cell image and text
+                        dark = self._customization.get_dark_image(picture)
+                        assert dark
+                        assert dark != picture
+                        output.append(f'<a href="{i.link}">')
+                        output.append('<picture>')
+                        output.append(f'<source srcset="{self._escape_link(picture)}" media="(prefers-color-scheme: light)"/>')
+                        output.append(f'<source srcset="{self._escape_link(dark)}" media="(prefers-color-scheme: dark)"/>')
+                        output.append(f'<img src="{self._escape_link(picture)}" alt="{i.name}"/>') # Add the original png, width and height
+                        output.append('</picture>')
+                        output.append(i.name)
+                        output.append('</a>')
+                    else:
+                        # A single-cell normal text
+                        output.append(f'[{i.name}]({i.link})')
+                # Else skip the item as it is too deep in the ToC tree
+        else:
+            # Add a list-based ToC
+            output.append("<nav>")
+            output.append(super()._add_toc(toc))
+        # Finalize
+        output.append("</nav>")
+        return self.PARAGRAPH_SEPARATOR.join(output)
     
     def _add_nav_bar(self, navbar):
         return "<nav>" + self.PARAGRAPH_SEPARATOR + super()._add_nav_bar(navbar) + self.PARAGRAPH_SEPARATOR + "</nav>"

@@ -229,7 +229,7 @@ definition_lists = {
 
 grid_tocs = {
     "The pattern language of software architecture":    (2, "grid5"),
-    "Arranging communication":                          (1, "grid3")
+    "Arranging communication":                          (2, "grid3")
 }
 
 

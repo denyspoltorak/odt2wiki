@@ -111,12 +111,12 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                         output.append(f'<source srcset="{self._escape_link(dark)}" media="(prefers-color-scheme: dark)"/>')
                         output.append(f'<img src="{self._escape_link(picture)}" alt="{i.name}"/>') # Add the original png, width and height
                         output.append('</picture>')
-                        output.append(i.name)
+                        output.append(i.name.split("(")[0].strip())    # Make the name shorter
                         output.append('</a>')
                     else:
                         # A single-cell normal text
                         output.append(f'<a href="{i.link}">')
-                        output.append(i.name)
+                        output.append(i.name.split("(")[0].strip())    # Make the name shorter
                         output.append('</a>')
                 # Else skip the item as it is too deep in the ToC tree
         else:

@@ -156,7 +156,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, ImageDa
                 unmatched[i.filename] = ImageData(i.filename, img.width, img.height)
     assert not has_ambiguous
     print(f"ODT images were processed sucessfully. Matched: {len(matched)}, unmatched: {len(unmatched)}")
-    return matched, unmatched
+    return matched, unmatched, local_data
 
 def extract_images(archive: ZipFile, destination: str, names: dict[str, ImageData]):
     archive.extractall(destination, names)

@@ -47,35 +47,35 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         self._in_list -= 1
         return result
            
-    def _make_image_html(self, link, original_link, presentation, scale, caption, width, height):
-        # Check if we need <picture> for multiple versions of the image
-        dark_link = self._customization.get_dark_image(link)
-        img_link = original_link if dark_link else link   
+    def _make_image_html(self, image, presentation, scale, caption):
         # Generate the HTML code      
         output = []
         output.append('<figure>')
-        output.append(f'<a href="{self._escape_link(original_link)}">')
-        # Add light and dark themes
-        if dark_link:
-            assert dark_link != link
-            output.append('<picture>')
-            output.append(f'<source srcset="{self._escape_link(link)}" media="(prefers-color-scheme: light)"/>')
-            output.append(f'<source srcset="{self._escape_link(dark_link)}" media="(prefers-color-scheme: dark)"/>')
-        # Add the fallback image and image dimensions
-        if width:
-            assert height
-            output.append(f'<img src="{self._escape_link(img_link)}" alt="{presentation}" loading="lazy" width="{width}" height="{height}" style="width:{scale:.0%}"/>')
-        else:
-            assert not height
-            output.append(f'<img src="{self._escape_link(img_link)}" alt="{presentation}" loading="lazy" style="width:{scale:.0%}"/>')
-        # Close the created elements
-        if dark_link:
-            output.append('</picture>')
+        output.append(f'<a href="{self._escape_link(image.original)}">')
+        output.extend(self._add_picture(image, presentation, scale))
         output.append('</a>')
         if caption:
             output.append("<figcaption>" + caption + "</figcaption>")
         output.append('</figure>')
         return "\n".join(output)
+    
+    def _add_picture(self, image, presentation, scale = None):
+        output = []
+        # Prepare
+        dimensions = f' width="{image.width}" height="{image.height}"' if image.width else ""
+        img_scale = f' style="width:{scale:.0%}"' if scale else ""
+        dark_link = self._customization.get_dark_image(image.link) if image.link != image.original else None
+        # Multiple image versions for light and dark themes
+        if dark_link:
+            assert dark_link != image.link
+            output.append('<picture>')
+            output.append(f'<source srcset="{self._escape_link(image.link)}" media="(prefers-color-scheme: light)"/>')
+            output.append(f'<source srcset="{self._escape_link(dark_link)}" media="(prefers-color-scheme: dark)"/>')
+        # The fallback - or the only - image
+        output.append(f'<img src="{self._escape_link(image.original)}" alt="{presentation}" loading="lazy"{dimensions}{img_scale}/>')
+        if dark_link:
+            output.append('</picture>')
+        return output
     
     def _add_toc(self, toc):
         output = []
@@ -102,15 +102,8 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                         output.append('</a>')
                     elif picture:
                         # A single-cell image and text
-                        dark = self._customization.get_dark_image(picture)
-                        assert dark
-                        assert dark != picture
                         output.append(f'<a href="{i.link}">')
-                        output.append('<picture>')
-                        output.append(f'<source srcset="{self._escape_link(picture)}" media="(prefers-color-scheme: light)"/>')
-                        output.append(f'<source srcset="{self._escape_link(dark)}" media="(prefers-color-scheme: dark)"/>')
-                        output.append(f'<img src="{self._escape_link(picture)}" alt="{i.name}"/>') # Add the original png, width and height
-                        output.append('</picture>')
+                        output.extend(self._add_picture(picture, i.name))
                         output.append(i.name.split("(")[0].strip())    # Make the name shorter
                         output.append('</a>')
                     else:

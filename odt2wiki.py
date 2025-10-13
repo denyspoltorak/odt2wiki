@@ -100,37 +100,57 @@ def _create_document(content, styles, dest_path, split_level, strategy, customiz
     # The index may be reused
     return doc, index
 
-def _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg):
+def _replace_image_dimensions_with_svg(image):
+    try:
+        image.link = os.path.splitext(image.link)[0] + ".svg"
+        with open(image.link) as file:
+            width, height = svg_tools.get_dimensions(file.read(svg_tools.PREFETCH_LENGTH))
+            assert width > 1 and height > 1
+            image.width = width
+            image.height = height
+    except Exception as e:
+        print(f"Exception {e} while processing {image.link}")
+        raise
+
+def _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg, customization = None):
     external_images = {}
     internal_images = {}
+    extras = {}
     if images_folder:
         if not image_matcher.has_image_matcher:
             print("FATAL: Matching images requires Pillow to be installed\n")
             exit(1)
         full_local_path = os.path.expanduser(images_folder)
-        matched, unmatched = image_matcher.match_images(archive, full_local_path)
+        # Get image dimensions and do match images between the local image folder and the input ODT archive
+        matched, unmatched, all_locals = image_matcher.match_images(archive, full_local_path)
+        # Replace PNG image dimensions with those of SVG images if we are going to use them instead
         if use_svg:
             for v in matched.values():
-                try:
-                    v.link = os.path.splitext(v.link)[0] + ".svg"
-                    with open(v.link) as file:
-                        width, height = svg_tools.get_dimensions(file.read(svg_tools.PREFETCH_LENGTH))
-                        assert width > 1 and height > 1
-                        v.width = width
-                        v.height = height
-                except Exception as e:
-                    print(f"Exception {e} while processing {v.link}")
-                    raise  
+                _replace_image_dimensions_with_svg(v)
+        # Process other images used by the website
+        if customization:
+            for k, v in all_locals.items():
+                new_name = k.replace(full_local_path, remote_image_path)
+                if customization.is_useful_image(new_name):
+                    # Replace image dimensions with those of its SVG version
+                    if use_svg and v.link == v.original:
+                        _replace_image_dimensions_with_svg(v)
+                    extras[new_name] = v
+        # Rewrite paths to images with those on the destination website
         if remote_image_path is not None:
-            for v in matched.values():
+            for v in set(matched.values()) | set(extras.values()):
                 v.replace_path(full_local_path, remote_image_path)
         external_images = matched
+        # Extract images from the input ODT which we could not match to anything in our local image folder
         if unmatched:
             image_matcher.extract_images(archive, dest_path, unmatched)
-            internal_images = unmatched                      
+            internal_images = unmatched
     else:
         internal_images = image_matcher.extract_all_images(archive, dest_path)
+    # Use the images
     doc.link_images(external_images, internal_images)
+    if customization:
+        customization.set_extra_images(extras)
 
 
 def convert_to_github_markdown( archive,
@@ -174,7 +194,7 @@ def convert_to_hugo_markdown(   archive,
     doc, _ = _create_document(content, styles, dest_path, split_level, strategy, customization, 
             customization.subtitle if customization.subtitle else "Table of Contents")
     # Map pictires inside the ODT to picture files in the destination folder
-    _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg)
+    _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg, customization)
     # Convert to markdown
     doc.crosslink()
     hugo_writer.HugoMarkdownWriter.set_customization(customization)

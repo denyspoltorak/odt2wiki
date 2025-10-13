@@ -185,25 +185,25 @@ previews = {
 toc_images = {
     "Programming and architectural paradigms":  plugins.Wide(),
     "Comparison of communication styles":       plugins.Wide(),
-    "Monolith":                                 "/diagrams/Web/Monolith.svg",
-    "Shards":                                   "/diagrams/Web/Shards.svg",
-    "Layers":                                   "/diagrams/Web/Layers.svg",
-    "Services":                                 "/diagrams/Web/Services.svg",
-    "Pipeline":                                 "/diagrams/Web/Pipeline.svg",
-    "Middleware":                               "/diagrams/Web/Middleware.svg",
-    "Shared Repository":                        "/diagrams/Web/Shared Repository.svg",
-    "Proxy":                                    "/diagrams/Web/Proxy.svg",
-    "Orchestrator":                             "/diagrams/Web/Orchestrator.svg",
-    "Combined Component":                       "/diagrams/Web/Combined Component.svg",
-    "Layered Services":                         "/diagrams/Web/Layered Services.svg",
-    "Polyglot Persistence":                     "/diagrams/Web/Polyglot Persistence.svg",
-    "Backends for Frontends (BFF)":             "/diagrams/Web/Backends for Frontends.svg",
-    "Service-Oriented Architecture (SOA)":      "/diagrams/Web/Service-Oriented Architecture.svg",
-    "Hierarchy":                                "/diagrams/Web/Hierarchy.svg",
-    "Plugins":                                  "/diagrams/Web/Plugins.svg",
-    "Hexagonal Architecture":                   "/diagrams/Web/Hexagonal Architecture.svg",
-    "Microkernel":                              "/diagrams/Web/Microkernel.svg",
-    "Mesh":                                     "/diagrams/Web/Mesh.svg"
+    "Monolith":                                 "/diagrams/Web/Monolith.png",
+    "Shards":                                   "/diagrams/Web/Shards.png",
+    "Layers":                                   "/diagrams/Web/Layers.png",
+    "Services":                                 "/diagrams/Web/Services.png",
+    "Pipeline":                                 "/diagrams/Web/Pipeline.png",
+    "Middleware":                               "/diagrams/Web/Middleware.png",
+    "Shared Repository":                        "/diagrams/Web/Shared Repository.png",
+    "Proxy":                                    "/diagrams/Web/Proxy.png",
+    "Orchestrator":                             "/diagrams/Web/Orchestrator.png",
+    "Combined Component":                       "/diagrams/Web/Combined Component.png",
+    "Layered Services":                         "/diagrams/Web/Layered Services.png",
+    "Polyglot Persistence":                     "/diagrams/Web/Polyglot Persistence.png",
+    "Backends for Frontends (BFF)":             "/diagrams/Web/Backends for Frontends.png",
+    "Service-Oriented Architecture (SOA)":      "/diagrams/Web/Service-Oriented Architecture.png",
+    "Hierarchy":                                "/diagrams/Web/Hierarchy.png",
+    "Plugins":                                  "/diagrams/Web/Plugins.png",
+    "Hexagonal Architecture":                   "/diagrams/Web/Hexagonal Architecture.png",
+    "Microkernel":                              "/diagrams/Web/Microkernel.png",
+    "Mesh":                                     "/diagrams/Web/Mesh.png"
 }
 
 override_images = {
@@ -273,6 +273,13 @@ class MetapatternsCustomization(plugins.Customization):
     
     def __init__(self, mode):
         self._hugo = (mode == "hugo")
+        self._extra_images = None
+        self._useful_image_names = {v for v in toc_images.values() if isinstance(v, str)}
+        
+    def set_extra_images(self, images):
+        assert images
+        assert not self._extra_images
+        self._extra_images = {k: images[v] for k, v in toc_images.items() if v in images}
     
     def preprocess(self, section):
         title = section.header.to_string()
@@ -378,9 +385,13 @@ class MetapatternsCustomization(plugins.Customization):
                 return c.data.original
         return None
 
-    @staticmethod
-    def get_toc_image(section_name):
-        return toc_images.get(section_name)
+    def get_toc_image(self, section_name):
+        image = self._extra_images.get(section_name)
+        if not image:
+            image = toc_images.get(section_name)
+            if isinstance(image, str):
+                image = document.ImageData(image)
+        return image
 
     @staticmethod
     def get_dark_image(light_image):
@@ -393,6 +404,9 @@ class MetapatternsCustomization(plugins.Customization):
             return light_image[:-4] + ".dark.svg"
         else:
             return None
+        
+    def is_useful_image(self, image):
+        return image in self._useful_image_names
 
 
 export = MetapatternsCustomization

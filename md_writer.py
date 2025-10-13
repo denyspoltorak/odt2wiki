@@ -150,19 +150,13 @@ class MarkdownWriter:
         assert image.data.link
         assert image.scale <= 1
         presentation = os.path.splitext(os.path.basename(image.data.link))[0].replace("_", ":")
-        return self._make_image_html(image.data.link,
-                                     image.data.original,
-                                     presentation, 
-                                     image.scale, 
-                                     image.caption, 
-                                     image.data.width, 
-                                     image.data.height)
+        return self._make_image_html(image.data, presentation, image.scale, image.caption)
         
-    def _make_image_html(self, link, original_link, presentation, scale, caption, width, height):
+    def _make_image_html(self, image, presentation, scale, caption):
         output = []
         output.append('<div align="center">')
-        output.append(f'<a href="{self._escape_link(original_link)}">')
-        output.append(f'<img src="{self._escape_link(link)}" alt="{presentation}" loading="lazy" width={scale:.0%}/>')
+        output.append(f'<a href="{self._escape_link(image.original)}">')
+        output.append(f'<img src="{self._escape_link(image.link)}" alt="{presentation}" loading="lazy" width={scale:.0%}/>')
         output.append('</a>')
         if caption:
             output.append("\n" + self._add_paragraph(document.Paragraph(caption), True) + "\n")

@@ -183,6 +183,10 @@ previews = {
 }
 
 toc_images = {
+    "Modules and complexity":                   "/diagrams/Web/Complexity.png",
+    "Forces, asynchronicity, and distribution": "/diagrams/Web/Forces.png",
+    "Four kinds of software":                   "/diagrams/Web/4Kinds.png",
+    "Arranging communication":                  "/diagrams/Web/Communication.png",
     "Programming and architectural paradigms":  plugins.Wide(),
     "Orchestration":                            "/diagrams/Web/Orchestration.png",
     "Choreography":                             "/diagrams/Web/Choreography.png",

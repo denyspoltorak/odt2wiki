@@ -103,7 +103,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                     elif picture:
                         # A single-cell image and text
                         output.append(f'<a href="{i.link}">')
-                        output.extend(self._add_picture(picture, i.name))
+                        output.extend(self._add_picture(picture, ""))
                         output.append(i.name.split("(")[0].strip())    # Make the name shorter
                         output.append('</a>')
                     else:

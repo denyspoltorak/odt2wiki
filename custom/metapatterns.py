@@ -184,6 +184,9 @@ previews = {
 
 toc_images = {
     "Programming and architectural paradigms":  plugins.Wide(),
+    "Orchestration":                            "/diagrams/Web/Orchestration.png",
+    "Choreography":                             "/diagrams/Web/Choreography.png",
+    "Shared data":                              "/diagrams/Web/Shared data.png",
     "Comparison of communication styles":       plugins.Wide(),
     "Monolith":                                 "/diagrams/Web/Monolith.png",
     "Shards":                                   "/diagrams/Web/Shards.png",

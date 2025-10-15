@@ -91,7 +91,7 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
                 if i.level < max_level:
                     # A grid-wide header
                     output.append(f'<a class="{self._customization.grid_wide_class}" href="{i.link}">')
-                    output.append("<h3>" + i.name + "</h3>")
+                    output.append("<h2>" + i.name + "</h2>")
                     output.append('</a>')
                 elif i.level == max_level:
                     picture = self._customization.get_toc_image(i.name)

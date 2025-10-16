@@ -1,9 +1,9 @@
-000000	ffff88  # Lines and text
+000000	ffff77  # Lines and text
 
 c3f7c8	448844	# Integration
 cfe4ff	4466aa	# Business logic
-ffffff	999999	# Generic code
-ced4db	666666	# Data
+ffffff	778888	# Generic code
+ced4db	555566	# Data
 e8e2c8  666600  # Client
 979ea8  334455  # Hardware
 

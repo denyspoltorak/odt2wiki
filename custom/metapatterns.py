@@ -115,7 +115,7 @@ meta_descriptions = {
         "Creative Commons Attribution 4.0 International Public License.",
     "Disclaimer":
         "IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.",
-    "Evolutions":
+    "Evolutions of architectures":
         "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits, and drawbacks.",
     "Evolutions of a Monolith that lead to Shards":
         "Multiple stateful or stateless instances of a Monolith can be deployed to improve performance. The systems may need a Sharding Proxy or Load Balancer.",
@@ -227,7 +227,7 @@ hidden_chapters = {
 
 extra_split = {
     "The heart of software architecture", 
-    "Evolutions"
+    "Evolutions of architectures"
 }
 
 definition_lists = {

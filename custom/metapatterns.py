@@ -277,6 +277,7 @@ class LinksCollector:
 class MetapatternsCustomization(plugins.Customization):
     subtitle = "The pattern language of software architecture"
     grid_wide_class = "grid-row"
+    large_favicon = "/diagrams/Web/Favicon-plain.png"
     
     def __init__(self, mode):
         self._hugo = (mode == "hugo")
@@ -380,9 +381,12 @@ class MetapatternsCustomization(plugins.Customization):
         assert title in meta_descriptions, title
         return meta_descriptions[title]
     
-    @staticmethod
-    def get_preview_image(section):
+    def get_preview_image(self, section):
         title = section.header.to_string()
+        # Use images from the table of contents on the landing page
+        image = self.get_toc_image(title)
+        if image:
+            return image.original
         # Check for a predefined image
         if title in previews:
             return previews[title]
@@ -390,7 +394,8 @@ class MetapatternsCustomization(plugins.Customization):
         for c in section.content:
             if isinstance(c, document.Image):
                 return c.data.original
-        return None
+        # Return the large version of the favicon
+        return self.large_favicon
 
     def get_toc_image(self, section_name):
         image = self._extra_images.get(section_name)

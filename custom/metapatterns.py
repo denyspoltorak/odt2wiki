@@ -183,39 +183,47 @@ previews = {
 }
 
 toc_images = {
-    "Modules and complexity":                   "/diagrams/Web/Complexity.png",
-    "Forces, asynchronicity, and distribution": "/diagrams/Web/Forces.png",
-    "Four kinds of software":                   "/diagrams/Web/4Kinds.png",
-    "Arranging communication":                  "/diagrams/Web/Communication.png",
-    "Programming and architectural paradigms":  plugins.Wide(),
-    "Orchestration":                            "/diagrams/Web/Orchestration.png",
-    "Choreography":                             "/diagrams/Web/Choreography.png",
-    "Shared data":                              "/diagrams/Web/Shared data.png",
-    "Comparison of communication styles":       plugins.Wide(),
-    "Monolith":                                 "/diagrams/Web/Monolith.png",
-    "Shards":                                   "/diagrams/Web/Shards.png",
-    "Layers":                                   "/diagrams/Web/Layers.png",
-    "Services":                                 "/diagrams/Web/Services.png",
-    "Pipeline":                                 "/diagrams/Web/Pipeline.png",
-    "Middleware":                               "/diagrams/Web/Middleware.png",
-    "Shared Repository":                        "/diagrams/Web/Shared Repository.png",
-    "Proxy":                                    "/diagrams/Web/Proxy.png",
-    "Orchestrator":                             "/diagrams/Web/Orchestrator.png",
-    "Combined Component":                       "/diagrams/Web/Combined Component.png",
-    "Layered Services":                         "/diagrams/Web/Layered Services.png",
-    "Polyglot Persistence":                     "/diagrams/Web/Polyglot Persistence.png",
-    "Backends for Frontends (BFF)":             "/diagrams/Web/Backends for Frontends.png",
-    "Service-Oriented Architecture (SOA)":      "/diagrams/Web/Service-Oriented Architecture.png",
-    "Hierarchy":                                "/diagrams/Web/Hierarchy.png",
-    "Plugins":                                  "/diagrams/Web/Plugins.png",
-    "Hexagonal Architecture":                   "/diagrams/Web/Hexagonal Architecture.png",
-    "Microkernel":                              "/diagrams/Web/Microkernel.png",
-    "Mesh":                                     "/diagrams/Web/Mesh.png"
+    "About this book":                                      "/diagrams/Web/About.png",
+    "Metapatterns":                                         "/diagrams/Web/Metapatterns.png",
+    "Modules and complexity":                               "/diagrams/Web/Complexity.png",
+    "Forces, asynchronicity, and distribution":             "/diagrams/Web/Forces.png",
+    "Four kinds of software":                               "/diagrams/Web/4Kinds.png",
+    "Arranging communication":                              "/diagrams/Web/Communication.png",
+    "Programming and architectural paradigms":              plugins.Wide(),
+    "Orchestration":                                        "/diagrams/Web/Orchestration.png",
+    "Choreography":                                         "/diagrams/Web/Choreography.png",
+    "Shared data":                                          "/diagrams/Web/Shared data.png",
+    "Comparison of communication styles":                   plugins.Wide(),
+    "Monolith":                                             "/diagrams/Web/Monolith.png",
+    "Shards":                                               "/diagrams/Web/Shards.png",
+    "Layers":                                               "/diagrams/Web/Layers.png",
+    "Services":                                             "/diagrams/Web/Services.png",
+    "Pipeline":                                             "/diagrams/Web/Pipeline.png",
+    "Middleware":                                           "/diagrams/Web/Middleware.png",
+    "Shared Repository":                                    "/diagrams/Web/Shared Repository.png",
+    "Proxy":                                                "/diagrams/Web/Proxy.png",
+    "Orchestrator":                                         "/diagrams/Web/Orchestrator.png",
+    "Combined Component":                                   "/diagrams/Web/Combined Component.png",
+    "Layered Services":                                     "/diagrams/Web/Layered Services.png",
+    "Polyglot Persistence":                                 "/diagrams/Web/Polyglot Persistence.png",
+    "Backends for Frontends (BFF)":                         "/diagrams/Web/Backends for Frontends.png",
+    "Service-Oriented Architecture (SOA)":                  "/diagrams/Web/Service-Oriented Architecture.png",
+    "Hierarchy":                                            "/diagrams/Web/Hierarchy.png",
+    "Plugins":                                              "/diagrams/Web/Plugins.png",
+    "Hexagonal Architecture":                               "/diagrams/Web/Hexagonal Architecture.png",
+    "Microkernel":                                          "/diagrams/Web/Microkernel.png",
+    "Mesh":                                                 "/diagrams/Web/Mesh.png",
+    "Comparison of architectural patterns":                 "/diagrams/Web/Comparison.png",
+    "Ambiguous patterns":                                   "/diagrams/Web/Ambiguous.png",
+    "Architecture and product life cycle":                  "/diagrams/Web/Life cycle.png",
+    "Real-world inspirations for architectural patterns":   "/diagrams/Web/Real-world.png",
+    "The heart of software architecture":                   "/diagrams/Web/Heart.png"
 }
 
 override_images = {
     "Performance/Hierarchy - speed.svg":            "Performance/Hierarchy - speed.negated.dark.svg",
-    "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.dark.svg"
+    "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.dark.svg",
+    "Web/Real-world.svg":                           "Web/Real-world.negated.dark.svg"
 }
 
 hidden_chapters = {
@@ -385,7 +393,7 @@ class MetapatternsCustomization(plugins.Customization):
         title = section.header.to_string()
         # Use images from the table of contents on the landing page
         image = self.get_toc_image(title)
-        if image:
+        if image and isinstance(image, document.ImageData): # Some items return plugins.Wide()
             return image.original
         # Check for a predefined image
         if title in previews:

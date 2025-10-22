@@ -163,25 +163,6 @@ meta_descriptions = {
         "The index of patterns described in the Architectural Metapatterns book."
 }
 
-previews = {
-    "About this book":                                  "/diagrams/Misc/Diagrams.png",
-    "Metapatterns":                                     "/diagrams/Intro/Example-Defined.png",
-    "Modules and complexity":                           "/diagrams/Intro/Modules-2.png",
-    "Forces, asynchronicity, and distribution":         "/diagrams/Intro/3-Tier.png",
-    "Four kinds of software":                           "/diagrams/4Kinds/4 Kinds.png",
-    "Programming and architectural paradigms":          "/diagrams/Communication/Paradigms - Object-oriented.png",
-    "Combined Component":                               "/diagrams/Variants/2/Multifunctional - API Gateway.png",
-    "Sharing functionality or data among services":     "/diagrams/Conclusion/Sharing-DirectCall.png",
-    "Pipelines in architectural patterns":              "/diagrams/Conclusion/Pipelineliness-EventDrivenArchitecture.png",
-    "Dependency inversion in architectural patterns":   "/diagrams/Conclusion/DI-1.png",
-    "Indirection in commands and queries":              "/diagrams/Conclusion/Indirection-Command.png",
-    "Ambiguous patterns":                               "/diagrams/Conclusion/Ambiguous-Monolith.png",
-    "Architecture and product life cycle":              "/diagrams/Conclusion/Lifecycle-4.png",
-    "Cohesers and decouplers":                          "/diagrams/Heart/Pain.png",
-    "Deconstructing patterns":                          "/diagrams/Heart/Basic.png",
-    "Choose your own architecture":                     "/diagrams/Heart/Features-1.png"
-}
-
 toc_images = {
     "About this book":                                      "/diagrams/Web/About.png",
     "Metapatterns":                                         "/diagrams/Web/Metapatterns.png",
@@ -248,7 +229,6 @@ grid_tocs = {
 }
 
 
-assert set(previews.keys()).issubset(meta_descriptions.keys())
 assert hidden_chapters.issubset(meta_descriptions.keys())
 assert extra_split.issubset(meta_descriptions.keys())
 assert definition_lists.issubset(meta_descriptions.keys())
@@ -286,6 +266,8 @@ class MetapatternsCustomization(plugins.Customization):
     subtitle = "The pattern language of software architecture"
     grid_wide_class = "grid-row"
     large_favicon = "/diagrams/Web/Favicon-plain.png"
+    image_path = "/diagrams/Web/"
+    og_path = "/diagrams/Web/og/"
     
     def __init__(self, mode):
         self._hugo = (mode == "hugo")
@@ -393,17 +375,10 @@ class MetapatternsCustomization(plugins.Customization):
         title = section.header.to_string()
         # Use images from the table of contents on the landing page
         image = self.get_toc_image(title)
-        if image and isinstance(image, document.ImageData): # Some items return plugins.Wide()
-            return image.original
-        # Check for a predefined image
-        if title in previews:
-            return previews[title]
-        # Return the first image after the chapter's title
-        for c in section.content:
-            if isinstance(c, document.Image):
-                return c.data.original
-        # Return the large version of the favicon
-        return self.large_favicon
+        # Some items return plugins.Wide(), and it may be None
+        link = image.original if isinstance(image, document.ImageData) else self.large_favicon
+        assert link.startswith(self.image_path)
+        return link.replace(self.image_path, self.og_path)
 
     def get_toc_image(self, section_name):
         image = self._extra_images.get(section_name)

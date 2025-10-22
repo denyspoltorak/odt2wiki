@@ -190,6 +190,14 @@ There are several transformation for colors not matched by the map:
 
 You can find examples of the color maps used for the [Architectural Metapatterns website](https://metapatterns.io/) in the `custom` folder.
 
+## Prepairing images for OpenGraph
+
+[OpenGraph](https://netpeak.net/blog/beginner-s-guide-to-open-graph-meta-tags/) clients vary in their expectations for image dimensions. The following ImageMagick command centers each input image in a 630x630 square after which the area is expanded to the recommended 1200x630 resolution by filling the sides of the image with white background color: 
+
+`convert InputFolder/*.png -set filename:fn %[basename] -background white -resize 630x630 -gravity center -extent 1200x630 OutputFolder/%[filename:fn].png`
+
+Then feed a resized image per page by subclassing `plugins.Customization` and returning the image's filename from `get_preview_image()`. See the corresponding method in `custom/metapatterns.py`
+
 ## Troubleshooting
 
 If anything goes wrong (you get a failed assertion or some content from the document does not appear on the wiki), there is a bunch of troubleshooting modes:

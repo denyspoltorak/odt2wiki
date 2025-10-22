@@ -192,7 +192,7 @@ You can find examples of the color maps used for the [Architectural Metapatterns
 
 ## Prepairing images for OpenGraph
 
-[OpenGraph](https://netpeak.net/blog/beginner-s-guide-to-open-graph-meta-tags/) clients vary in their expectations for image dimensions. The following ImageMagick command centers each input image in a 630x630 square after which the area is expanded to the recommended 1200x630 resolution by filling the sides of the image with white background color: 
+[OpenGraph](https://netpeak.net/blog/beginner-s-guide-to-open-graph-meta-tags/) clients vary in their expectations for image dimensions. The following ImageMagick command centers each input image in a 630x630 square (for Twitter) after which the area is expanded to the recommended 1200x630 resolution (For Facebook) by filling the sides of the image with white background color. This makes the resulting diagram fit any social network as it looks good both in wide and in square previews: 
 
 `convert InputFolder/*.png -set filename:fn %[basename] -background white -resize 630x630 -gravity center -extent 1200x630 OutputFolder/%[filename:fn].png`
 

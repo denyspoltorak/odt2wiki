@@ -170,11 +170,9 @@ toc_images = {
     "Forces, asynchronicity, and distribution":             "/diagrams/Web/Forces.png",
     "Four kinds of software":                               "/diagrams/Web/4Kinds.png",
     "Arranging communication":                              "/diagrams/Web/Communication.png",
-    "Programming and architectural paradigms":              plugins.Wide(),
     "Orchestration":                                        "/diagrams/Web/Orchestration.png",
     "Choreography":                                         "/diagrams/Web/Choreography.png",
     "Shared data":                                          "/diagrams/Web/Shared data.png",
-    "Comparison of communication styles":                   plugins.Wide(),
     "Monolith":                                             "/diagrams/Web/Monolith.png",
     "Shards":                                               "/diagrams/Web/Shards.png",
     "Layers":                                               "/diagrams/Web/Layers.png",
@@ -207,6 +205,11 @@ override_images = {
     "Web/Real-world.svg":                           "Web/Real-world.negated.dark.svg"
 }
 
+wide_previews = {
+    "Programming and architectural paradigms",
+    "Comparison of communication styles"
+}
+
 hidden_chapters = {
     "Acknowledgements",
     "Copyright",
@@ -234,6 +237,7 @@ assert extra_split.issubset(meta_descriptions.keys())
 assert definition_lists.issubset(meta_descriptions.keys())
 assert set(grid_tocs.keys()).issubset(meta_descriptions.keys())
 assert set(toc_images.keys()).issubset(meta_descriptions.keys())
+assert wide_previews.issubset(meta_descriptions.keys())
 
 
 class LinksCollector:
@@ -373,20 +377,15 @@ class MetapatternsCustomization(plugins.Customization):
     
     def get_preview_image(self, section):
         title = section.header.to_string()
-        # Use images from the table of contents on the landing page
-        image = self.get_toc_image(title)
-        # Some items return plugins.Wide(), and it may be None
-        link = image.original if isinstance(image, document.ImageData) else self.large_favicon
+        # Reuse images from the table of contents on the landing page
+        link = toc_images.get(title, self.large_favicon)
         assert link.startswith(self.image_path)
         return link.replace(self.image_path, self.og_path)
 
     def get_toc_image(self, section_name):
-        image = self._extra_images.get(section_name)
-        if not image:
-            image = toc_images.get(section_name)
-            if isinstance(image, str):
-                image = document.ImageData(image)
-        return image
+        if section_name in wide_previews:
+            return plugins.Wide()
+        return self._extra_images.get(section_name)
 
     @staticmethod
     def get_dark_image(light_image):

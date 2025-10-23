@@ -236,7 +236,10 @@ definition_lists = {
 
 grid_tocs = {
     "The pattern language of software architecture":    (2, "grid5"),
+    "Introduction":                                     (2, "grid3"),
+    "Foundations of software architecture":             (2, "grid3"),
     "Arranging communication":                          (2, "grid3"),
+    "Analytics":                                        (2, "grid3"),
     "Comparison of architectural patterns":             (2, "grid3"),
     "The heart of software architecture":               (2, "grid3")
 }

@@ -1,6 +1,6 @@
 # ODT to wiki converter
 
-odt2wiki is a small tool that converts an OpenOffice / LibreOffice text document into a markdown-based wiki. It was designed for processing large documents with hundreds of diagrams and thousands of cross-links.
+odt2wiki is a small tool that converts an OpenOffice / LibreOffice text document into a markdown-based wiki or a static website. It was designed for processing large documents with hundreds of diagrams and thousands of cross-links.
 
 Supported output formats:
 
@@ -336,5 +336,7 @@ Yep. There should have been at least one. Please [contact me](https://www.linked
 
 ## Portfolio
 
-[Architectural Metapatterns wiki](https://github.com/denyspoltorak/metapatterns/wiki)
-[Architectural Metapatterns website](https://metapatterns.io/)
+* [Architectural Metapatterns wiki](https://github.com/denyspoltorak/metapatterns/wiki)
+
+* [Architectural Metapatterns website](https://metapatterns.io/)
+

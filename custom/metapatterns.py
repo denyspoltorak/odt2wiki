@@ -170,6 +170,7 @@ toc_images = {
     "Forces, asynchronicity, and distribution":             "/diagrams/Web/Forces.png",
     "Four kinds of software":                               "/diagrams/Web/4Kinds.png",
     "Arranging communication":                              "/diagrams/Web/Communication.png",
+    "Programming and architectural paradigms":              "/diagrams/Web/Paradigms.png",
     "Orchestration":                                        "/diagrams/Web/Orchestration.png",
     "Choreography":                                         "/diagrams/Web/Choreography.png",
     "Shared data":                                          "/diagrams/Web/Shared data.png",
@@ -193,10 +194,17 @@ toc_images = {
     "Microkernel":                                          "/diagrams/Web/Microkernel.png",
     "Mesh":                                                 "/diagrams/Web/Mesh.png",
     "Comparison of architectural patterns":                 "/diagrams/Web/Comparison.png",
+    "Sharing functionality or data among services":         "/diagrams/Web/Sharing.png",
+    "Pipelines in architectural patterns":                  "/diagrams/Web/Pipelineliness.png",
+    "Dependency inversion in architectural patterns":       "/diagrams/Web/DI.png",
+    "Indirection in commands and queries":                  "/diagrams/Web/Indirection.png",
     "Ambiguous patterns":                                   "/diagrams/Web/Ambiguous.png",
     "Architecture and product life cycle":                  "/diagrams/Web/Life cycle.png",
     "Real-world inspirations for architectural patterns":   "/diagrams/Web/Real-world.png",
-    "The heart of software architecture":                   "/diagrams/Web/Heart.png"
+    "The heart of software architecture":                   "/diagrams/Web/Heart.png",
+    "Cohesers and decouplers":                              "/diagrams/Web/Heart.png",
+    "Deconstructing patterns":                              "/diagrams/Web/Heart2.png",
+    "Choose your own architecture":                         "/diagrams/Web/Heart3.png"
 }
 
 override_images = {
@@ -228,7 +236,9 @@ definition_lists = {
 
 grid_tocs = {
     "The pattern language of software architecture":    (2, "grid5"),
-    "Arranging communication":                          (2, "grid3")
+    "Arranging communication":                          (2, "grid3"),
+    "Comparison of architectural patterns":             (2, "grid3"),
+    "The heart of software architecture":               (2, "grid3")
 }
 
 

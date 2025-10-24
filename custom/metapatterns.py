@@ -6,81 +6,81 @@ import plugins
 
 meta_descriptions = {
     "The pattern language of software architecture":
-        "The Metapatterns website is a compendium and classification of architectural patterns based on the assumption that structure determines function.",
+        "Explore how patterns relate to each other and work together.",
     "Introduction":
-        "This part defines metapatterns, explains the notation for NoSQL diagrams used throughout the book, and provides a theory for pattern classification.",
+        "Architectural Metapatterns is a structured collection of patterns featuring hundreds of NoUML diagrams.",
     "About this book":
-        "The story behind Architectural Metapatterns, the kinds of diagrams and notation used throughout the book, and why we need a taxonomy for patterns.",
+        "There are too many patterns to remember, therefore we need a system to sort them out and remove duplicates.",
     "Metapatterns":
-        "A metapattern is a cluster of patterns with related structure and function. We sketch designs along the abstractness, subdomain, and sharding axes.",
+        "A metapattern is a group of patterns related in their structure and function.",
     "Foundations of software architecture":
-        "This part reviews the basics of software architecture: forces, complexity, distribution, and ways to connect multiple components in a system.",
+        "Learn basic principles of software architecture such as complexity, forces, and the ways to build large systems.",
     "Modules and complexity":
-        "Complexity is the number of concepts which one must keep in mind to understand a system. Breaking a system into components may lower its complexity.",
+        "Complexity is how much you must know about a system to understand it.",
     "Forces, asynchronicity, and distribution":
-        "Forces are non-functional requirements for a system. Conflicting forces are satisfied by splitting a system into asynchronous or distributed components.",
+        "Forces are our expectations about a system’s properties.",
     "Four kinds of software":
-        "Control, interactive, streaming and computational software differ in their architectures and design patterns. Complex systems mix these four approaches.",
+        "Control, interactive, streaming and computational software differ in design.",
     "Arranging communication":
-        "Components can be integrated through orchestration, choreography, or shared data. These approaches emerge at every level, from code to system design.",
+        "Components can be integrated through orchestration, choreography, or shared data.",
     "Programming and architectural paradigms":
-        "The object-oriented, functional, and procedural paradigms are the code-level manifestations of orchestration, choreography, and shared data, respectively.",
+        "The object-oriented, functional and procedural paradigms also emerge in system design.",
     "Orchestration":
-        "In orchestration there is a high-level component, called orchestrator, which uses (orchestrates) other components in order to implement application logic.",
+        "A single component, called Orchestrator, coordinates other system components.",
     "Choreography":
-        "In choreography user requests or input events pass through a chain of components that handle individual steps of the scenario which the system implements.",
+        "Components communicate with each other without any explicit supervisor.",
     "Shared data":
-        "Communication through shared data benefits data-centric domains where multiple services need to operate on a common dataset.",
+        "Components communicate by changing a shared state.",
     "Comparison of communication styles":
-        "Orchestration is good when there are many complex scenarios, choreography - for simple highly loaded systems, shared data - for data-centric domains.",
+        "Orchestration helps with complex use cases, shared data supports data-centric domains, while choreography is highly scalable.",
     "Basic metapatterns":
-        "Basic architectures include: Monolith, Shards, Layers, Services, and Pipeline. They are the building blocks for more complex designs.",
+        "Basic architectures include: Monolith, Shards, Layers, Services, and Pipeline.",
     "Monolith":
-        "A Monolith is a cohesive system which keeps all of its business logic, generic code and data together. This architecture fits short-lived tiny projects.",
+        "A Monolith is an unstructured application, fast to write but hard to maintain.",
     "Shards":
-        "Shards are multiple instances of a subsystem or component. They can be stateful or stateless. Stateful shards with identical data are called replicas.",
+        "Shards are multiple instances of a component or subsystem.",
     "Layers":
-        "A layered system is subdivided by the level of abstraction. It is common to have presentation, application, domain, and infrastructure layers.",
+        "Layers (or distributed Tiers) separate the high-level logic from the low-level details.",
     "Services":
-        "Services are components dedicated to subdomains. They may vary in size, internal structure and technologies. A service can be further subdivided into a Cell.",
+        "Services deal with large projects by dividing them into subdomain-aligned components of smaller sizes.",
     "Pipeline":
-        "A pipeline is a chain of components that implement individual steps of data or event processing. Its parts tend to be highly independent and scalable.",
+        "A Pipeline represents a data processing algorithm as a sequence of steps.",
     "Extension metapatterns":
-        "A system of services can be extended with one or more specialized layers such as a Proxy, a Middleware, an Orchestrator, or a Shared Repository.",
+        "A Middleware, Shared Repository, Proxy, an Orchestrator or a Combined Component extends the underlying system of services or shards.",
     "Middleware":
-        "A Middleware provides system components with a means of communication. It may also manage their deployment, scaling, and failure recovery.",
+        "A Middleware provides a system of services with means of communication, scalability, and error recovery.",
     "Shared Repository":
-        "A Shared Repository stores all or a part of the system's data. It may provide notifications on data change and atomic transactions.",
+        "A Shared Repository encapsulates a system’s data, allowing for data-centric development.",
     "Proxy":
-        "A Proxy represents a system to its clients. It implements cross-cutting concerns, such as caching or protocol translation, and routes client requests.",
+        "A Proxy represents a system to its clients and takes care of some aspects of the communication.",
     "Orchestrator":
-        "An Orchestrator integrates lower-level components. It runs a client request as a series of calls to other components while keeping their states consistent.",
+        "An Orchestrator is a high-level layer which integrates other components.",
     "Combined Component":
-        "A Combined Component implements two or more of the following extension patterns: Middleware, Shared Repository, Proxy, and Orchestrator.",
+        "A Combined Component is a layer which implements multiple cross-cutting concerns.",
     "Fragmented metapatterns":
-        "Fragmented architectures make use of small specialized components. Examples include Layered Services, BFF, SOA, Polyglot Persistence, and Hierarchy.",
+        "Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, or Hierarchy builds a system from many smaller components.",
     "Layered Services":
-        "Layered Services may orchestrate each other, rely on choreography, or make a CQRS system. The communication between services happens at different layers.",
+        "Layered Services is an umbrella architecture for common implementations of systems of services.",
     "Polyglot Persistence":
-        "Polyglot Persistence is the pattern for using multiple databases, which may be mutually independent or derived. The specialization improves performance.",
+        "Polyglot Persistence is the pattern for using multiple databases.",
     "Backends for Frontends (BFF)":
-        "Backends for Frontends dedicate a component to each kind of a system's client. That grants flexibility in workflows and technologies.",
+        "Backends for Frontends dedicate a component to each kind of a system's client.",
     "Service-Oriented Architecture (SOA)":
-        "Service-Oriented Architecture is an application of object-oriented design at the system level. It builds a system from small reusable components.",
+        "Service-Oriented Architecture builds a system from layers of services.",
     "Hierarchy":
-        "A Hierarchy distributes responsibilities throughout a tree of components. It is fault tolerant, and the components remain simple and are easy to replace.",
+        "Hierarchy distributes responsibilities throughout a tree of components.",
     "Implementation metapatterns":
-        "Implementation patterns study the internals of a component. Plugins, Microkernel and Hexagonal Architecture grant flexibility while Mesh provides resilience.",
+        "Plugins, Hexagonal Architecture, Microkernel, and Mesh present internal designs of components.",
     "Plugins":
-        "Plugins let a client customize select aspects of a system's behavior. Addons build their application logic on top of whatever the modified system provides.",
+        "Plugins allow for customization of a component’s behavior",
     "Hexagonal Architecture":
-        "Hexagonal Architecture isolates a component's business logic from its environment by hiding all the component's dependencies behind Adapters.",
+        "Hexagonal Architecture isolates a component’s business logic from its external dependencies by inserting adapters.",
     "Microkernel":
-        "A microkernel mediates between resource providers and resource consumers. It both makes the providers expendable and sandboxes the consumers.",
+        "A microkernel mediates between resource providers and resource consumers.",
     "Mesh":
-        "A Mesh or Grid is a virtual layer of interconnected components which makes a distributed Middleware. It features supreme fault tolerance and scalability.",
+        "A Mesh or Grid is a virtual layer of interconnected components which makes a distributed Middleware.",
     "Analytics":
-        "This part compares different aspects of patterns which were covered in the previous chapters and outlines a few general topics of software architecture.",
+        "The analytics compares architectural patterns, highlights ambiguous patterns, and shows how a project’s architecture evolves over time.",
     "Comparison of architectural patterns":
         "Patterns vary in the ways they share functionality or data among system components, build pipelines, and in their use of dependency inversion or indirection.",
     "Sharing functionality or data among services":

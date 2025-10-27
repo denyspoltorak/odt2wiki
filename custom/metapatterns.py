@@ -24,7 +24,7 @@ meta_descriptions = {
     "Arranging communication":
         "Components can be integrated through orchestration, choreography, or shared data.",
     "Programming and architectural paradigms":
-        "The object-oriented, functional and procedural paradigms also emerge in system design.",
+        "The object-oriented, functional, and procedural paradigms also emerge in system design.",
     "Orchestration":
         "A single component, called Orchestrator, coordinates other system components.",
     "Choreography":

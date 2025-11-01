@@ -1,4 +1,5 @@
 import os.path
+import re
 
 import document
 import plugins
@@ -298,16 +299,11 @@ class MetapatternsCustomization(plugins.Customization):
     
     def preprocess(self, section):
         title = section.header.to_string()
-        # Strip technical terms
-        new_title = None
-        if title.startswith("Part "):
-            new_title = title[len("Part X. "):]
-        elif title.startswith("Appendix "):
-            assert title.endswith(".")
-            new_title = title[len("Appendix X. "):-1]
-        if new_title:
+        # Strip technical terms "Part N" or "Appendix X" with the associated full stops
+        found = re.fullmatch(r"(?:Part\s\d+\.\s+|Appendix\s\w\.\s+)(.+?)(?:\.?)", title)
+        if found:
             assert len(section.header.spans) == 1
-            title = section.header.spans[0].text = new_title
+            title = section.header.spans[0].text = found[1]
         # Find figure captions
         elements = []
         for c in section.content:

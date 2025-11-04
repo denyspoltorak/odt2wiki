@@ -198,6 +198,18 @@ You can find examples of the color maps used for the [Architectural Metapatterns
 
 Then feed a resized image per page by subclassing `plugins.Customization` and returning the image's filename from `get_preview_image()`. See the corresponding method in `custom/metapatterns.py`
 
+## Other operations on images
+
+### Conversion from SVG to PNG
+
+There is a tool that converts all SVG files in a folder into the PNG format applying custom zoom level (2x) and adding transparent margins (5%):
+
+`tools/svg2png InputFolder OutputFolder 2 5%`
+
+You will need `librsvg2-bin` and `ImageMagick` to run it.
+
+I wrote the tool for using dark-themed images generated with `svgcolor.py` in slides. Google Slides does not support SVG image format while LibreOffice Impress corrupts colors in SVG images. Therefore I had to convert them to PNGs.
+
 ## Troubleshooting
 
 If anything goes wrong (you get a failed assertion or some content from the document does not appear on the wiki), there is a bunch of troubleshooting modes:

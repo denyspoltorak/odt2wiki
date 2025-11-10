@@ -211,7 +211,7 @@ class FullVisitor():
                 output.spans.append(_Span(child.tail, style))
         # Commit
         if image:
-            assert not output.spans
+            assert not output.spans, output.to_string()
             return image
         else:
             output.spans = self._convert_spans(output.spans)

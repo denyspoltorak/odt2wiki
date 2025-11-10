@@ -385,7 +385,7 @@ class Section:
             assert (not self.prev) == (not self.next)
             if self.next and self.split_level and self.strategy.needs_navigation:   # No navbar for stand-alone ToC or a single-file project
                 writer.add(self._make_navigation())
-            with open(self.abs_filename, "x") as output:
+            with open(self.abs_filename, "x", encoding='utf-8') as output:
                 output.write(writer.get_output())
     
     def traverse(self, handler):

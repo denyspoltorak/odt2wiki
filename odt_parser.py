@@ -5,6 +5,7 @@ from xml.etree.ElementTree import Element
 
 from odt_tools import extract
 import document
+import exceptions
 
 # Data classes
 class _Style:
@@ -211,7 +212,11 @@ class FullVisitor():
                 output.spans.append(_Span(child.tail, style))
         # Commit
         if image:
-            assert not output.spans, output.to_string()
+            if output.spans:
+                raise exceptions.ParsingError(f"""
+There is an image embedded inside a paragraph of text in the input document. 
+This feature is not supported by markdown. Please delete the image or move it to a dedicated paragraph.
+Paragraph text: '{output.to_string()}'.""")
             return image
         else:
             output.spans = self._convert_spans(output.spans)

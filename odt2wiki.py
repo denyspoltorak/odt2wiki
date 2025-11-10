@@ -96,9 +96,10 @@ def _create_document(content, styles, dest_path, split_level, strategy, customiz
     doc.create_folders()
     # Create the table of contents
     index = document.TocMaker(strategy).make(doc.root())
-    doc.root().content.append(index)
+    if index:
+        doc.root().content.append(index)
     # The index may be reused
-    return doc, index
+    return doc, index if index else None
 
 def _replace_image_dimensions_with_svg(image):
     try:
@@ -166,7 +167,7 @@ def convert_to_github_markdown( archive,
     # Set up
     strategy = github_writer.GithubStrategy()
     doc, index = _create_document(content, styles, dest_path, split_level, strategy, customization, "Home")
-    side_toc = document.Section.create("_Sidebar", [index,], dest_path)
+    side_toc = document.Section.create("_Sidebar", [index,], dest_path) if index else None
     # Check for duplicate file names as the GitHub wiki ignores paths
     dups = duplicates.HasDuplicateChapters().make(doc.root())
     assert not dups, dups
@@ -175,7 +176,8 @@ def convert_to_github_markdown( archive,
     # Convert to markdown
     doc.crosslink()
     doc.dump(functools.partial(github_writer.GithubMarkdownWriter, collapse_level=collapse_level))
-    side_toc.dump(functools.partial(github_writer.GithubMarkdownWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
+    if side_toc:
+        side_toc.dump(functools.partial(github_writer.GithubMarkdownWriter, toc_collapse_level=1))   # Collapse book parts in the ToC
     print(f"GitHub markdown created in {dest_path}")
 
 def convert_to_hugo_markdown(   archive,

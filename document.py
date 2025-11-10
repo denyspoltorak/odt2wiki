@@ -188,6 +188,9 @@ class ToC(Content):
     def __init__(self):
         self.items = []
         self.root = None
+
+    def __bool__(self):
+        return bool(self.items)
         
 
 class NavBar(Content):

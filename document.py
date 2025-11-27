@@ -468,6 +468,7 @@ class Section:
                 return self.strategy.process_internal_link(self._join_paths(self.path_to_root, new_link))
         else:
             assert is_link_external(link), link
+            assert "docs.google.com" not in link    # Clong a Google Doc may turn an internal link into an external one towards the old document
             return link
         
     def _make_navigation(self):

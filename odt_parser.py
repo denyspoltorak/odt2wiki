@@ -253,9 +253,9 @@ Paragraph text: '{output.to_string()}'.""")
                 case "table-header-rows":
                     assert not child.text
                     for r in child:
-                        assert extract(r.tag) == "table-row"
-                        output.rows.append(self._process_table_row(r))
-                        assert not r.tail
+                        if extract(r.tag) == "table-row":
+                            output.rows.append(self._process_table_row(r))
+                            assert not r.tail
                 case "table-row":
                     output.rows.append(self._process_table_row(child))
             assert not child.tail

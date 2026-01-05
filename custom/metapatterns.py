@@ -211,6 +211,7 @@ toc_images = {
 override_images = {
     "Performance/Hierarchy - speed.svg":            "Performance/Hierarchy - speed.negated.dark.svg",
     "Communication/Pipeline Early Response.svg":    "Communication/Pipeline Early Response.negated.dark.svg",
+    "Variants/2/User Interface.svg":                "Variants/2/User Interface.negated.dark.svg",
     "Web/Real-world.svg":                           "Web/Real-world.negated.dark.svg"
 }
 

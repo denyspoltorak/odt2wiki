@@ -207,9 +207,10 @@ class FullVisitor():
                     output.spans.append(span)
                 case "span":
                     span = self._process_span(child)
-                    span.style |= style
-                    output.grayed_out = output.grayed_out or span.style.colored_background
-                    output.spans.append(span)
+                    if span:
+                        span.style |= style
+                        output.grayed_out = output.grayed_out or span.style.colored_background
+                        output.spans.append(span)
                 case "bookmark" | "bookmark-end":
                     output.bookmarks.append(self._process_bookmark(child))
                 case "frame":
@@ -380,6 +381,7 @@ Paragraph text: '{output.to_string()}'.""")
         span = a[0]
         assert extract(span.tag) == "span"
         output = self._process_span(span)
+        assert output
         # Extract link
         for (k, v) in a.attrib.items():
             attr_name = extract(k)
@@ -393,12 +395,16 @@ Paragraph text: '{output.to_string()}'.""")
         return output
     
     def _process_span(self, span):
+        if not span.text:
+            assert len(span) == 1
+            assert extract(span[0].tag) == "annotation"
+            return None
+
         style = None
         for (k, v) in span.attrib.items():
             assert extract(k) == "style-name"
             style = self._styles.get(v, _Style())
         assert style
-        assert span.text
         return _Span(span.text, style)
     
     def _process_s(self, s):

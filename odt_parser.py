@@ -86,10 +86,23 @@ class FullVisitor():
             if child_tag == "automatic-styles":
                 self._traverse_styles(child)
             elif child_tag == "body":
-                assert len(child) == 1
-                text = child[0]
-                assert extract(text.tag) == "text"
-                self._traverse_text(text)
+                try:
+                    assert len(child) == 1
+                    text = child[0]
+                    assert extract(text.tag) == "text"
+                    self._traverse_text(text)
+                except:
+                    print("EXCEPTION while parsing the input document.")
+                    print("The last successfully parsed elements were:")
+                    for i in reversed(self._content):
+                        meta = type(i)
+                        print(meta.__name__)
+                        if meta == document.Header:
+                            print(i.to_string())
+                        elif meta == document.Paragraph:
+                            print(i.to_string())
+                            break
+                    raise
         self._rescale_images()
     
     # _Style extraction

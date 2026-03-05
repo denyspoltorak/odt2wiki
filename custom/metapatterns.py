@@ -56,8 +56,8 @@ meta_descriptions = {
         "A Proxy represents a system to its clients and takes care of some aspects of the communication.",
     "Orchestrator":
         "An Orchestrator is a high-level layer which integrates other components.",
-    "Combined Component":
-        "A Combined Component is a layer which implements multiple cross-cutting concerns.",
+    "Sandwich":
+        "In Sandwich, the domain layer is subdivided while the integration and data layers remain monolithic.",
     "Fragmented metapatterns":
         "Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, or Hierarchy builds a system from many smaller components.",
     "Layered Services":
@@ -138,7 +138,7 @@ meta_descriptions = {
         "There are a few ways to improve the performance of a layered system: merge the layers, scale them, or use specialized databases (Polyglot Persistence).",
     "Evolutions of Layers to gain flexibility":
         "The upper Proxy or Orchestrator layer can be split into a service per client, making Backends for Frontends. This allows for per-client customization.",
-    "Evolutions of Services that add or remove services":
+    "Evolutions of Services that restructure services":
         "A new service can be added, an existing one can be split in two, or multiple services can be merged if they become tightly coupled.",
     "Evolutions of Services that add layers":
         "A system of services can be extended with a Middleware, Service Mesh, Proxies, Shared Database, or an Orchestrator which implement cross-cutting concerns.",
@@ -152,8 +152,8 @@ meta_descriptions = {
         "A new system-wide proxy may be stacked with the existing one or you can deploy a proxy per client type.",
     "Evolutions of an Orchestrator":
         "An Orchestrator can be subdivided into Backends for Frontends or Layered Services. Alternatively, you can use a layered or hierarchical Orchestrator.",
-    "Evolutions of a Combined Component":
-        "A stack of single-purpose layers can replace a Combined Component, buying you flexibility at the cost of development effort and, often, performance.",
+    "Evolutions of a Sandwich":
+        "A Sandwich allows for easy changes in its domain layer and can be transformed into Layers or Layered Services.",
     "Format of a metapattern":
         "This section formalizes the format of each of the metapattern chapters.",
     "Glossary":
@@ -184,7 +184,7 @@ toc_images = {
     "Shared Repository":                                    "/diagrams/Web/Shared Repository.png",
     "Proxy":                                                "/diagrams/Web/Proxy.png",
     "Orchestrator":                                         "/diagrams/Web/Orchestrator.png",
-    "Combined Component":                                   "/diagrams/Web/Combined Component.png",
+    "Sandwich":                                             "/diagrams/Web/Sandwich.png",
     "Layered Services":                                     "/diagrams/Web/Layered Services.png",
     "Polyglot Persistence":                                 "/diagrams/Web/Polyglot Persistence.png",
     "Backends for Frontends (BFF)":                         "/diagrams/Web/Backends for Frontends.png",

@@ -355,14 +355,14 @@ class Section:
         for child in self.children:
             child.replace_bookmarks(direct, remap)
             
-    def replace_links(self, mapping):
+    def replace_links(self, mapping, broken):
         for s in self.header.spans:
             if s.link:
-                s.link = self._replace_single_link(s.link, mapping)
+                s.link = self._replace_single_link(s.link, mapping, broken)
         for c in self.content:
-            self._replace_links_in_content(c, mapping)
+            self._replace_links_in_content(c, mapping, broken)
         for child in self.children:
-            child.replace_links(mapping)
+            child.replace_links(mapping, broken)
         
     def dump(self, writer_factory, writer = None):
         assert self.abs_filename
@@ -434,22 +434,22 @@ class Section:
                 for i in c.items:
                     self._replace_bookmarks_in_content(i, mapping)                    
     
-    def _replace_links_in_content(self, c, mapping):
+    def _replace_links_in_content(self, c, mapping, broken):
         match c:
             case Paragraph():
                 for s in c.spans:
                     if s.link:
-                        s.link = self._replace_single_link(s.link, mapping)
+                        s.link = self._replace_single_link(s.link, mapping, broken)
             case List():
                 for i in c.items:
-                    self._replace_links_in_content(i, mapping)
+                    self._replace_links_in_content(i, mapping, broken)
             case Table():
                 for r in c.rows:
                     for col in r:
-                        self._replace_links_in_content(col, mapping)
+                        self._replace_links_in_content(col, mapping, broken)
             case DefinitionList():
                 for i in c.items:
-                    self._replace_links_in_content(i[1], mapping)
+                    self._replace_links_in_content(i[1], mapping, broken)
     
     def _replace_single_bookmark(self, bookmarks, mapping):
         assert bookmarks
@@ -459,7 +459,7 @@ class Section:
         assert new_bookmark.startswith(self.rel_filename)
         return new_bookmark[len(self.rel_filename):]
     
-    def _replace_single_link(self, link, mapping):
+    def _replace_single_link(self, link, mapping, broken):
         new_link = mapping.get(link)
         if new_link:
             if new_link.startswith(self.rel_filename):
@@ -467,8 +467,9 @@ class Section:
             else:
                 return self.strategy.process_internal_link(self._join_paths(self.path_to_root, new_link))
         else:
-            assert is_link_external(link), link
-            assert "docs.google.com" not in link    # Cloning a Google Doc may turn an internal link into an external one towards the old document
+            # Cloning a Google Doc may turn an internal link into an external one towards the old document
+            if (not is_link_external(link)) or ("docs.google.com" in link):
+                broken.add(link)
             return link
         
     def _make_navigation(self):
@@ -524,6 +525,7 @@ class Document:
         self._strategy = strategy
         self._root = Section(None, Header(DEFAULT_NAME))
         self._current_section = self._root
+        self._broken_links = set()
         
     def create_folders(self) -> None:
         self._root.create_folders(self._destination, "")
@@ -552,7 +554,8 @@ class Document:
                 direct[l] = p
         # Commit the changes
         self._root.replace_bookmarks(direct, remap)
-        self._root.replace_links(direct | remap)
+        self._root.replace_links(direct | remap, self._broken_links)
+        self._assert_no_broken_links()
         
     def dump(self, writer_factory) -> None:
         self._root.dump(writer_factory)
@@ -619,3 +622,12 @@ class Document:
         self._current_section.next = new_section
         new_section.prev = self._current_section
         self._current_section = new_section
+
+    def _assert_no_broken_links(self):
+        if self._broken_links:
+            print()
+            print("BROKEN LINKS:")
+            for l in self._broken_links:
+                print(l)
+            print()
+            assert False, "Broken links found"

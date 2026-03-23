@@ -1031,5 +1031,83 @@ image_descriptions = {
     "Variants/4/Space-Based Architecture.png":
         "",
     "Variants/4/Virtualizer.png":
-        ""
+        "",
+    "Web/4Kinds.png":
+        "",
+    "Web/About.png":
+        "",
+    "Web/Ambiguous.png":
+        "",
+    "Web/Backends for Frontends.png":
+        "",
+    "Web/Choreography.png":
+        "",
+    "Web/Communication.png":
+        "",
+    "Web/Comparison.png":
+        "",
+    "Web/Complexity.png":
+        "",
+    "Web/DI.png":
+        "",
+    "Web/Forces.png":
+        "",
+    "Web/Heart.png":
+        "",
+    "Web/Heart2.png":
+        "",
+    "Web/Heart3.png":
+        "",
+    "Web/Hexagonal Architecture.png":
+        "",
+    "Web/Hierarchy.png":
+        "",
+    "Web/Indirection.png":
+        "",
+    "Web/Layered Services.png":
+        "",
+    "Web/Layers.png":
+        "",
+    "Web/Life cycle.png":
+        "",
+    "Web/Mesh.png":
+        "",
+    "Web/Metapatterns.png":
+        "",
+    "Web/Microkernel.png":
+        "",
+    "Web/Middleware.png":
+        "",
+    "Web/Monolith.png":
+        "",
+    "Web/Orchestration.png":
+        "",
+    "Web/Orchestrator.png":
+        "",
+    "Web/Pipeline.png":
+        "",
+    "Web/Pipelineliness.png":
+        "",
+    "Web/Plugins.png":
+        "",
+    "Web/Polyglot Persistence.png":
+        "",
+    "Web/Proxy.png":
+        "",
+    "Web/Real-world.png":
+        "",
+    "Web/Sandwich.png":
+        "",
+    "Web/Service-Oriented Architecture.png":
+        "",
+    "Web/Services.png":
+        "",
+    "Web/Shards.png":
+        "",
+    "Web/Shared Repository.png":
+        "",
+    "Web/Shared data.png":
+        "",
+    "Web/Sharing.png":
+        "",
 }

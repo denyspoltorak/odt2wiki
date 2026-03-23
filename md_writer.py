@@ -149,12 +149,7 @@ class MarkdownWriter:
     def _add_image(self, image):
         assert image.data.link
         assert image.scale <= 1
-        presentation = None
-        if image.data.short_name:   # A matched image
-            presentation = self._customization.get_image_alt_text(image.data.short_name)
-        if not presentation:        # The customization does not have an alt description for this image
-            presentation = os.path.splitext(os.path.basename(image.data.link))[0].replace("_", ":")
-        return self._make_image_html(image.data, presentation, image.scale, image.caption)
+        return self._make_image_html(image.data, self._make_image_presentation(image.data), image.scale, image.caption)
         
     def _make_image_html(self, image, presentation, scale, caption):
         output = []
@@ -166,6 +161,14 @@ class MarkdownWriter:
             output.append("\n" + self._add_paragraph(document.Paragraph(caption), True) + "\n")
         output.append('</div>')
         return "\n".join(output)
+    
+    def _make_image_presentation(self, image_data):
+        presentation = None
+        if image_data.short_name:   # A matched image
+            presentation = self._customization.get_image_alt_text(image_data.short_name)
+        if not presentation:        # The customization does not have an alt description for this image
+            presentation = os.path.splitext(os.path.basename(image_data.link))[0].replace("_", ":")
+        return presentation
     
     # Table of Contents
     def _add_toc(self, toc):

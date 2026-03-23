@@ -175,6 +175,7 @@ def convert_to_github_markdown( archive,
     _process_images(doc, archive, dest_path, images_folder, remote_image_path, use_svg)
     # Convert to markdown
     doc.crosslink()
+    github_writer.GithubMarkdownWriter.set_customization(customization)
     doc.dump(functools.partial(github_writer.GithubMarkdownWriter, collapse_level=collapse_level))
     if side_toc:
         side_toc.dump(functools.partial(github_writer.GithubMarkdownWriter, toc_collapse_level=1))   # Collapse book parts in the ToC

@@ -149,7 +149,11 @@ class MarkdownWriter:
     def _add_image(self, image):
         assert image.data.link
         assert image.scale <= 1
-        presentation = os.path.splitext(os.path.basename(image.data.link))[0].replace("_", ":")
+        presentation = None
+        if image.data.short_name:   # A matched image
+            presentation = self._customization.get_image_alt_text(image.data.short_name)
+        if not presentation:        # The customization does not have an alt description for this image
+            presentation = os.path.splitext(os.path.basename(image.data.link))[0].replace("_", ":")
         return self._make_image_html(image.data, presentation, image.scale, image.caption)
         
     def _make_image_html(self, image, presentation, scale, caption):

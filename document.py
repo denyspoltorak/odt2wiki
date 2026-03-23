@@ -30,11 +30,12 @@ class ListStyle(Enum):
     
 
 class ImageData:
-    def __init__(self, link, width=0, height=0):
+    def __init__(self, link, width=0, height=0, short_name = None):
         assert link
         self.original = self.link = link
         self.width = width
         self.height = height
+        self.short_name = short_name
         
     def set_link(self, link):
         self.original = self.link = link

@@ -98,6 +98,11 @@ class Customization:
     def get_description(section):
         return None
     
+    # Alt text for image
+    @staticmethod
+    def get_image_alt_text(image):
+        return None
+    
     # Return an image for sharing the page on social networks and messengers
     @staticmethod
     def get_preview_image(section):

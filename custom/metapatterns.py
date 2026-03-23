@@ -228,6 +228,13 @@ class MetapatternsCustomization(plugins.Customization):
         assert title in meta_descriptions, title
         return meta_descriptions[title]
     
+    @staticmethod
+    def get_image_alt_text(image):
+        assert image in image_descriptions, image
+        result = image_descriptions[image]
+        assert result, image
+        return result
+    
     def get_preview_image(self, section):
         title = section.header.to_string()
         # Reuse images from the table of contents on the landing page

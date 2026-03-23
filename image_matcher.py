@@ -82,6 +82,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, ImageDa
     has_ambiguous = False
     aspect_ratios = defaultdict(list)
     print("Processing local images...")
+    prefix_path_length = len(image_folder) + 1
     local_data = {}
     for path, _, files in os.walk(image_folder, onerror=_assert):
         for f in files:
@@ -91,7 +92,7 @@ def match_images(archive: ZipFile, image_folder: str) -> tuple[dict[str, ImageDa
                 # Load the image
                 img = _load_image(filename)
                 assert filename not in local_data
-                local_data[filename] = ImageData(filename, img.width, img.height)
+                local_data[filename] = ImageData(filename, img.width, img.height, filename[prefix_path_length:])
                 aspect = int(img.width / img.height * 100)
                 stats = _calc_stats(img)
                 # Make sure there are no similar images

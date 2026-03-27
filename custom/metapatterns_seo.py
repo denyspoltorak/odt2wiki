@@ -18,7 +18,7 @@ meta_descriptions = {
     "Arranging communication":
         "This chapter discusses communication paradigms: orchestration, choreography, or shared data. It shows their applicability, benefits, and drawbacks.",
     "Programming and architectural paradigms":
-        "This section discusses the object-oriented, functional, and procedural programing paradigms and their relation to common architectural styles.",
+        "This section discusses the object-oriented, functional, and procedural programming paradigms and their relation to common architectural styles.",
     "Orchestration":
         "This section discusses orchestration, where a single component coordinates the entire system, and mutual orchestration, where components call each other.",
     "Choreography":
@@ -74,7 +74,7 @@ meta_descriptions = {
     "Mesh":
         "This chapter explores meshes, their types and examples: peer-to-peer networks, Service Mesh, Space-Based Architecture, Leaf-Spine Architecture, and Actors.",
     "Analytics":
-        "This book part compares architectural patterns, highlights ambiguous cases, shows how an system evolves over time, and revisits coupling and cohesion.",
+        "This book part compares architectural patterns, highlights ambiguous cases, shows how a system evolves over time, and revisits coupling and cohesion.",
     "Comparison of architectural patterns":
         "This chapter explores the ways patterns share functionality or data among their components, build pipelines, and use dependency inversion or indirection.",
     "Sharing functionality or data among services":
@@ -96,11 +96,11 @@ meta_descriptions = {
     "Cohesers and decouplers":
         "This section discusses hierarchical decomposition, the influence of a project's modularity on its properties, and lists common cohesers and decouplers.",
     "Deconstructing patterns":
-        "This section analizes SOLID principles, Gang of Four design patterns, and architectural metapatterns from the basic principles of coupling and cohesion.",
+        "This section analyzes SOLID principles, Gang of Four design patterns, and architectural metapatterns from the basic principles of coupling and cohesion.",
     "Choose your own architecture":
         "This section is a guide to choosing an architectural style based on project size, domain features, target performance, and flexibility requirements.",
     "Appendices":
-        "This book part contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revisions history.",
+        "This book part contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revision history.",
     "Acknowledgements":
         "Thanks to all the people who made the Architectural Metapatterns book possible.",
     "Books referenced":
@@ -108,7 +108,7 @@ meta_descriptions = {
     "Copyright":
         "The full text of Creative Commons Attribution 4.0 International Public License.",
     "Disclaimer":
-        "The disclamer for readers of Architectural Metapatterns.",
+        "The disclaimer for readers of Architectural Metapatterns.",
     "Evolutions of architectures":
         "Avenues to evolve many software and system architectures. Each evolution lists its goal, preconditions, benefits, and drawbacks.",
     "Evolutions of a Monolith that lead to Shards":
@@ -159,7 +159,7 @@ meta_descriptions = {
 
 image_descriptions = {
     "4Kinds/3D action.png":
-        "A game framework receives data from hardware and sends an event to the buisiness logic which updates multiple game objects. Finally, the framework sends updates to the hardware.",
+        "A game framework receives data from hardware and sends an event to the business logic which updates multiple game objects. Finally, the framework sends updates to the hardware.",
     "4Kinds/4 Kinds.png":
         "Diagrams of control, interactive, streaming, and computational systems.",
     "4Kinds/Camera.png":
@@ -191,13 +191,13 @@ image_descriptions = {
     "Communication/Downstream Dependencies.png":
         "Adding an upstream component in a command-based pipeline.",
     "Communication/Facade - Parallel.png":
-        "A Facade initiates communication with every service that it orchestrates simultameously in a fan-out manner.",
+        "A facade initiates communication with every service that it orchestrates simultaneously in a fan-out manner.",
     "Communication/Facade.png":
-        "A Facade uses request/confirm pairs of messages to communicate with the services which it orchestrates.",
+        "A facade uses request/confirm pairs of messages to communicate with the services which it orchestrates.",
     "Communication/Gateway to API Gateway.png":
         "An API Gateway runs subrequests in parallel while a pipeline runs them consecutively by passing a message through a chain of services.",
     "Communication/Hierarchy - Dependencies.png":
-        "In a Hierarchy each child component depends on the same Service Provider Interface of their parent component.",
+        "In a hierarchy each child component depends on the same Service Provider Interface of their parent component.",
     "Communication/Mediator.png":
         "A mediator receives an input from one component, processes it, and initiates actions in other components.",
     "Communication/Microkernel - Dependencies.png":
@@ -235,11 +235,11 @@ image_descriptions = {
     "Communication/Paradigms - Object-oriented - Variants.png":
         "Diagrams of: Microservices, Orchestrated Services, and Service-Oriented Architecture.",
     "Communication/Paradigms - Object-oriented.png":
-        "A diagram of an object-oriented system build through composition.",
+        "A diagram of an object-oriented system built through composition.",
     "Communication/Pipeline Early Response.png":
         "The first service of a pipeline responds to the client immediately while forwarding the client's request to other services, which will eventually produce the result.",
     "Communication/Pipeline Enricher.png":
-        "A request collects data from every services in a pipeline as it passes those services.",
+        "A request collects data from every service in a pipeline as it passes those services.",
     "Communication/Pipeline Error.png":
         "Rollback of changes done by services arranged into a pipeline.",
     "Communication/Pipeline Gateway.png":
@@ -247,15 +247,15 @@ image_descriptions = {
     "Communication/Pipeline Not Parallel.png":
         "An Orchestrator can run subrequests in parallel which is impossible for a sequential pipeline.",
     "Communication/Purchase and Return.png":
-        "Both purchare and refund services see and edit the entire system's data.",
+        "Both purchase and refund services see and edit the entire system's data.",
     "Communication/Queues.png":
         "Diagrams for: a queue per service, separate input and output queues, a queue per channel, and a single system queue.",
     "Communication/Services to Orchestrator.png":
-        "After a Monolith is subdivided into Services, an orchestrator is added to communicate with the client and with each service.",
+        "After a monolith is subdivided into services, an orchestrator is added to communicate with the client and with each service.",
     "Communication/Services to Pipeline.png":
-        "After a Monolith is subdivided into Services, the services are assembled into a pipeline.",
+        "After a monolith is subdivided into services, the services are assembled into a pipeline.",
     "Communication/Services to Shared Data.png":
-        "After a Monolith is subdivided into Services, a shared database is used to integrate the services.",
+        "After a monolith is subdivided into services, a shared database is used to integrate the services.",
     "Communication/Shared Data - Dependencies.png":
         "Each service depends only on the shared database.",
     "Communication/Shared Data add a Service.png":
@@ -271,7 +271,7 @@ image_descriptions = {
     "Conclusion/Ambiguous-DomainServices.png":
         "Diagrams of domain services according to Domain-Driven Design and Fundamentals of Software Architecture.",
     "Conclusion/Ambiguous-FrontController.png":
-        "Diagrams of Front Controller according to Paterns of Enterprise Application Architecture and Software Architecture: the Hard Parts.",
+        "Diagrams of Front Controller according to Patterns of Enterprise Application Architecture and Software Architecture: the Hard Parts.",
     "Conclusion/Ambiguous-Microkernel.png":
         "Diagrams of Microkernel according to Pattern-Oriented Software Architecture and of Plugins Architecture",
     "Conclusion/Ambiguous-Monolith.png":
@@ -283,7 +283,7 @@ image_descriptions = {
     "Conclusion/DI-1.png":
         "Plugins depend on the core's SPIs. There are multiple versions of plugins. Adapters of Hexagonal Architecture depend on both the core's SPIs and APIs of the adapted components.",
     "Conclusion/DI-2.png":
-        "In an operating system device drivers depend on the kernel's SPIs. In a Hierarchy chaild nodes depend on their parent's SPI. Cell-Based Architecture uses adapters to break dependencies between Cells.",
+        "In an operating system device drivers depend on the kernel's SPIs. In a hierarchy child nodes depend on their parent's SPI. Cell-Based Architecture uses adapters to break dependencies between Cells.",
     "Conclusion/DI-3.png":
         "Standard APIs are used between frontend and backend, and backend and database. CQRS views and adapters protect a service from dependencies on other services.",
     "Conclusion/Indirection-Command.png":
@@ -291,7 +291,7 @@ image_descriptions = {
     "Conclusion/Indirection-Query.png":
         "Dependency diagrams for CQRS View, Reporting Database, and Query Service.",
     "Conclusion/Lifecycle-1.png":
-        "A diagram of a Monolith.",
+        "A diagram of a monolith.",
     "Conclusion/Lifecycle-2.png":
         "Diagrams of Layers and Hexagonal Architecture.",
     "Conclusion/Lifecycle-3.png":
@@ -311,7 +311,7 @@ image_descriptions = {
     "Conclusion/Pipelineliness-PipesAndFilters.png":
         "Pipes and Filters where a data stream originates with the source, passes several filters, and ends in a sink.",
     "Conclusion/Sharing-DedicatedService.png":
-        "A shared logger deployed as a service in Service-Oriented Architecture. A shared counder deployed as a stand-alone shared database in Polyglot Persistence.",
+        "A shared logger deployed as a service in Service-Oriented Architecture. A shared counter deployed as a stand-alone shared database in Polyglot Persistence.",
     "Conclusion/Sharing-Delegate.png":
         "Message loggers in a proxy and middleware. A request counter in a gateway of a pipeline.",
     "Conclusion/Sharing-DirectCall.png":
@@ -363,11 +363,11 @@ image_descriptions = {
     "Dependencies/Hexagonal Architecture.png":
         "In Hexagonal Architecture each adapter depends on the core and the component or protocol it adapts.",
     "Dependencies/Hierarchy.png":
-        "In Hierarchy a child component depends on an SPI of its parent component. If the children are polymorpfic, their parent has a single SPI.",
+        "In Hierarchy a child component depends on an SPI of its parent component. If the children are polymorphic, their parent has a single SPI.",
     "Dependencies/Layers-1.png":
         "Individual layers may depend on other layers' APIs, SPIs, or both. In the last case the layer between the SPI and API is an adapter.",
     "Dependencies/Layers-2.png":
-        "Dependencies with an open and closed layers.",
+        "Dependencies for open and closed layers.",
     "Dependencies/Layers-3.png":
         "A load balancer helps access multiple instances of a layer directly below it.",
     "Dependencies/Microkernel.png":
@@ -377,7 +377,7 @@ image_descriptions = {
     "Dependencies/Orchestrator.png":
         "A facade depends on every service. Contrariwise, every service depends on a mediator.",
     "Dependencies/Pipeline.png":
-        "Commands cause downstream dependencies. Notifications cause upstream dependencies. If shared message schema is used, every component depends on the shared message.",
+        "Commands cause downstream dependencies. Notifications cause upstream dependencies. If a shared message schema is used, every component depends on the shared message.",
     "Dependencies/Plugins.png":
         "Each plugin depends on an interface of the core.",
     "Dependencies/PolyglotPersistence.png":
@@ -387,11 +387,11 @@ image_descriptions = {
     "Dependencies/Service-Oriented Architecture.png":
         "Tasks depend on entities. Entities depend on utilities and libraries. The many dependencies make it hard to change almost any component.",
     "Dependencies/Services-1.png":
-        "With request/confirm a service depdends on whatever it uses.",
+        "With request/confirm a service depends on whatever it uses.",
     "Dependencies/Services-2.png":
         "With pub/sub a service depends on its notification sources.",
     "Dependencies/Services-3.png":
-        "A CQRS view breakes dependencies between services.",
+        "A CQRS view breaks dependencies between services.",
     "Dependencies/Services-4.png":
         "Adapters isolate a service from its dependencies.",
     "Dependencies/SharedRepository-1.png":
@@ -417,7 +417,7 @@ image_descriptions = {
     "Evolutions/2/Sandwich add remove Service.png":
         "One of the domain-level services is removed and another one is added.",
     "Evolutions/2/Sandwich split merge Services.png":
-        "One domain-level service is split in half which two other services are merged together.",
+        "One domain-level service is split in half while two other services are merged together.",
     "Evolutions/2/Sandwich to Layered Services.png":
         "The integration and data layers are divided into subdomains, producing Three-Layered Services.",
     "Evolutions/2/Sandwich to Layers.png":
@@ -437,7 +437,7 @@ image_descriptions = {
     "Evolutions/3/Hierarchy - 1.png":
         "The upper layer of a top-down hierarchy is subdivided into Backends for Frontends.",
     "Evolutions/3/Polyglor Persistence - 1.png":
-        "The backend layer that uses an OLAP and OLTP databases is subdivided into command and quesry backends, resulting in full-featured Command-Query Responsibility Segregation.",
+        "The backend layer that uses OLAP and OLTP databases is subdivided into command and query backends, resulting in full-featured Command-Query Responsibility Segregation.",
     "Evolutions/3/SOA - 1.png":
         "The shared components are replicated into services which use them.",
     "Evolutions/3/SOA - 2.png":
@@ -485,9 +485,9 @@ image_descriptions = {
     "Evolutions/Monolith/Monolith add Proxy.png":
         "A part of generic functionality of a monolith is moved to a proxy.",
     "Evolutions/Monolith/Monolith to Hexagonal.png":
-        "The database, external libraries and a protocol support components are separated from the business logic and isolated with adapters.",
+        "The database, external libraries, and a protocol support component are separated from the business logic and isolated with adapters.",
     "Evolutions/Monolith/Monolith to Instance per Client.png":
-        "Each user is alocated a temporary instance of a subsystem which loads their data at the start of session and persistes any changes to the database.",
+        "Each user is allocated a temporary instance of a subsystem which loads their data at the start of the session and persists any changes to the database.",
     "Evolutions/Monolith/Monolith to Interpreter.png":
         "The high-level logic is rewritten as scripts which are run by an interpreter.",
     "Evolutions/Monolith/Monolith to Isolated Shards with Load Balancer.png":
@@ -563,7 +563,7 @@ image_descriptions = {
     "Heart/Features-2.png":
         "Diagrams of Services with a shared database and Space-Based Architecture.",
     "Heart/Features-3.png":
-        "Diagrams of Services with a middleware, Services wioth a proxy, and Backends for Frontends.",
+        "Diagrams of Services with a middleware, Services with a proxy, and Backends for Frontends.",
     "Heart/Flexibility-1.png":
         "Diagrams of Plugins, Hexagonal Architecture, and Microkernel.",
     "Heart/Flexibility-2.png":
@@ -575,11 +575,11 @@ image_descriptions = {
     "Heart/Implementation.png":
         "Diagrams of Plugins, Hexagonal Architecture, Microkernel, and Mesh, with cohesive and decoupled components highlighted.",
     "Heart/Lifecycle.png":
-        "A monolith transforming into Layered Services, whose application layers paritally merge and domain layers split, only to finally glue into Layers with multiple databases.",
+        "A monolith transforming into Layered Services, whose application layers partially merge and domain layers split, only to finally glue into Layers with multiple databases.",
     "Heart/Pain.png":
         "A chart that shows that unstructured code is the least painful solution for a tiny project while something large is unbearable if not decomposed into services.",
     "Heart/Performance-1.png":
-        "Diagrams of stateless instanes with a load balancer and a shared database, Shards behind a sharding proxy, and Replicas behind a load balancer.",
+        "Diagrams of stateless instances with a load balancer and a shared database, shards behind a sharding proxy, and replicas behind a load balancer.",
     "Heart/Performance-2.png":
         "Diagrams of Services with Polyglot Persistence and a Cell with a scaled pipeline.",
     "Heart/Performance-3.png":
@@ -591,7 +591,7 @@ image_descriptions = {
     "Heart/Size-1.png":
         "Diagrams of Monolith, Layers, Services, Service-Oriented Architecture, and Cell-Based Architecture.",
     "Heart/Size-2.png":
-        "Diagrams of Sandwich, Top-Down Hierarcht, and Pipeline.",
+        "Diagrams of Sandwich, Top-Down Hierarchy, and Pipeline.",
     "Intro/3-Tier.png":
         "Frontend, backend, and database layers differ in their scalability, security, and operational costs.",
     "Intro/CQRS with notes.png":
@@ -669,7 +669,7 @@ image_descriptions = {
     "Performance/Hexagonal Architecture.png":
         "A data stream between adapters of Hexagonal Architecture.",
     "Performance/Hierarchy - optimizations.png":
-        "Aggregation of data in mid-level nodes; autonous decision-making by mid-level nodes; direct communication between low-level nodes of a hierarchy.",
+        "Aggregation of data in mid-level nodes; autonomous decision-making by mid-level nodes; direct communication between low-level nodes of a hierarchy.",
     "Performance/Hierarchy - speed.png":
         "Comparison of latency for decision-making at various levels of a hierarchy.",
     "Performance/Layered Services - channels.png":
@@ -733,7 +733,7 @@ image_descriptions = {
     "Variants/1/DDD.png":
         "The four layers of Domain-Driven Design: presentation, application, domain, and infrastructure.",
     "Variants/1/Data - Derived.png":
-        "Diagrams of a three-tier system, hierarchicel control system, and Space-Based Architecture.",
+        "Diagrams of a three-tier system, hierarchical control system, and Space-Based Architecture.",
     "Variants/1/Data - Evolutions.png":
         "A load-balanced service over a database evolves into a monolith with two specialized databases or into a load-balanced stateless service over database replicas with a single leader.",
     "Variants/1/Data Mesh.png":
@@ -743,13 +743,13 @@ image_descriptions = {
     "Variants/1/Domain - Derived.png":
         "Diagrams of Services, Sandwich, Hierarchy, and Command-Query Responsibility Segregation.",
     "Variants/1/Drivers.png":
-        "Applications call a System Call Inteface which dispatches their requests to device drivers.",
+        "Applications call a System Call Interface which dispatches their requests to device drivers.",
     "Variants/1/ECB as SOA.png":
         "The boundary, control and entity layers, each subdivided into several services.",
     "Variants/1/ECB.png":
         "The boundary, control and entity layers.",
     "Variants/1/Embedded.png":
-        "An emvedded system with the following pairs of layers: user interface and human-machine interface, software development kit and hardware abstraction layer, firmware and hardware.",
+        "An embedded system with the following pairs of layers: user interface and human-machine interface, software development kit and hardware abstraction layer, firmware and hardware.",
     "Variants/1/Event-Driven Architecture.png":
         "Event-Driven Architecture as a branched pipeline built from a group of services.",
     "Variants/1/Generic Code - Derived.png":
@@ -765,7 +765,7 @@ image_descriptions = {
     "Variants/1/Lambdalith.png":
         "Instances of a stateless component between a load balancer and a database.",
     "Variants/1/Layer Roles.png":
-        "A stack of layers: client or user, interface, application, domain, generic code, communication, data, and operatins system and hardware.",
+        "A stack of layers: client or user, interface, application, domain, generic code, communication, data, and operating system and hardware.",
     "Variants/1/Layered Monolith.png":
         "Application, domain, and infrastructure layers.",
     "Variants/1/Microservices.png":
@@ -777,7 +777,7 @@ image_descriptions = {
     "Variants/1/Nanoservices - API Layer.png":
         "Nanoservices dedicated to Get and Post methods between a client and a shared database.",
     "Variants/1/Nanoservices.png":
-        "Many Nanoservices accessing a shared database to implement CRUD functionality.",
+        "Many Nanoservices access a shared database to implement CRUD functionality.",
     "Variants/1/Pipes and Filters.png":
         "A pipeline chaining: source, three filters, and sink.",
     "Variants/1/Proactor.png":
@@ -785,15 +785,15 @@ image_descriptions = {
     "Variants/1/Reactor - Multiple Threads.png":
         "Two threads, each runs a single request and blocks on accessing an operating system.",
     "Variants/1/Reactor - Single Thread.png":
-        "A single thread that block on calls to an operating system executes a request and then another request which had to wait in a queue.",
+        "A single thread that blocks on calls to an operating system executes a request and then another request which has to wait in a queue.",
     "Variants/1/Reactor with Extractors.png":
-        "In the extract phase components call each other and add actions to their queues. In the react phase they execute the actions from their queues but don't inteact. The phases alternate.",
+        "In the extract phase components call each other and add actions to their queues. In the react phase they execute the actions from their queues but don't interact. The phases alternate.",
     "Variants/1/Service - Cell.png":
         "Three subservices behind a Cell gateway. Two of them share a database.",
     "Variants/1/Service - Hexagonal.png":
-        "A core connected to: a protocol adapter, a Database Abstracton Layer with a database behind it, and an adapter with a library behind it.",
+        "A core connected to: a protocol adapter, a Database Abstraction Layer with a database behind it, and an adapter with a library behind it.",
     "Variants/1/Service - Layered.png":
-        "The integraton, core and database layers.",
+        "The integration, core and database layers.",
     "Variants/1/Service - Monolithic.png":
         "A diagram of a monolithic component.",
     "Variants/1/Service - Scaled.png":
@@ -813,7 +813,7 @@ image_descriptions = {
     "Variants/1/Subtypes of Services.png":
         "A monolithic service, layered service, hexagonal services, scaled service, and a Cell interconnected into a single system.",
     "Variants/1/Three-Tier.png":
-        "Four instances of the presentaton layer accessing two instances of the logic layer accessing a single database.",
+        "Four instances of the presentation layer accessing two instances of the logic layer accessing a single database.",
     "Variants/1/True Monolith.png":
         "A square that represents a non-modular monolith.",
     "Variants/2/API Composer.png":
@@ -823,9 +823,9 @@ image_descriptions = {
     "Variants/2/Adapter.png":
         "An adapter between a client and a service provider translates between their protocols.",
     "Variants/2/Blackboard.png":
-        "A Blackboard System includes a control which orchstrates knowledge sources which access a blackboard with shared data.",
+        "A Blackboard System includes a control which orchestrates knowledge sources which access a blackboard with shared data.",
     "Variants/2/CQRS to Layered Services.png":
-        "The single database of a Sandwich-like CQRS with a shared database is subdivided into an OLTP and OLAP databases, forming Layered Services.",
+        "The single database of a Sandwich-like CQRS with a shared database is subdivided into OLTP and OLAP databases, forming Layered Services.",
     "Variants/2/CQRS.png":
         "A large read and smaller write models between a user interface and database.",
     "Variants/2/Cache.png":
@@ -845,21 +845,21 @@ image_descriptions = {
     "Variants/2/Full Proxy.png":
         "A full proxy mediates all messages between a client and a server.",
     "Variants/2/Half Proxy.png":
-        "A half-proxy intercepts only the session establishment request and is transparent to the following in-session communication between the clinet and server.",
+        "A half-proxy intercepts only the session establishment request and is transparent to the following in-session communication between the client and server.",
     "Variants/2/Integration Service.png":
         "An integration service is a full-featured service that stands between the client and the remaining services of the system.",
     "Variants/2/Load Balancer.png":
         "A load balancer forwards a client's request to any idle instance of a stateless service. A sharding proxy forwards a client's request to the shard that contains the client's data.",
     "Variants/2/Message Bus.png":
-        "A message bus has an adapter per service to allow each service use its own protocol.",
+        "A message bus has an adapter per service to allow each service to use its own protocol.",
     "Variants/2/Middleware - Shared Event Store.png":
         "Both persistent event log and shared event store merge the functionality of middleware and shared repository.",
     "Variants/2/Middleware - Structure.png":
-        "In middleware each service is colocated with a generic component which may either be a node of a mesh or forward the service's requests to a centralized broker as a proxy.",
+        "In middleware each service is co-located with a generic component which may either be a node of a mesh or forward the service's requests to a centralized broker as a proxy.",
     "Variants/2/Multifunctional - Service Mesh.png":
         "Scaled services reside on a shared layer of sidecars which is placed on top of a shared mesh engine. All instances of each service access the service's database.",
     "Variants/2/Multifunctional - Space-Based Architecture.png":
-        "Space-Based Architectutre comprises the following layers: a messaging grid, a processing grid, scaled processing units, a data grid, a deployemnt manager, and a persistent database.",
+        "Space-Based Architecture comprises the following layers: a messaging grid, a processing grid, scaled processing units, a data grid, a deployment manager, and a persistent database.",
     "Variants/2/Nanoservices.png":
         "Nanoservices form a Sandwich-shaped architecture. The upper layer is an API Gateway for an orchestrated system or a gateway for pipelined Nanoservices. The lower layer is a shared datastore.",
     "Variants/2/Orchestrator - BFF.png":
@@ -873,7 +873,7 @@ image_descriptions = {
     "Variants/2/Orchestrator - Monolythic.png":
         "An orchestrator communicates with several services.",
     "Variants/2/Orchestrator - Open.png":
-        "An orchestrator mediates a multi-step client reqests while it is transparent to simpler requests.",
+        "An orchestrator mediates a multi-step client request while it is transparent to simpler requests.",
     "Variants/2/Orchestrator - SOA.png":
         "There are several orchestrators which use the same set of services.",
     "Variants/2/Orchestrator - Scaled.png":
@@ -883,11 +883,11 @@ image_descriptions = {
     "Variants/2/Proxy placement - Ambassador.png":
         "An ambassador runs on the client side and translates the client's protocol into the one in use with the service.",
     "Variants/2/Proxy placement - Sidecar.png":
-        "A sidecar is colocated with the services and translates from the client's protocol to the service's API.",
+        "A sidecar is co-located with the services and translates from the client's protocol to the service's API.",
     "Variants/2/Proxy placement - Standalone.png":
         "A standalone proxy is placed between a client and a layer of services.",
     "Variants/2/Saga.png":
-        "An atomically consistent saga rolls back changes after a failed write. An avantually consistent saga retries the failed write till it succeeds.",
+        "An atomically consistent saga rolls back changes after a failed write. An eventually consistent saga retries the failed write till it succeeds.",
     "Variants/2/Service-Based Architecture.png":
         "A Sandwich-like topology with user interface, a layer of domain services, and a shared database.",
     "Variants/2/Service-Based to Layered Services.png":
@@ -897,11 +897,11 @@ image_descriptions = {
     "Variants/2/Shared Database.png":
         "Several services access a shared database and optionally communicate with each other directly.",
     "Variants/2/Shared files.png":
-        "An algorithm processes a batch of input files and writes output files. Its output becomes an input for another algorithm. The algorithems make a pipeline.",
+        "An algorithm processes a batch of input files and writes output files. Its output becomes an input for another algorithm. The algorithms make a pipeline.",
     "Variants/2/Shared memory.png":
         "Areas of shared memory (ring buffers) between two processes make a pair of event channels.",
     "Variants/2/Sidecars.png":
-        "A proxy between a service and its client; one between a service and a midldeware; an extension aside of a service; a utility layer below a service.",
+        "A proxy between a service and its client; one between a service and a middleware; an extension aside of a service; a utility layer below a service.",
     "Variants/2/Stamp Coupling.png":
         "A message collects pieces of data while passing through a pipeline.",
     "Variants/2/User Interface.png":
@@ -919,7 +919,7 @@ image_descriptions = {
     "Variants/3/CQRS - pipeline view.png":
         "In CQRS data streams from the client to the write backend, then to the OLTP database, to the OLAP database, to the read backend and, finally, returns to the client.",
     "Variants/3/CQRS - subtypes.png":
-        "In CQRS the OLAP databases receive data from the OLTP database or from events originating in the write backend. Alternatively, the reaf and write backends may share a database.",
+        "In CQRS the OLAP databases receive data from the OLTP database or from events originating in the write backend. Alternatively, the read and write backends may share a database.",
     "Variants/3/CQRS.png":
         "Write requests from a client go to the write backend and OLTP database which feeds OLAP databases. Read requests go to the scaled read backend and the scaled OLAP database.",
     "Variants/3/Cache-Aside.png":
@@ -929,15 +929,15 @@ image_descriptions = {
     "Variants/3/DOMA.png":
         "There are five layers: segmented gateways, segmented presentation, segmented product made of cells, segmented business made of cells, and monolithic infrastructure.",
     "Variants/3/Distributed Monolith.png":
-        "There are three segmented layers: tasks, services and infrastructure. Each component oa layer accesses multiple components in layers below it.",
+        "There are three segmented layers: tasks, services and infrastructure. Each component of a layer accesses multiple components in layers below it.",
     "Variants/3/Enterprise SOA.png":
         "An Enterprise Service Bus interconnects multilayered segmented subsystems each using its own protocol.",
     "Variants/3/Hierarchy - Bottom-up.png":
-        "An integraton middleware interconnects the middlewares of two systems.",
+        "An integration middleware interconnects the middlewares of two systems.",
     "Variants/3/Hierarchy - Top-down.png":
-        "A single component calls rwo components in the layer below it, each of which calls two or three lower-level leaf components.",
+        "A single component calls two components in the layer below it, each of which calls two or three lower-level leaf components.",
     "Variants/3/Historical Data.png":
-        "A service works with an operational database. An archiver reads from the operational database and write to an archive. An analyst reads from both the archive and operational database.",
+        "A service works with an operational database. An archiver reads from the operational database and writes to an archive. An analyst reads from both the archive and operational database.",
     "Variants/3/Memory Image.png":
         "At startup a service reads from an event store and writes to a memory image. At runtime it reads from the memory image and updates both the memory image and event store.",
     "Variants/3/PAC.png":
@@ -965,17 +965,17 @@ image_descriptions = {
     "Variants/3/Two-Layered Services.png":
         "The domain-level components of two-layered services participate in multiple pipelines and access their service's databases.",
     "Variants/4/AUTOSAR classic.png":
-        "AUTOSAR Classic defines three segmented layers: ppplications, runtime environment with a shared Virtual Functional Bus, and basic software with generic and hardware-specific services.",
+        "AUTOSAR Classic defines three segmented layers: applications, runtime environment with a shared Virtual Functional Bus, and basic software with generic and hardware-specific services.",
     "Variants/4/Actors.png":
         "Each actor reads from its message queue and writes to other actors' message queues.",
     "Variants/4/Addin.png":
         "An addin is hosted inside a system and implements a part of its control flow.",
     "Variants/4/Addon.png":
-        "An addon is a layer between a system and its client. It translates a single client request into mutliple calls to the underlying system.",
+        "An addon is a layer between a system and its client. It translates a single client request into multiple calls to the underlying system.",
     "Variants/4/Ambassador Plugin.png":
-        "An ambassador plugin is a part of one service hosted inside another servise. When called, it may consult its origin service or make independent decisions.",
+        "An ambassador plugin is a part of one service hosted inside another service. When called, it may consult its origin service or make independent decisions.",
     "Variants/4/Cell - Basic - Evolutions.png":
-        "A layered system transfroms into a Sandwich-based Cell. A group of stand-alone services is aggregated into a cell behind a Cell gateway.",
+        "A layered system transforms into a Sandwich-based Cell. A group of stand-alone services is aggregated into a cell behind a Cell gateway.",
     "Variants/4/Cell - Basic - Subtypes.png":
         "Diagrams for: a Cell with a Sandwich, a Cell with services, and a Cell with a pipeline.",
     "Variants/4/Cell - Full-Featured - Plugins.png":
@@ -983,15 +983,15 @@ image_descriptions = {
     "Variants/4/Cell.png":
         "Several intercommunicating subservices are wrapped with a cell gateway that receives client requests, adapters for outgoing communication, and a plugin.",
     "Variants/4/Config file.png":
-        "A configurator runs at a system's startup, reads a configuration file, and set up a system of services.",
+        "A configurator runs at a system's startup, reads a configuration file, and sets up a system of services.",
     "Variants/4/Extension.png":
         "An extension is called as a high-level part of a system's use case.",
     "Variants/4/Framework.png":
         "A framework is a facade between a user application and several lower-level components.",
     "Variants/4/Hexagonal - Adapters with Components.png":
-        "Adapters colocated with external components translate a single message from the core into multiple calls to the adapted components.",
+        "Adapters co-located with external components translate a single message from the core into multiple calls to the adapted components.",
     "Variants/4/Hexagonal - Adapters with the Core.png":
-        "Adapters for external services and a shared database are colocated with the core.",
+        "Adapters for external services and a shared database are co-located with the core.",
     "Variants/4/Hexagonal - Driven.png":
         "The core uses adapters to call a database, a library, and an external service.",
     "Variants/4/Hexagonal - Driving and Driven.png":
@@ -1007,13 +1007,13 @@ image_descriptions = {
     "Variants/4/Leaf-Spine.png":
         "Each server of a datacenter is connected to a leaf node. Each leaf communicates with every spine node.",
     "Variants/4/MVC - subtypes.png":
-        "Diagrams of MVC with a dedicated view-controller pair for each widget, ADR and RMR where the action calls the responser, Model 2 with an orchestrating controller, and a game development engine.",
+        "Diagrams of MVC with a dedicated view-controller pair for each widget, ADR and RMR where the action calls the responder, Model 2 with an orchestrating controller, and a game development engine.",
     "Variants/4/MVC.png":
-        "The control flow in Model-View-Controller start with mouse events handled by the controller which calls the model which calls the view which updates the display.",
+        "The control flow in Model-View-Controller starts with mouse events handled by the controller which calls the model which calls the view which updates the display.",
     "Variants/4/MVP - subtypes.png":
         "Diagrams of MVP with a view-presenter pair for each screen, MVA with different adapters for different kinds of users, MVVM with data in ViewModel, and simple Document-View and Model 1.",
     "Variants/4/MVP.png":
-        "The control flow of Model-View-Presenter is a loop that starts with an OS GUI, is hadled by the view, passes to the presenter, then down to the model, and all the way back to the OS.",
+        "The control flow of Model-View-Presenter is a loop that starts with an OS GUI, is handled by the view, passes to the presenter, then down to the model, and all the way back to the OS.",
     "Variants/4/Monolithic Hexagonal.png":
         "Adapters of the Hexagonal Architecture translate between the interfaces of its core and those of the adapted external components.",
     "Variants/4/OS.png":
@@ -1045,7 +1045,7 @@ image_descriptions = {
     "Web/Communication.png":
         "A diagram of a client above three services with question marks between the components.",
     "Web/Comparison.png":
-        "Diagrams of services sharing a dataset, a pipeline, dependency inversion in an operating system with device drivers, and an adapter bewteen a client and a service.",
+        "Diagrams of services sharing a dataset, a pipeline, dependency inversion in an operating system with device drivers, and an adapter between a client and a service.",
     "Web/Complexity.png":
         "A diagram of three components each encapsulating a graph of nodes.",
     "Web/DI.png":
@@ -1083,11 +1083,11 @@ image_descriptions = {
     "Web/Orchestration.png":
         "A diagram of a client that calls an orchestrator which calls three services one by one.",
     "Web/Orchestrator.png":
-        "A diagram with an integration lauer above three services.",
+        "A diagram with an integration layer above three services.",
     "Web/Pipeline.png":
         "A diagram of a pipeline made from input, three processing steps, and output.",
     "Web/Pipelineliness.png":
-        "A diagram of a client passing data to a service, which passes it to its database, which passes it to another service's databse, from which it goes to the other service, and back to the client.",
+        "A diagram of a client passing data to a service, which passes it to its database, which passes it to another service's database, from which it goes to the other service, and back to the client.",
     "Web/Plugins.png":
         "A diagram with three layers: two extensions above a large core with business logic above three plugins.",
     "Web/Polyglot Persistence.png":
@@ -1103,7 +1103,7 @@ image_descriptions = {
     "Web/Services.png":
         "A diagram of three interacting services.",
     "Web/Shards.png":
-        "A diagram of three interacting instances of a sybsystem.",
+        "A diagram of three interacting instances of a subsystem.",
     "Web/Shared Repository.png":
         "A diagram of three services above a shared data layer.",
     "Web/Shared data.png":
@@ -1111,3 +1111,17 @@ image_descriptions = {
     "Web/Sharing.png":
         "A diagram of two services with private databases and one database shared by the services.",
 }
+
+
+if __name__ == "__main__":
+    print()
+    print("META DESCRIPTIONS AND LENGTHS (LIMIT 160):")
+    for d in meta_descriptions.values():
+        length = len(d)
+        assert length <= 160, d
+        print(f"{d}\t{length}")
+    print()
+    print("IMAGE ALTS:")
+    for d in image_descriptions.values():
+        print(d)
+    print()

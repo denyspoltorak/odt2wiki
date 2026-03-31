@@ -8,7 +8,7 @@ meta_descriptions = {
     "Metapatterns":
         "This chapter explores metapatterns (clusters of closely related patterns), design space, and the abstractness-subdomain-sharding system of coordinates.",
     "Foundations of software architecture":
-        "This part of the book discusses such fundamental topics as complexity, non-functional requirements(forces), communication paradigms, and types of software systems.",
+        "This part of the book discusses fundamental topics: complexity, non-functional requirements (forces), communication paradigms, and types of software systems.",
     "Modules and complexity":
         "This chapter graphically explores the basic concepts of software architecture: complexity, modularity, encapsulation, bounded contexts, coupling, and cohesion.",
     "Forces, asynchronicity, and distribution":
@@ -28,7 +28,7 @@ meta_descriptions = {
     "Comparison of communication styles":
         "This section discusses the use cases, benefits, and drawbacks of orchestration, choreography, and integration through shared data.",
     "Basic metapatterns":
-        "This part of the book discusses basic system topologies: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for more complex architectures.",
+        "This part of the book discusses basic system topologies: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for complex architectures.",
     "Monolith":
         "This chapter explores monolithic architectures: Reactor, Proactor, Half-Sync/Half-Async (coroutines), and (Re)Actor-with-Extractors (phased simulation).",
     "Shards":
@@ -52,7 +52,7 @@ meta_descriptions = {
     "Sandwich":
         "This chapter explores sandwiched architectures: Blackboard System, Space-Based Architecture, Service-Based Architecture, CQRS, Nanoservices, and Lambdas.",
     "Fragmented metapatterns":
-        "This part of the book discusses fragmented topologies: Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy.",
+        "This book part discusses fragmented topologies: Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy.",
     "Layered Services":
         "This chapter discusses layered services, their orchestrated and choreographed variants, and Command-Query Responsibility Segregation (CQRS) systems.",
     "Polyglot Persistence":

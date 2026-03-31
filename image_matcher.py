@@ -56,7 +56,7 @@ class _Stats:
         return self._eq(other, 0.15)
     
     def eq_double(self, other):
-        return self._eq(other, 0.3)
+        return self._eq(other, 0.2)
     
     def _eq(self, other, abs_tolerance):
         return math.isclose(self.r, other.r, rel_tol=0, abs_tol=abs_tolerance) \

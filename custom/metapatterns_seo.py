@@ -2,13 +2,13 @@ meta_descriptions = {
     "The pattern language of software architecture":
         "This is an online version of the Architectural Metapatterns book which explores system topologies and arranges architectural patterns into a pattern language.",
     "Introduction":
-        "This book part covers introductory topics that range from the book's structure to the underlying theory that enabled the research presented in the book.",
+        "This part of the book covers introductory topics that range from the book's structure to the underlying theory that enabled the research presented in the book.",
     "About this book":
         "This is the introduction to the Architectural Metapatterns book. It discusses the book's rationale, structure, and the types of diagrams used in the text.",
     "Metapatterns":
         "This chapter explores metapatterns (clusters of closely related patterns), design space, and the abstractness-subdomain-sharding system of coordinates.",
     "Foundations of software architecture":
-        "This book part discusses such fundamental topics as complexity, non-functional requirements(forces), communication paradigms, and types of software systems.",
+        "This part of the book discusses such fundamental topics as complexity, non-functional requirements(forces), communication paradigms, and types of software systems.",
     "Modules and complexity":
         "This chapter graphically explores the basic concepts of software architecture: complexity, modularity, encapsulation, bounded contexts, coupling, and cohesion.",
     "Forces, asynchronicity, and distribution":
@@ -28,7 +28,7 @@ meta_descriptions = {
     "Comparison of communication styles":
         "This section discusses the use cases, benefits, and drawbacks of orchestration, choreography, and integration through shared data.",
     "Basic metapatterns":
-        "This book part discusses basic system topologies: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for more complex architectures.",
+        "This part of the book discusses basic system topologies: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for more complex architectures.",
     "Monolith":
         "This chapter explores monolithic architectures: Reactor, Proactor, Half-Sync/Half-Async (coroutines), and (Re)Actor-with-Extractors (phased simulation).",
     "Shards":
@@ -40,7 +40,7 @@ meta_descriptions = {
     "Pipeline":
         "This chapter explores pipelined architectures that process streams: Pipes and Filters, Choreographed Event-Driven Architecture, Data Mesh, and Nanoservices.",
     "Extension metapatterns":
-        "This book part discusses architectural components that integrate systems of services: Middleware, Shared Repository, Proxy, and Orchestrator.",
+        "This part of the book discusses architectural components that integrate systems of services: Middleware, Shared Repository, Proxy, and Orchestrator.",
     "Middleware":
         "This chapter discusses Middleware and its variants: Message Bus, Event Mediator, Service Mesh, Enterprise Service Bus, and Persistent Event Log.",
     "Shared Repository":
@@ -52,7 +52,7 @@ meta_descriptions = {
     "Sandwich":
         "This chapter explores sandwiched architectures: Blackboard System, Space-Based Architecture, Service-Based Architecture, CQRS, Nanoservices, and Lambdas.",
     "Fragmented metapatterns":
-        "This book part discusses fragmented topologies: Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy.",
+        "This part of the book discusses fragmented topologies: Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy.",
     "Layered Services":
         "This chapter discusses layered services, their orchestrated and choreographed variants, and Command-Query Responsibility Segregation (CQRS) systems.",
     "Polyglot Persistence":
@@ -64,7 +64,7 @@ meta_descriptions = {
     "Hierarchy":
         "This chapter explores hierarchical architectures: Cell-Based Architecture, Presentation-Abstraction-Control (PAC), HMVC, and Network of Networks.",
     "Implementation metapatterns":
-        "This book part discusses architectural patterns used inside a system component, namely Plugins, Hexagonal Architecture, Microkernel, and Mesh.",
+        "This part of the book discusses architectural patterns used inside system components, namely Plugins, Hexagonal Architecture, Microkernel, and Mesh.",
     "Plugins":
         "This chapter explores the highly customizable Plugins architecture and its subtypes: Plugin, Ambassador Plugin, Extension, Addin, and Addon.",
     "Hexagonal Architecture":
@@ -74,11 +74,11 @@ meta_descriptions = {
     "Mesh":
         "This chapter explores meshes, their types and examples: peer-to-peer networks, Service Mesh, Space-Based Architecture, Leaf-Spine Architecture, and Actors.",
     "Analytics":
-        "This book part compares architectural patterns, highlights ambiguous cases, shows how a system evolves over time, and revisits coupling and cohesion.",
+        "This part of the book compares architectural patterns, highlights ambiguous cases, shows how a system evolves over time, and revisits coupling and cohesion.",
     "Comparison of architectural patterns":
-        "This chapter explores the ways patterns share functionality or data among their components, build pipelines, and use dependency inversion or indirection.",
+        "This chapter explores the ways patterns share functionality or data between their components, build pipelines, and use dependency inversion or indirection.",
     "Sharing functionality or data among services":
-        "This section discusses various ways, including separation, delegation, and replication, to share functionality or data in a complex or distributed system.",
+        "This section discusses various ways to share functionality or data in a complex or distributed system, including separation, delegation, and replication.",
     "Pipelines in architectural patterns":
         "This section discusses architectural patterns that involve pipelined data processing, namely Pipes and Filters, Event-Driven Architecture, MVC, and CQRS.",
     "Dependency inversion in architectural patterns":
@@ -100,7 +100,7 @@ meta_descriptions = {
     "Choose your own architecture":
         "This section is a guide to choosing an architectural style based on project size, domain features, target performance, and flexibility requirements.",
     "Appendices":
-        "This book part contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revision history.",
+        "This part of the book contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revision history.",
     "Acknowledgements":
         "Thanks to all the people who made the Architectural Metapatterns book possible.",
     "Books referenced":
@@ -114,11 +114,11 @@ meta_descriptions = {
     "Evolutions of a Monolith that lead to Shards":
         "Multiple stateful or stateless instances of a Monolith can be deployed to improve performance. The systems may need a Sharding Proxy or Load Balancer.",
     "Evolutions of a Monolith that result in Layers":
-        "A Monolith can be split into Layers, or a specialized layer, such as a Proxy or an Orchestrator, may be added between an existing Monolith and its clients.",
+        "A Monolith can be split into Layers. Or, a specialized layer, such as a Proxy or an Orchestrator, may be added between an existing Monolith and its clients.",
     "Evolutions of a Monolith that make Services":
-        "A Monolith can be divided into modules, Services, or a Pipeline to support development by multiple teams, improve its codebase, and employ more hardware.",
+        "A Monolith can be divided into modules, Services, or a Pipeline to support development by multiple teams, improve its codebase, and deploy more hardware.",
     "Evolutions of a Monolith that rely on Plugins":
-        "Plugins or Interpreter make a monolithic component customizable. Hexagonal Architecture protects its business logic from unstable external dependencies. ",
+        "Plugins or an Interpreter make a monolithic component customizable. Hexagonal Architecture protects its business logic from unstable external dependencies.",
     "Evolutions of Shards that share data":
         "The main issue with Shards is coordination between the instances. It is solved by deploying a Shared Repository or wrapping the shared data with a service.",
     "Evolutions of Shards that share logic":
@@ -183,9 +183,9 @@ image_descriptions = {
     "Communication/Add Remove with Shared Message.png":
         "A service in a pipeline with a shared message format can be replaced with another service if the message fields which it uses are also replaced.",
     "Communication/Blackboard.png":
-        "Components of Blackboard Architecture.",
+        "Components of the Blackboard Architecture.",
     "Communication/Cell-Based Architecture.png":
-        "A diagram of Cell-Based Architecture.",
+        "A diagram of the Cell-Based Architecture.",
     "Communication/Cross-link Pipeline.png":
         "Cross-linking independent pipelines by establishing new data or event streams.",
     "Communication/Downstream Dependencies.png":
@@ -283,11 +283,13 @@ image_descriptions = {
     "Conclusion/DI-1.png":
         "Plugins depend on the core's SPIs. There are multiple versions of plugins. Adapters of Hexagonal Architecture depend on both the core's SPIs and APIs of the adapted components.",
     "Conclusion/DI-2.png":
-        "In an operating system device drivers depend on the kernel's SPIs. In a hierarchy child nodes depend on their parent's SPI. Cell-Based Architecture uses adapters to break dependencies between Cells.",
+        "In an operating system, device drivers depend on the kernel's SPIs. In a hierarchy, child nodes depend on their parent's SPI. Cell-Based Architecture uses adapters to break dependencies between Cells.",
     "Conclusion/DI-3.png":
         "Standard APIs are used between frontend and backend, and backend and database. CQRS views and adapters protect a service from dependencies on other services.",
     "Conclusion/Indirection-Command.png":
         "Dependency diagrams for Anticorruption Layer, Open Host Service, and Orchestrated Services.",
+    "Conclusion/Indirection-Plugin.png":
+        "A service which injects a plugin into another service and streams data for use by the plugin.",
     "Conclusion/Indirection-Query.png":
         "Dependency diagrams for CQRS View, Reporting Database, and Query Service.",
     "Conclusion/Lifecycle-1.png":
@@ -787,7 +789,7 @@ image_descriptions = {
     "Variants/1/Reactor - Single Thread.png":
         "A single thread that blocks on calls to an operating system executes a request and then another request which has to wait in a queue.",
     "Variants/1/Reactor with Extractors.png":
-        "In the extract phase components call each other and add actions to their queues. In the react phase they execute the actions from their queues but don't interact. The phases alternate.",
+        "In the extraction phase components call each other and add actions to their queues. In the reaction phase they execute the actions from their queues but don't interact. The phases alternate.",
     "Variants/1/Service - Cell.png":
         "Three subservices behind a Cell gateway. Two of them share a database.",
     "Variants/1/Service - Hexagonal.png":
@@ -949,7 +951,7 @@ image_descriptions = {
     "Variants/3/PP - Private and Shared.png":
         "A subset of data shared between shards and between services.",
     "Variants/3/PP - Specialized.png":
-        "A service uses both SQL and NoSQL databases.",
+        "A service which uses both SQL and NoSQL databases.",
     "Variants/3/Query Service.png":
         "Several services both stream updates and query data from a shared query service.",
     "Variants/3/Read-only Replica.png":
@@ -1021,7 +1023,7 @@ image_descriptions = {
     "Variants/4/P2P.png":
         "Each application is connected to a node of a mesh. The nodes find each other's addresses in a registry and then communicate directly.",
     "Variants/4/Pedestal.png":
-        "A Pedestal uses a driver for each hardware component. There is a control layer that mediates the drivers. An operating system adds a kernel between the drivers and an application that uses them.",
+        "A Pedestal has a control layer mediating hardware drivers which wrap each hardware component. An operating system adds a kernel between the drivers and an application that uses them.",
     "Variants/4/Plugins.png":
         "Several low-level plugins are called by a use case running in a system.",
     "Variants/4/Saga engine.png":

@@ -237,7 +237,7 @@ class MarkdownWriter:
         # Merge
         result = "".join(output)
         assert result
-        return result
+        return result.replace("’*s", "*’s") # * sticks to letters, therefore something like *Cell'*s does not convert to an italicized word in markdown.
     
     @staticmethod
     def _get_color_id(color):

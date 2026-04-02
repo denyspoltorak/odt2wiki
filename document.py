@@ -450,6 +450,7 @@ class Section:
                         self._replace_links_in_content(col, mapping, broken)
             case DefinitionList():
                 for i in c.items:
+                    self._replace_links_in_content(i[0], mapping, broken)
                     self._replace_links_in_content(i[1], mapping, broken)
     
     def _replace_single_bookmark(self, bookmarks, mapping):

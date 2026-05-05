@@ -4,6 +4,7 @@
 
 from argparse import ArgumentParser
 from zipfile import ZipFile
+from tempfile import TemporaryDirectory
 import os.path
 import functools
 import importlib
@@ -62,7 +63,7 @@ def extract_text(content, dest_path):
     with open(dest_path, "x") as output:
         output.write(visitor.results())
 
-def analyze(content, styles, split_level, customization, analytics):
+def analyze(archive, content, styles, split_level, images_folder, remote_images, customization, analytics):
     # Parse the input file
     visitor = odt_parser.FullVisitor()
     visitor.preload_styles(styles)
@@ -73,9 +74,13 @@ def analyze(content, styles, split_level, customization, analytics):
     doc.finalize()
     doc.push_root(document.Section.create("Home"))
     doc.create_folders()
+    # Process images if needed
+    if images_folder:
+        with TemporaryDirectory() as tempdirname:
+            _process_images(doc, archive, tempdirname, images_folder, remote_images, False, customization)
     # Run the analyitcs
     print()
-    result = analytics.make(doc.root())
+    result = analytics.make(doc.root(), customization)
     if result:
         print(result)
 
@@ -209,7 +214,7 @@ def main():
     description = "Convert ODT to wiki markdown. It can split a book into chapters and match images from the document to those on your drive."
     usage = """
 odt2wiki.py <input.odt> --print={files|attrs|tags}
-odt2wiki.py <input.odt> --analyze=<script> [--split=<level>] [--customize=<python_module>]
+odt2wiki.py <input.odt> --analyze=<script> [--split=<level>] [--customize=<python_module>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]]
 odt2wiki.py <input.odt> <output.txt> --convert=text
 odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<level>] [--split=<level>] [--images-folder=<folder> [--remote-images={<link>|<folder>}]] [--customize=<python_module>]"""
     
@@ -276,7 +281,14 @@ odt2wiki.py <input.odt> <output_folder> --convert={github|hugo} [--collapse=<lev
             # Run the command
             if args.analyze:
                 analytics = importlib.import_module("analytics." + args.analyze).export()
-                analyze(parsed_content, parsed_styles, args.split_level, customization, analytics)
+                analyze(archive, 
+                        parsed_content, 
+                        parsed_styles, 
+                        args.split_level, 
+                        args.images_folder, 
+                        args.remote_images, 
+                        customization, 
+                        analytics)
             else:
                 assert args.convert
                 # Process more parameters

@@ -147,12 +147,10 @@ class HugoMarkdownWriter(md_writer.MarkdownWriter):
         if image:
             assert not image.endswith(".svg")
             output.append(f'images = ["{self._escape_link(image)}"]')
-        for c in creator.content:
-            if isinstance(c, document.Image):
-                image_name = c.data.original
-                assert not image_name.endswith(".svg")
-                output.append(f'primary_image = "{self._escape_link(image_name)}"')
-                break
+        primary_image = self._customization.get_primary_image(creator)
+        if(primary_image):
+            assert not primary_image.endswith(".svg")
+            output.append(f'primary_image = "{self._escape_link(primary_image)}"')
         # ToC
         if creator.type == document.SectionType.FOLDER:
             output.append("bookCollapseSection = true")

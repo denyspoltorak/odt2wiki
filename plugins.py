@@ -108,6 +108,11 @@ class Customization:
     def get_preview_image(section):
         return None
     
+    # Return an image for showing in Google search
+    @staticmethod
+    def get_primary_image(section):
+        return None
+    
     # Return an image for showing in a CSS-grid-based table of contents, Wide() for a row-length item or None for text
     @staticmethod
     def get_toc_image(section_name):

@@ -10,6 +10,7 @@ from custom.metapatterns_seo import *
 toc_images = {
     "About this book":                                      "/diagrams/Web/About.png",
     "Metapatterns":                                         "/diagrams/Web/Metapatterns.png",
+    "System topologies":                                    "/diagrams/Web/Topologies.png",
     "Modules and complexity":                               "/diagrams/Web/Complexity.png",
     "Forces, asynchronicity, and distribution":             "/diagrams/Web/Forces.png",
     "Four kinds of software":                               "/diagrams/Web/4Kinds.png",
@@ -49,6 +50,10 @@ toc_images = {
     "Cohesers and decouplers":                              "/diagrams/Web/Heart.png",
     "Deconstructing patterns":                              "/diagrams/Web/Heart2.png",
     "Choose your own architecture":                         "/diagrams/Web/Heart3.png"
+}
+
+primary_images = {
+    "System topologies":                                    "/diagrams/Topologies/Topologies Map.png",
 }
 
 override_images = {
@@ -95,6 +100,7 @@ assert extra_split.issubset(meta_descriptions.keys())
 assert definition_lists.issubset(meta_descriptions.keys())
 assert set(grid_tocs.keys()).issubset(meta_descriptions.keys())
 assert set(toc_images.keys()).issubset(meta_descriptions.keys())
+assert set(primary_images.keys()).issubset(meta_descriptions.keys())
 assert wide_previews.issubset(meta_descriptions.keys())
 
 
@@ -241,6 +247,18 @@ class MetapatternsCustomization(plugins.Customization):
         link = toc_images.get(title, self.large_favicon)
         assert link.startswith(self.image_path)
         return link.replace(self.image_path, self.og_path)
+    
+    def get_primary_image(self, section):
+        title = section.header.to_string()
+        link = primary_images.get(title)
+        # Try overrides
+        if link:
+            return link
+        # Else use the first image of the main section
+        for c in section.content:
+            if isinstance(c, document.Image):
+                return c.data.original
+        return None
 
     def get_toc_image(self, section_name):
         if section_name in wide_previews:

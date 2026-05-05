@@ -7,6 +7,8 @@ meta_descriptions = {
         "This is the introduction to the Architectural Metapatterns book. It discusses the book's rationale, structure, and the types of diagrams used in the text.",
     "Metapatterns":
         "This chapter explores metapatterns (clusters of closely related patterns), design space, and the abstractness-subdomain-sharding system of coordinates.",
+    "System topologies":
+        "This chapter explores common system topologies arranged according to the measure of their partitioning into layers or subdomains.",
     "Foundations of software architecture":
         "This part of the book discusses fundamental topics: complexity, non-functional requirements (forces), communication paradigms, and types of software systems.",
     "Modules and complexity":
@@ -726,6 +728,44 @@ image_descriptions = {
         "Scaling a single service or the entire system.",
     "Relations/Shared Repository.png":
         "A shared repository for Services, Shards, and Service-Oriented Architecture.",
+    "Topologies/Topologies Map.png":
+        "A map of system topologies arranged according to the amount of their partitioning into layers and services.",
+    "Topologies/Barebone Services.png":
+        "Diagrams of Services, Three-Layered Services, Pipeline, and Two-Layered Services.",
+    "Topologies/True Monoliths.png":
+        "Diagrams of Monolith, Shards, and Replicas.",
+    "Topologies/Layered Services.png":
+        "Diagrams of Orchestrated Three-Layered Services and Choreographed Two-Layered Services.",
+    "Topologies/Ordinary Layers.png":
+        "Diagrams of DDD-Style Layers, Layers with Polyglot Persistence, Layers with Backends for Frontends, and Monolith with a database.",
+    "Topologies/Monoliths with Layers.png":
+        "Diagrams of Monolith with Backends for Frontends, Managed Shards, Peer-to-Peer Mesh, Monolith with a database, and Monolith with Polyglot Persistence.",
+    "Topologies/Monoliths with Plugins.png":
+        "Diagrams of Monolith with Plugins, Model-View-Controller, and Hexagonal Architecture.",
+    "Topologies/Partitioning.png":
+        "Technical partitioning into Layers, domain partitioning into Services, and multiple instances of a system.",
+    "Topologies/Hierarchies of Services.png":
+        "Diagrams of Cell-Based Architecture and Hierarchical Middleware.",
+    "Topologies/Other Layered.png":
+        "Diagrams of Model-View-Presenter, Onion Architecture, and Sandwich.",
+    "Topologies/Hexagonal Architecture.png":
+        "Diagrams of Ports and Adapters and Onion Architecture.",
+    "Topologies/Underdeveloped Moduliths.png":
+        "Diagrams of Monolith with libraries and Modulith with shared code.",
+    "Topologies/Separated Presentation.png":
+        "Diagrams of Model-View-Presenter and Model-View-Controller.",
+    "Topologies/Scaled Layers.png":
+        "Diagrams of Three-Tier System, MapReduce, Managed Shards, Scaled Service, and Peer-to-Peer Mesh.",
+    "Topologies/Layers of Services.png":
+        "Diagrams of Services with Polyglot Persistence, Services with Backends for Frontends, and Service-Oriented Architecture.",
+    "Topologies/Control Patterns.png":
+        "Diagrams of Pedestal and Microkernel.",
+    "Topologies/Plugin Architecture.png":
+        "A plugin, library, and extension called by a core.",
+    "Topologies/Partially Merged Services.png":
+        "Diagrams of Sandwich and Modulith with shared code.",
+    "Topologies/Services with Extensions.png":
+        "Diagrams of Services with a Gateway; Orchestrated Services; Services with: an API Gateway, Backends for Frontends, Shared Repository, Middleware, and Pplyglot Persistence; and of Service Mesh.",
     "Variants/1/Actors.png":
         "Actors running over an actor framework.",
     "Variants/1/Application - Derived.png":
@@ -1112,6 +1152,8 @@ image_descriptions = {
         "A diagram of a client communicating with a service which writes to a shared data layer, causing data processing by two other services.",
     "Web/Sharing.png":
         "A diagram of two services with private databases and one database shared by the services.",
+    "Web/Topologies.png":
+        "Diagrams of Monolith, Layers, Plugins, Hierarchy, and Services in a system of coordinates that shows partitioning into layers and subdomains.",
 }
 
 

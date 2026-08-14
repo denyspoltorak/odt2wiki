@@ -87,6 +87,8 @@ meta_descriptions = {
         "This section discusses dependency inversion in Plugins, Hexagonal Architecture, Microkernel, Hierarchy, Layers, and Services.",
     "Indirection in commands and queries":
         "This section discusses indirection as implemented with Anticorruption Layer or Open Host Service in OLTP and with CQRS View or Reporting Database in OLAP.",
+    "The multiform read-write separation":
+        "Patterns that separate read and write paths include: read-only database replicas, response cache, CQRS, Data Mesh, MVCC, and (Re)Actor-with-Extractors.",
     "Ambiguous patterns":
         "This chapter explores ambiguous patterns: Monolith, Reactor, Microkernel, Domain Services, Service-Based Architecture, Cell, and Nanoservices.",
     "Architecture and product life cycle":
@@ -314,6 +316,16 @@ image_descriptions = {
         "Events from the mouse pass to the controller and the model, and those from the model - to the view and display.",
     "Conclusion/Pipelineliness-PipesAndFilters.png":
         "Pipes and Filters where a data stream originates with the source, passes several filters, and ends in a sink.",
+    "Conclusion/RW-Cache.png":
+        "The cache layer remembers responses from the application and reuses them for incoling client queries.",
+    "Conclusion/RW-Control.png":
+        "The control layer repeatedly queries the model layer and finally decides to send a request which is propagated down to the hardware components.",
+    "Conclusion/RW-CQRS-Options.png":
+        "The domain-level separation of CQRS can be combined with the data-level separation of read-only database replicas or a pair of OLTP and OLTP databases.",
+    "Conclusion/RW-MVCC.png":
+        "The database creates a snapshot of its data for every incoming write request. A read request is served from the latest snapshot. Unused snapshots are deleted.",
+    "Conclusion/RW-OLTP-OLAP.png":
+        "Write requests go to the OLTP database. Read requests go to the OLAP database. The OLTP database streams changes to the OLAP database.",
     "Conclusion/Sharing-DedicatedService.png":
         "A shared logger deployed as a service in Service-Oriented Architecture. A shared counter deployed as a stand-alone shared database in Polyglot Persistence.",
     "Conclusion/Sharing-Delegate.png":
@@ -948,6 +960,10 @@ image_descriptions = {
         "A message collects pieces of data while passing through a pipeline.",
     "Variants/2/User Interface.png":
         "A user interface stands between a human and software. It receives mouse input and produces output on a display.",
+    "Variants/2/Vertical Slice Architecture - Basic.png":
+        "Each screen is connected to several backend slices, all of which share a database.",
+    "Variants/2/Vertical Slice Architecture - Real.png":
+        "In complex systems slices are grouped into features which are further composed into services. Each feature or service is encapsulated with an API. There are shared components.",
     "Variants/3/BFF - API gateways.png":
         "Each API Gateway in the Backends for Frontends layer both adapts its client's protocol and orchestrates the services of the domain layer.",
     "Variants/3/BFF - Event mediators.png":
@@ -1136,6 +1152,8 @@ image_descriptions = {
         "A diagram of three services that share two databases.",
     "Web/Proxy.png":
         "A diagram of a client above a proxy above three services.",
+    "Web/Read-write.png":
+        "Read and write requests go to different databases.",
     "Web/Real-world.png":
         "A diagram of three services with queues of people and luggage above a transport layer with train stations and trains.",
     "Web/Sandwich.png":

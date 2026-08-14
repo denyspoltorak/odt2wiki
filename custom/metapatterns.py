@@ -43,6 +43,7 @@ toc_images = {
     "Pipelines in architectural patterns":                  "/diagrams/Web/Pipelineliness.png",
     "Dependency inversion in architectural patterns":       "/diagrams/Web/DI.png",
     "Indirection in commands and queries":                  "/diagrams/Web/Indirection.png",
+    "The multiform read-write separation":                  "/diagrams/Web/Read-write.png",
     "Ambiguous patterns":                                   "/diagrams/Web/Ambiguous.png",
     "Architecture and product life cycle":                  "/diagrams/Web/Life cycle.png",
     "Real-world inspirations for architectural patterns":   "/diagrams/Web/Real-world.png",

@@ -44,6 +44,7 @@ toc_images = {
     "Dependency inversion in architectural patterns":       "/diagrams/Web/DI.png",
     "Indirection in commands and queries":                  "/diagrams/Web/Indirection.png",
     "The multiform read-write separation":                  "/diagrams/Web/Read-write.png",
+    "Latency optimizations on the system level":            "/diagrams/Web/Latency.png",
     "Ambiguous patterns":                                   "/diagrams/Web/Ambiguous.png",
     "Architecture and product life cycle":                  "/diagrams/Web/Life cycle.png",
     "Real-world inspirations for architectural patterns":   "/diagrams/Web/Real-world.png",
@@ -55,6 +56,7 @@ toc_images = {
 
 primary_images = {
     "System topologies":                                    "/diagrams/Topologies/Topologies Map.png",
+    "Latency optimizations on the system level":            "/diagrams/Performance/Plugins-injection.png",
 }
 
 override_images = {

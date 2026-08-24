@@ -89,6 +89,8 @@ meta_descriptions = {
         "This section discusses indirection as implemented with Anticorruption Layer or Open Host Service in OLTP and with CQRS View or Reporting Database in OLAP.",
     "The multiform read-write separation":
         "Patterns that separate read and write paths include: read-only database replicas, response cache, CQRS, Data Mesh, MVCC, and (Re)Actor-with-Extractors.",
+    "Latency optimizations on the system level":
+        "Architectural level latency optimizations co-locate or bypass components, preprocess and preload data, and rely on non-blocking access or request hedging.",
     "Ambiguous patterns":
         "This chapter explores ambiguous patterns: Monolith, Reactor, Microkernel, Domain Services, Service-Based Architecture, Cell, and Nanoservices.",
     "Architecture and product life cycle":
@@ -296,6 +298,16 @@ image_descriptions = {
         "A service which injects a plugin into another service and streams data for use by the plugin.",
     "Conclusion/Indirection-Query.png":
         "Dependency diagrams for CQRS View, Reporting Database, and Query Service.",
+    "Conclusion/Latency-Bypass.png":
+        "A hierarchical control system, Model-View-Controller, and and an OS with kernel bypass featuring early response.",
+    "Conclusion/Latency-Colocate.png":
+        "An ambassador sharding proxy, mesh nodes in sidecars, and an actor framework optimize latency by co-locating system components.",
+    "Conclusion/Latency-EarlyResponse.png":
+        "In a rate limiter, response cache, or a pipeline the component which receives a client request may respond immediately.",
+    "Conclusion/Latency-Omit.png":
+        "In a half-proxy or open orchestrator a system layer may be omitted. A telephone server leaves conversation after the phones establish a direct connection.",
+    "Conclusion/Latency-Preloading.png":
+        "A Space-Based Architecture, CQRS, and CQRS view.",
     "Conclusion/Lifecycle-1.png":
         "A diagram of a monolith.",
     "Conclusion/Lifecycle-2.png":
@@ -1122,6 +1134,8 @@ image_descriptions = {
         "A diagram of a hierarchy with three layers. There is one component in the top layer, two components below it, and five components in the lowest layer.",
     "Web/Indirection.png":
         "A diagram of a client accessing a service through an adapter.",
+    "Web/Latency.png":
+        "The first component of a pipeline immediately responds to the client.",
     "Web/Layered Services.png":
         "A diagram of three three-layered services.",
     "Web/Layers.png":

@@ -2,7 +2,7 @@ meta_descriptions = {
     "The pattern language of software architecture":
         "Architectural Metapatterns is a compendium that organizes architectural patterns according to their structure and function into a universal pattern language.",
     "Introduction":
-        "Architectural Metapatterns is a compendium of architectueral patterns, an atlas of system topologies, and one of the largest pattern languages.",
+        "Architectural Metapatterns is a compendium of architectural patterns, an atlas of system topologies, and one of the largest pattern languages.",
     "About this book":
         "Architectural Metapatterns contains introductory topics, 19 chapters each dedicated to a cluster of closely related patterns, analytics, and pattern evolutions.",
     "Metapatterns":
@@ -20,9 +20,9 @@ meta_descriptions = {
     "Arranging communication":
         "The components of a software system can be integrated through orchestration, choreography, or shared data. Each approach has benefits and drawbacks.",
     "Programming and architectural paradigms":
-        "The object-oriented, functional, and procedural paradigms re-emerge at the system level as microservies, pipelines, and Space-Based Architecture.",
+        "The object-oriented, functional, and procedural paradigms re-emerge at the system level as microservices, pipelines, and Space-Based Architecture.",
     "Orchestration":
-        "Orchestration relies on a facade or mediator to integrate the entire system. It sacrifices performance for support of high number of complex scenarios.",
+        "Orchestration relies on a facade or mediator to integrate the entire system. It sacrifices performance for support of a high number of complex scenarios.",
     "Choreography":
         "Choreography builds a pipeline to process requests. It may work through commands, publish/subscribe, or shared message format. Early response is preferred.",
     "Shared data":
@@ -78,7 +78,7 @@ meta_descriptions = {
     "Analytics":
         "We will compare architectural patterns, highlight ambiguous pattern names, show how a system evolves over time, and revisit coupling and cohesion.",
     "Comparison of architectural patterns":
-        "The classification of architectural patterns into metapatterns is applied to compare them and reveal how various architectures approach certain problem.",
+        "The classification of architectural patterns into metapatterns is applied to compare them and reveal how various architectures approach certain problems.",
     "Sharing functionality or data among services":
         "When you need to share code, library, or data between services, you can: co-locate everything, dedicate a shared service, delegate, or replicate the aspect.",
     "Pipelines in architectural patterns":
@@ -94,7 +94,7 @@ meta_descriptions = {
     "Ambiguous patterns":
         "The meaning of Monolith, Reactor, Microkernel, Domain Services, Service-Based Architecture, Cell, or Nanoservices varies depending on which book you read.",
     "Architecture and product life cycle":
-        "Software architecture changes as a project grows, matures, and dies. It starts small, then expands into fragmens, then collapses back to a monolithic state.",
+        "Software architecture changes as a project grows, matures, and dies. It starts small, then expands into fragments, then collapses back to a monolithic state.",
     "Real-world inspirations for architectural patterns":
         "There are parallels between our daily life, software design and patterns. The article shows how the same ideas bloom in software and in the physical world.",
     "The heart of software architecture":
@@ -287,7 +287,7 @@ image_descriptions = {
     "Conclusion/Ambiguous-ServiceBasedArchitecture.png":
         "Service-Based Architecture, microservices, and Service-Oriented Architecture.",
     "Conclusion/DI-1.png":
-        "Plugins depend on the core's SPIs wjile adapters of Hexagonal Architecture depend on both the core's SPIs and APIs of the adapted components.",
+        "Plugins depend on the core's SPIs while adapters of Hexagonal Architecture depend on both the core's SPIs and APIs of the adapted components.",
     "Conclusion/DI-2.png":
         "Dependencies in an operating system, hierarchy, and Cell-Based Architecture.",
     "Conclusion/DI-3.png":
@@ -299,7 +299,7 @@ image_descriptions = {
     "Conclusion/Indirection-Query.png":
         "Dependencies for a CQRS view, reporting database, and query service.",
     "Conclusion/Latency-Bypass.png":
-        "A hierarchical control system, Model-View-Controller, and and an OS with kernel bypass featuring early response.",
+        "A hierarchical control system, Model-View-Controller, and an OS with kernel bypass featuring early response.",
     "Conclusion/Latency-Colocate.png":
         "An ambassador sharding proxy, mesh nodes in sidecars, and an actor framework optimize latency by co-locating system components.",
     "Conclusion/Latency-EarlyResponse.png":
@@ -357,7 +357,7 @@ image_descriptions = {
     "Contents/Layers.png":
         "Layered architecture.",
     "Contents/Mesh.png":
-        "Services comminicating through a mesh.",
+        "Services communicating through a mesh.",
     "Contents/Microkernel.png":
         "Microkernel.",
     "Contents/Middleware.png":
@@ -369,7 +369,7 @@ image_descriptions = {
     "Contents/Pipeline.png":
         "Pipeline.",
     "Contents/Plugins.png":
-        "Plugins Architecture.",
+        "Plugin Architecture.",
     "Contents/Polyglot Persistence.png":
         "Services with polyglot persistence.",
     "Contents/Proxy.png":
@@ -545,7 +545,7 @@ image_descriptions = {
     "Evolutions/Monolith/Monolith to Stateless Shards with Shared DB.png":
         "A monolith is transformed into stateless instances which run behind a load balancer and access a shared database.",
     "Evolutions/Monolith/Monolith_ Services and Pipeline.png":
-        "In services a single component executes a client request while in pipeline there is no use case owner.",
+        "In services a single component executes a client request while in a pipeline there is no use case owner.",
     "Evolutions/Services/Pipeline promote Front Controller.png":
         "The first service of a pipeline subscribes to notifications from other services and thus becomes a front controller.",
     "Evolutions/Services/Pipeline use Orchestrator.png":
@@ -673,7 +673,7 @@ image_descriptions = {
     "Main/Pipeline.png":
         "Pipeline.",
     "Main/Plugins.png":
-        "Plugins Architecture.",
+        "Plugin Architecture.",
     "Main/Polyglot Persistence.png":
         "Services with polyglot persistence.",
     "Main/Proxy.png":
@@ -689,7 +689,7 @@ image_descriptions = {
     "Main/Shared Repository.png":
         "Services with a shared repository.",
     "Misc/Diagrams.png":
-        "A structural, sequence, and dependency diagrams in NoSQL notation as used throughout the Architectural Metapatterns book.",
+        "A structural, sequence, and dependency diagram in NoSQL notation as used throughout the Architectural Metapatterns book.",
     "Misc/Layers of Services.png":
         "Backends for frontends and services with polyglot persistence.",
     "Misc/Orchestrator.png":
@@ -875,7 +875,7 @@ image_descriptions = {
     "Variants/1/Shards - Sharding.png":
         "A sharding proxy connects a new client to a shard that contains data for the first letter of the client's name.",
     "Variants/1/Subtypes of Monolith.png":
-        "Control flow diagrams for a reactor, proactor, and Half-Sync/Half-Async.",
+        "Control flow for a reactor, proactor, and Half-Sync/Half-Async.",
     "Variants/1/Subtypes of Services.png":
         "A monolithic service, layered service, hexagonal services, scaled service, and a cell interconnected into a single system.",
     "Variants/1/Three-Tier.png":
@@ -893,7 +893,7 @@ image_descriptions = {
     "Variants/2/CQRS to Layered Services.png":
         "The single database of a sandwich-like CQRS with a shared database is subdivided into OLTP and OLAP databases, forming layered services.",
     "Variants/2/CQRS.png":
-        "A large read and smaller write models between a user interface and database.",
+        "A large read and smaller write model between a user interface and database.",
     "Variants/2/Cache.png":
         "A cache proxies requests and remembers responses to shortcircuit the processing of future requests.",
     "Variants/2/Data Grid.png":
@@ -1121,7 +1121,7 @@ image_descriptions = {
     "Web/DI.png":
         "Polymorphic device drivers in an operating system.",
     "Web/Forces.png":
-        "Mssaging in a three-layered system with the lower layer making multiple calls to hardware.",
+        "Messaging in a three-layered system with the lower layer making multiple calls to hardware.",
     "Web/Heart.png":
         "The pain level of maintaining a project depends on the project's size, with different architectures being optimal for different project sizes.",
     "Web/Heart2.png":
@@ -1147,7 +1147,7 @@ image_descriptions = {
     "Web/Metapatterns.png":
         "Abstraction, subdomain, and sharding axes with the following text between them: your pattern here.",
     "Web/Microkernel.png":
-        "Aplications running over a microkernel.",
+        "Applications running over a microkernel.",
     "Web/Middleware.png":
         "Services connected through a middleware.",
     "Web/Monolith.png":
@@ -1159,9 +1159,9 @@ image_descriptions = {
     "Web/Pipeline.png":
         "A pipeline made from input, three processing steps, and output.",
     "Web/Pipelineliness.png":
-        "A client passing data to a service, which passes it to its database, which passes it to another service's database, from which it goes to the other service, and back to the client.",
+        "A client passes data to a service, which passes it to its database, which passes it to another service's database, from which it goes to the other service, and back to the client.",
     "Web/Plugins.png":
-        "Plugins Architecture.",
+        "Plugin Architecture.",
     "Web/Polyglot Persistence.png":
         "Polyglot Persistence.",
     "Web/Proxy.png":

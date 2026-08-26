@@ -1,112 +1,112 @@
 meta_descriptions = {
     "The pattern language of software architecture":
-        "This is an online version of the Architectural Metapatterns book which explores system topologies and arranges architectural patterns into a pattern language.",
+        "Architectural Metapatterns is a compendium that organizes architectural patterns according to their structure and function into a universal pattern language.",
     "Introduction":
-        "This part of the book covers introductory topics that range from the book's structure to the underlying theory that enabled the research presented in the book.",
+        "Architectural Metapatterns is a compendium of architectueral patterns, an atlas of system topologies, and one of the largest pattern languages.",
     "About this book":
-        "This is the introduction to the Architectural Metapatterns book. It discusses the book's rationale, structure, and the types of diagrams used in the text.",
+        "Architectural Metapatterns contains introductory topics, 19 chapters each dedicated to a cluster of closely related patterns, analytics, and pattern evolutions.",
     "Metapatterns":
-        "This chapter explores metapatterns (clusters of closely related patterns), design space, and the abstractness-subdomain-sharding system of coordinates.",
+        "Architectural patterns can be organized according to their structure and function, which reveals relations between the patterns and creates a pattern language.",
     "System topologies":
-        "This chapter explores common system topologies arranged according to the measure of their partitioning into layers or subdomains.",
+        "System and software architectures are organized by their partitioning into monolithic, layered, service-based, fragmented, and plugins topologies.",
     "Foundations of software architecture":
-        "This part of the book discusses fundamental topics: complexity, non-functional requirements (forces), communication paradigms, and types of software systems.",
+        "Introductory topics of software architecture review complexity, non-functional requirements (forces), communication paradigms, and types of software systems.",
     "Modules and complexity":
-        "This chapter graphically explores the basic concepts of software architecture: complexity, modularity, encapsulation, bounded contexts, coupling, and cohesion.",
+        "The basic concepts of software architecture: complexity, modularity, encapsulation, bounded contexts, coupling, and cohesion are explored with diagrams.",
     "Forces, asynchronicity, and distribution":
-        "This chapter explores non-functional requirements (forces), their conflicts, and the ways to address them in modular, asynchronous, or distributed systems.",
+        "Modularity, asynchronous communication and distribution allow a system to meet conflicting forces. However, that impairs debugging and performance.",
     "Four kinds of software":
-        "This chapter discusses the internal structure and architectural patterns for control, interactive, streaming, and computational software.",
+        "There are four kinds of software with different architectures: control, interactive, streaming and computational. Let's discuss their code and patterns.",
     "Arranging communication":
-        "This chapter discusses communication paradigms: orchestration, choreography, or shared data. It shows their applicability, benefits, and drawbacks.",
+        "The components of a software system can be integrated through orchestration, choreography, or shared data. Each approach has benefits and drawbacks.",
     "Programming and architectural paradigms":
-        "This section discusses the object-oriented, functional, and procedural programming paradigms and their relation to common architectural styles.",
+        "The object-oriented, functional, and procedural paradigms re-emerge at the system level as microservies, pipelines, and Space-Based Architecture.",
     "Orchestration":
-        "This section discusses orchestration, where a single component coordinates the entire system, and mutual orchestration, where components call each other.",
+        "Orchestration relies on a facade or mediator to integrate the entire system. It sacrifices performance for support of high number of complex scenarios.",
     "Choreography":
-        "This section discusses choreography, where a system component processes inputs and produces outputs without any knowledge about other components.",
+        "Choreography builds a pipeline to process requests. It may work through commands, publish/subscribe, or shared message format. Early response is preferred.",
     "Shared data":
-        "This section illustrates the use of shared data for integration of system components with an example of a ticketing service.",
+        "Communication through shared data allows for the services that operate the data to be independent. The data layer is used for persistence, messaging, or both.",
     "Comparison of communication styles":
-        "This section discusses the use cases, benefits, and drawbacks of orchestration, choreography, and integration through shared data.",
+        "Orchestration tackles complex use cases, choreography provides good performance for data transformations, while shared data supports data-centric domains.",
     "Basic metapatterns":
-        "This part of the book discusses basic system topologies: Monolith, Shards, Layers, Services, and Pipeline. They are building blocks for complex architectures.",
+        "Monolith, Shards, Layers, Services, and Pipeline are the basic building blocks for any complex architecture.",
     "Monolith":
-        "This chapter explores monolithic architectures: Reactor, Proactor, Half-Sync/Half-Async (coroutines), and (Re)Actor-with-Extractors (phased simulation).",
+        "The monolithic architecture is good for tiny projects. It may act as a Reactor, Proactor, Half-Sync/Half-Async (coroutines), or (Re)Actor-with-Extractors.",
     "Shards":
-        "This chapter explores sharded systems that run multiple instances of a component: partitions, replicas, replicated load-balanced services, lambdas, and actors.",
+        "Shards are instances of a component or subsystem. They can be stateful, stateless (form a pool), or created on demand. The main issue is data synchronization.",
     "Layers":
-        "This chapter explores layered architectures (Layers and Tiers) and individual layers: interface, application, domain, utilities, middleware, and persistence.",
+        "Layers or tiers subdivide a system into high-level and low-level components such as: interface, application, domain, utilities, middleware, and persistence.",
     "Services":
-        "This chapter explores architectures with subdomain modules or services: Modulith, Actors, Service-Based Architecture, Microservices, and Nanoservices.",
+        "Services dedicate a component and a team to each subdomain. Examples include Service-Based Architecture, Microservices, Modulith, Actors, and Nanoservices.",
     "Pipeline":
-        "This chapter explores pipelined architectures that process streams: Pipes and Filters, Choreographed Event-Driven Architecture, Data Mesh, and Nanoservices.",
+        "Pipelines are good for building highly scalable systems. They include Pipes and Filters, Choreographed Event-Driven Architecture, Data Mesh, and Nanoservices.",
     "Extension metapatterns":
-        "This part of the book discusses architectural components that integrate systems of services: Middleware, Shared Repository, Proxy, and Orchestrator.",
+        "Middleware, Shared Repository, Proxy, and Orchestrator extract some aspects of a system into a dedicated layer. Sandwich subdivides only the domain logic.",
     "Middleware":
-        "This chapter discusses Middleware and its variants: Message Bus, Event Mediator, Service Mesh, Enterprise Service Bus, and Persistent Event Log.",
+        "Middleware takes care of messaging, scalability, and error recovery. Its examples include Message Bus, Event Mediator, Service Mesh, and Enterprise Service Bus.",
     "Shared Repository":
-        "This chapter discusses Shared Repository and its variants: Integration Database, Blackboard, Data Grid, shared memory, shared file system, and Stamp Coupling.",
+        "Shared Repository is about persistence and communication through data. It covers: Integration Database, Blackboard, and Data Grid of Space-Based Architecture.",
     "Proxy":
-        "This chapter discusses proxies such as: Firewall, Response Cache, Load Balancer, Sharding Proxy, Reverse Proxy, Adapter, API Gateway, and even User Interface.",
+        "A Proxy represents a system to its clients and implements an aspect of its behavior. Proxies include: Firewall, Load Balancer, Adapter, and Response Cache.",
     "Orchestrator":
-        "This chapter discusses Orchestrator and its variants: API Composer, MapReduce, Process Manager, Saga, Coordinator, Integration Service, and Front Controller.",
+        "An Orchestrator integrates the underlying components. It combines the aspects of facade and mediator and is known as API Composer, Process Manager, or Saga.",
     "Sandwich":
-        "This chapter explores sandwiched architectures: Blackboard System, Space-Based Architecture, Service-Based Architecture, CQRS, Nanoservices, and Lambdas.",
+        "A Sandwich is a system midway between Layers and Services. Its examples include: Blackboard System, Space-Based Architecture, and Vertical Slice Architecture.",
     "Fragmented metapatterns":
-        "This book part discusses fragmented topologies: Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy.",
+        "Layered Services, Polyglot Persistence, Backends for Frontends, Service-Oriented Architecture, and Hierarchy comprise systems of fine-grained components,",
     "Layered Services":
-        "This chapter discusses layered services, their orchestrated and choreographed variants, and Command-Query Responsibility Segregation (CQRS) systems.",
+        "Layered Services are about the internals of systems of services. They include: orchestrated 3-layered services, choreographed 2-layered services, and CQRS.",
     "Polyglot Persistence":
-        "This chapter discusses Polyglot Persistence and its variants: read-only replicas, Cache-Aside, Memory Image, Reporting Database, CQRS View, and Query Service.",
+        "Polyglot Persistence is about using multiple databases, which may be of different kinds (SQL vs NoSQL), or dedicated to read and write requests (as in CQRS).",
     "Backends for Frontends (BFF)":
-        "This chapter discusses Backends for Frontends (BFF) which dedicates a component (proxy, orchestrator, or an API Gateway) to each kind of a system's client.",
+        "Backends for Frontends (BFF) dedicates a Proxy, Orchestrator, or an API Gateway to each kind of a system's client, allowing for drastically different clients.",
     "Service-Oriented Architecture (SOA)":
-        "This chapter explores Service-Oriented Architecture (SOA) and its variants: Distributed Monolith, Domain-Oriented Microservice Architecture, and Nanoservices.",
+        "Service-Oriented Architecture (SOA) employs 3 or 4 layers of reusable services. It fits huge projects but the naive implementation may be slow and error-prone.",
     "Hierarchy":
-        "This chapter explores hierarchical architectures: Cell-Based Architecture, Presentation-Abstraction-Control (PAC), HMVC, and Network of Networks.",
+        "Hierarchy distributes complexity over a tree of components. Examples include Cell-Based Architecture, Vertical Slice Architecture, HMVC, and Bus of Buses.",
     "Implementation metapatterns":
-        "This part of the book discusses architectural patterns used inside system components, namely Plugins, Hexagonal Architecture, Microkernel, and Mesh.",
+        "Plugins, Hexagonal Architecture (including MVC and MVP), Microkernel, and Mesh are patterns used to implement system components.",
     "Plugins":
-        "This chapter explores the highly customizable Plugins architecture and its subtypes: Plugin, Ambassador Plugin, Extension, Addin, and Addon.",
+        "Plugins, Addons, and Addins provide for customization of an application. An Ambassador Plugin injects the business logic of one service into another service.",
     "Hexagonal Architecture":
-        "This chapter explores Hexagonal Architecture and its subtypes: Ports and Adapters, Onion Architecture, MVC, MVP and MVVM, Pedestal, and Cell (Cluster).",
+        "Hexagonal Architecture (Ports and Adapters) and the derived Model-View-Controller (MVC) and Cell aim to protect business logic from external dependencies.",
     "Microkernel":
-        "This chapter explores Microkernel architecture and its variants: Interpreter, Virtualizer, Configurator, Saga engine, AUTOSAR Classic, and operating system.",
+        "Microkernel shares resources of providers among consumers. It is the pattern for operating systems, interpreters, hypervisors, and software frameworks.",
     "Mesh":
-        "This chapter explores meshes, their types and examples: peer-to-peer networks, Service Mesh, Space-Based Architecture, Leaf-Spine Architecture, and Actors.",
+        "Mesh is a system of interconnected components (nodes) of one or two types. Meshes include: peer-to-peer networks, Service Mesh, and Space-Based Architecture.",
     "Analytics":
-        "This part of the book compares architectural patterns, highlights ambiguous cases, shows how a system evolves over time, and revisits coupling and cohesion.",
+        "We will compare architectural patterns, highlight ambiguous pattern names, show how a system evolves over time, and revisit coupling and cohesion.",
     "Comparison of architectural patterns":
-        "This chapter explores the ways patterns share functionality or data between their components, build pipelines, and use dependency inversion or indirection.",
+        "The classification of architectural patterns into metapatterns is applied to compare them and reveal how various architectures approach certain problem.",
     "Sharing functionality or data among services":
-        "This section discusses various ways to share functionality or data in a complex or distributed system, including separation, delegation, and replication.",
+        "When you need to share code, library, or data between services, you can: co-locate everything, dedicate a shared service, delegate, or replicate the aspect.",
     "Pipelines in architectural patterns":
-        "This section discusses architectural patterns that involve pipelined data processing, namely Pipes and Filters, Event-Driven Architecture, MVC, and CQRS.",
+        "A data or event stream may or may not preserve the data type, order, and identity, as seen in Pipes and Filters, EDA, CQRS, and MVC.",
     "Dependency inversion in architectural patterns":
-        "This section discusses dependency inversion in Plugins, Hexagonal Architecture, Microkernel, Hierarchy, Layers, and Services.",
+        "Dependency inversion on the system level is used in Plugins, Hexagonal Architecture, Microkernel, Hierarchy, and, to a certain extent, in Layers or Services.",
     "Indirection in commands and queries":
-        "This section discusses indirection as implemented with Anticorruption Layer or Open Host Service in OLTP and with CQRS View or Reporting Database in OLAP.",
+        "OLTP systems use Anticorruption Layer, Open Host Service, and Orchestrator as adapters. Data Mesh relies on CQRS View, Reporting Database, or Query Service.",
     "The multiform read-write separation":
         "Patterns that separate read and write paths include: read-only database replicas, response cache, CQRS, Data Mesh, MVCC, and (Re)Actor-with-Extractors.",
     "Latency optimizations on the system level":
         "Architectural level latency optimizations co-locate or bypass components, preprocess and preload data, and rely on non-blocking access or request hedging.",
     "Ambiguous patterns":
-        "This chapter explores ambiguous patterns: Monolith, Reactor, Microkernel, Domain Services, Service-Based Architecture, Cell, and Nanoservices.",
+        "The meaning of Monolith, Reactor, Microkernel, Domain Services, Service-Based Architecture, Cell, or Nanoservices varies depending on which book you read.",
     "Architecture and product life cycle":
-        "This chapter explores how the architecture of a software project expands from Monolith through Layers to Layered Services and contracts back over its lifetime.",
+        "Software architecture changes as a project grows, matures, and dies. It starts small, then expands into fragmens, then collapses back to a monolithic state.",
     "Real-world inspirations for architectural patterns":
-        "This chapter discusses inspirations and parallels for architectural patterns found in the world around us, devices we use, and the code we write.",
+        "There are parallels between our daily life, software design and patterns. The article shows how the same ideas bloom in software and in the physical world.",
     "The heart of software architecture":
-        "This chapter explores how cohesion and decoupling make the entirety of software architecture: its principles, patterns, and guidelines.",
+        "The interplay of cohesion and decoupling gives birth to the entirety of software architecture: its principles, patterns, and guidelines.",
     "Cohesers and decouplers":
-        "This section discusses hierarchical decomposition, the influence of a project's modularity on its properties, and lists common cohesers and decouplers.",
+        "We tackle complexity through hierarchical decomposition. Cohesers push you to merge all the code together while decouplers favor fine-grained components.",
     "Deconstructing patterns":
-        "This section analyzes SOLID principles, Gang of Four design patterns, and architectural metapatterns from the basic principles of coupling and cohesion.",
+        "The SOLID principles, Gang of Four design patterns, and architectural metapatterns are tracked down to the foundational ideas of decoupling and cohesion.",
     "Choose your own architecture":
-        "This section is a guide to choosing an architectural style based on project size, domain features, target performance, and flexibility requirements.",
+        "Some guidelines to choosing an architectural style based on project size, domain features, target performance, and flexibility requirements.",
     "Appendices":
-        "This part of the book contains miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revision history.",
+        "Miscellaneous information which ranges from marginally useful (e.g. pattern evolutions) to copyright and revision history.",
     "Acknowledgements":
         "Thanks to all the people who made the Architectural Metapatterns book possible.",
     "Books referenced":
@@ -154,7 +154,7 @@ meta_descriptions = {
     "Evolutions of a Sandwich":
         "A Sandwich allows for easy changes in its domain layer and can be transformed into Layers or Layered Services.",
     "Format of a metapattern":
-        "This section formalizes the format of each of the metapattern chapters.",
+        "The formal description of the format of each of the metapattern chapters.",
     "Glossary":
         "The glossary of terms used throughout the Architectural Metapatterns book.",
     "History of changes":

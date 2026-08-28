@@ -376,7 +376,7 @@ Paragraph text: '{output.to_string()}'.""")
 
     def _process_a(self, a):
         # Extract text
-        assert not a.text
+        assert not a.text, a.text   # This may happen if the document contains suggestions - they are implemented with <a>
         assert len(a) == 1
         span = a[0]
         assert extract(span.tag) == "span"
